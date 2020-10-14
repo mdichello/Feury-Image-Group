@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="sale_order_form_inherit_feury_mrp_sale" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.feury_mrp_sale</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object" name="action_view_manufacturing_orders"
+                        class="oe_stat_button" icon="fa-cogs"
+                        attrs="{'invisible': [('mfg_count', '=', 0)]}" groups="base.group_user">
+                    <field name="mfg_count" widget="statinfo" string="Production(s)"/>
+                </button>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm'][1]" position="replace">
+                <field name="show_confirm" invisible="1"/>
+                <button name="action_confirm" id="action_confirm" string="Confirm" class="btn-primary"
+                        type="object" attrs="{'invisible': ['|', ('state', 'not in', ['sent']), ('show_confirm', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm'][2]" position="replace">
+                <button name="action_confirm" string="Confirm" type="object"
+                        attrs="{'invisible': ['|', ('state', 'not in', ['draft']), ('show_confirm', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//form//field[@name='name']" position="after">
+                <field name="custom_notes"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position="after">
+                <field name="custom_notes"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="credit_hold" string="SO on HOLD" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
