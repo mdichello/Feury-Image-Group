@@ -41,7 +41,7 @@ class SaleOrder(models.Model):
         if len(self.mfg_ids) > 1:
             action_data['domain'] = [('id', 'in', self.mfg_ids.ids)]
         else:
-            form_view = [(self.env.ref('stock.view_picking_form').id, 'form')]
+            form_view = [(self.env.ref('mrp.mrp_production_form_view').id, 'form')]
             action_data['views'] = form_view
             action_data['res_id'] = self.mfg_ids[0].id
         action_data['context'] = {'default_company_id': self.env.user.company_ids.ids[0]}
