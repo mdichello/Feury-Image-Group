@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+
+		<!-- Is a Customer, Is a Vendor -->
+		<record id="partner_difference_form" model="ir.ui.view">
+			<field name="name">res.partner.form.view</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_form" />
+			<field name="arch" type="xml">
+				<data>
+					<xpath expr="//page[@name='sales_purchases']//field[@name='user_id']" position="before">
+						<field name="is_customer" />
+					</xpath>
+
+					<xpath expr="//page[@name='sales_purchases']//field[@name='property_supplier_payment_term_id']" position="before">
+						<field name="is_vendor" />
+					</xpath>
+				</data>
+			</field>
+		</record>
+
+		<!--Inherit Partner Search View-->
+		<record id="partner_difference_filter" model="ir.ui.view">
+			<field name="name">res.partner.select.filter</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="account.res_partner_view_search"/>
+			<field name="arch" type="xml">
+				<xpath expr="//filter[@name='customer']" position="replace">
+					<filter string="Customers" name="is_customer" domain="[('is_customer','=', True)]"/>
+				</xpath>
+				<xpath expr="//filter[@name='supplier']" position="replace">
+					<filter string="Vendors" name="is_vendor" domain="[('is_vendor','=', True)]"/>
+				</xpath>
+			</field>
+		</record>
+
+		<!-- Sales Order Form Customer Filter -->
+		<record id="partner_difference_sale_order_view" model="ir.ui.view">
+			<field name="name">sale.order.form</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.view_order_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_id']" position="replace">
+					<field name="partner_id" widget="res_partner_many2one" domain="[('is_customer','=',True)]" context="{'search_default_customer':1, 'show_address': 1, 'show_vat': True}" options='{"always_reload": True}'/> 
+				</xpath>
+			</field>
+		</record>
+
+		<!-- Purchase Order Form Vendor Filter -->
+		<record id="partner_difference_purchase_order_view" model="ir.ui.view">
+			<field name="name">purchase.order.form</field>
+			<field name="model">purchase.order</field>
+			<field name="inherit_id" ref="purchase.purchase_order_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_id']" position="replace">
+					<field name="partner_id" widget="res_partner_many2one" domain="[('is_vendor','=',True)]" context="{'search_default_customer':1, 'show_address': 1, 'show_vat': True}" options='{"always_reload": True}'/> 
+				</xpath>
+			</field>
+		</record>
+
+		<!--Inherit Sale, Purchase Action-->
+		<record id="account.res_partner_action_customer" model="ir.actions.act_window">
+		   <field name="context">{'search_default_is_customer': 1, 'default_is_company': True}</field>
+		</record>
+		<record id="account.res_partner_action_supplier" model="ir.actions.act_window">
+		   <field name="context">{'search_default_is_vendor': 1, 'default_is_company': True}</field>
+		</record>
+
+	</data>
+</odoo>
