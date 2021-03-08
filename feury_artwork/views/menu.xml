@@ -1,0 +1,13 @@
+<odoo>
+    <data>
+        <menuitem id="menu_artwork"
+            name="Artwork"
+            parent="sale.menu_sale_config"
+            sequence="7"/>
+
+        <menuitem id="artwork_list" 
+            action="artwork_action" 
+            parent="menu_artwork"
+            name="Artwork" />
+    </data>
+</odoo>
