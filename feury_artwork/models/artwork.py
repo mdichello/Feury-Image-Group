@@ -2,6 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+# TODO ask mike about security group!
 
 
 class Artwork(models.Model):
@@ -10,8 +11,29 @@ class Artwork(models.Model):
     _inherit = ['mail.thread']
 
     _sql_constraints = [
-        ('artwork_number_uniq', 'unique(number)', 'An artwork number should be unique.')
+        ('artwork_reference_uniq', 'unique(reference, partner_id)', 'An artwork reference should be unique per partner.')
     ]
+
+    # TODO ask mike about default value.
+    type = fields.Selection(
+        selection=[
+            ('embroider', 'Embroider'),
+            ('screen_print', 'Screen Print'),
+            ('heat_seal', 'Heat Seal'),
+            ('sew_patch', 'Sew Patch'),
+            ('sew_stripe', 'Sew Stripe'),
+            ('hem_pants', 'Hem Pants'),
+        ],
+        string='Type',
+        required=True,
+        default='heat_seal'
+    )
+
+    name = fields.Char(
+        string='Name',
+        required=True,
+        unique=True
+    )
 
     reference = fields.Char(
         string='Logo Number',
@@ -19,10 +41,9 @@ class Artwork(models.Model):
         unique=True
     )
 
+    # TODO ask mike about required!
     image = fields.Image(
-        string='Logo',
-        max_width=350, 
-        max_height=200,
+        string='Thumb Print',
         required=False
     )
 
@@ -32,12 +53,23 @@ class Artwork(models.Model):
         inverse_name="artwork_id"
     )
 
+    stitch_count = fields.Integer(
+        string='Stitch count',
+        required=False,
+        default=0
+    )
+
+    color_wave = fields.Char(
+        string='Color wave',
+        required=False,
+    )
+
     partner_id = fields.Many2one(
-        string='Partner', 
+        string='Partner',
         comodel_name='res.partner', 
         ondelete='cascade', 
         index=True,
-        domain=[('parent_id', '=', False)], 
+        domain=['&', ('parent_id', '=', False), ('is_customer', '=', True)], 
         required=False
     )
 
@@ -45,12 +77,6 @@ class Artwork(models.Model):
         comodel_name='res.company', 
         required=False,
         default=lambda self: self.env.company
-    )
-
-    name = fields.Char(
-        string='Name',
-        required=True,
-        unique=True
     )
 
     is_default = fields.Boolean(

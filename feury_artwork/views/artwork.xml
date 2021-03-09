@@ -30,27 +30,31 @@
                     </div>
 
                     <group>
-                        <group string="Characteristics">
+                        <group>
                             <field name="company_id" groups="base.group_multi_company"/>
-                            <field name="partner_id" />
-                            <field name="reference" />
+                            <field name="partner_id" invisible="context.get('hide_partner', False)" />
                         </group>
                         <group>
+                            <field name="type" />
+                            <field name="reference" />
+                            <field name="stitch_count" widget="integer" attrs="{'invisible': [('type', '!=', 'embroider')]}" />
+                            <field name="color_wave" attrs="{'invisible': [('type', '!=', 'embroider')]}" />
+                            <field name="is_default" widget="boolean" />
                         </group>
                     </group>
 
                     <notebook>
-                        <page string="Discounts">
+                        <page string="Lines">
                             <field name="line_ids">
                                 <tree editable="bottom">
                                     <field name="sequence" widget="handle"/>
                                     <field name="name" colspan="3"/>
                                     <field name="color_code" />
-                                    <field name="color" />
+                                    <field name="color" widget="color"/>
                                 </tree>
                                 <form>
                                     <group>
-                                        <field name="name"/>
+                                        <field name="name" />
                                         <field name="color" widget="color" />
                                     </group>
                                 </form>

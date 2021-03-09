@@ -11,5 +11,5 @@ class Res_Partner(models.Model):
 
 	is_vendor = fields.Boolean(
 		string="Is a Vendor",
-		default=True
+		default=False
 	)

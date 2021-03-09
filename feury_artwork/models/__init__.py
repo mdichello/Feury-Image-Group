@@ -3,3 +3,4 @@
 
 from . import artwork
 from . import artwork_line
+from . import res_partner

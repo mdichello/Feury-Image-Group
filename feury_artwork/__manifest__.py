@@ -3,7 +3,7 @@
 {
     'name': "Customer artwork",
     'version': '1.0',
-    'depends': ['sale_management'],
+    'depends': ['sale_management', 'is_customer_is_supplier'],
     'author': 'Business Software Development Solutions',
     'license': 'AGPL-3',
     'mainainer': 'Business Software Development Solutions',
@@ -12,6 +12,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/artwork.xml',
+        'views/res_partner.xml',
         'views/menu.xml',
     ],
 }

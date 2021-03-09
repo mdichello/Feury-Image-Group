@@ -4,7 +4,7 @@
 from odoo import api, fields, models
 
 
-class Artwork(models.Model):
+class ArtworkLine(models.Model):
     _name = 'artwork.line'
     _description = 'Artwork Line'
 
