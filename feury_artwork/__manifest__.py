@@ -3,7 +3,11 @@
 {
     'name': "Customer artwork",
     'version': '1.0',
-    'depends': ['sale_management', 'is_customer_is_supplier'],
+    'depends': [
+        'sale_management', 
+        'is_customer_is_supplier',
+        'feury_tools'
+    ],
     'author': 'Business Software Development Solutions',
     'license': 'AGPL-3',
     'mainainer': 'Business Software Development Solutions',
