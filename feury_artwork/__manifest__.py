@@ -14,7 +14,10 @@
     'category': 'Customization',
     'description': "Customer artwork",
     'data': [
+        'security/groups.xml',
         'security/ir.model.access.csv',
+        'security/ir_rule.xml',
+        'views/color.xml',
         'views/artwork.xml',
         'views/res_partner.xml',
         'views/menu.xml',

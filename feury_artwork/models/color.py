@@ -7,91 +7,25 @@ from odoo import api, fields, models
 from odoo.modules.module import get_module_resource
 
 
-class Artwork(models.Model):
-    _name = 'artwork'
-    _description = 'Artwork'
-    _inherit = ['mail.thread']
-    _check_company_auto = True
+class Color(models.Model):
+    _name = 'color'
+    _description = 'Color'
+    _rec_name = 'code'
 
     _sql_constraints = [
-        ('artwork_reference_uniq', 'unique(reference, partner_id)', 'An artwork reference should be unique per partner.')
+        ('color_code_uniq', 'unique(code)', 'A color code should be unique.')
     ]
 
-    @api.model
-    def _default_image(self):
-        image_path = get_module_resource(
-            'feury_artwork',
-            'static/src/img',
-            'image-not-found.jpg'
-        )
-        return base64.b64encode(open(image_path, 'rb').read())
-
-    type = fields.Selection(
-        selection=[
-            ('embroider', 'Embroider'),
-            ('screen_print', 'Screen Print'),
-            ('heat_seal', 'Heat Seal'),
-            ('sew_patch', 'Sew Patch'),
-            ('sew_stripe', 'Sew Stripe'),
-            ('hem_pants', 'Hem Pants'),
-        ],
-        string='Type',
-        required=True,
-        default='embroider'
-    )
-
-    name = fields.Char(
-        string='Name',
+    code = fields.Char(
+        string='Code',
         required=True,
         unique=True
     )
 
-    reference = fields.Char(
-        string='Logo Number',
+    hex_code = fields.Char(
+        string='Hex Code',
         required=True,
         unique=True
-    )
-
-    image = fields.Image(
-        string='Thumb Print',
-        default=_default_image,
-        required=True
-    )
-
-    line_ids = fields.One2many(
-        string="Artwork Lines",
-        comodel_name="artwork.line",
-        inverse_name="artwork_id"
-    )
-
-    stitch_count = fields.Integer(
-        string='Stitch count',
-        required=False,
-        default=0
-    )
-
-    color_wave = fields.Char(
-        string='Color wave',
-        required=False,
-    )
-
-    partner_id = fields.Many2one(
-        string='Partner',
-        comodel_name='res.partner', 
-        ondelete='cascade', 
-        index=True,
-        domain=['&', ('parent_id', '=', False), ('is_customer', '=', True)], 
-        required=False
-    )
-
-    company_id = fields.Many2one(
-        comodel_name='res.company', 
-        required=False,
-    )
-
-    is_default = fields.Boolean(
-        string = 'Is default',
-        default = False
     )
 
     active = fields.Boolean(

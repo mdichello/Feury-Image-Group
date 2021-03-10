@@ -1,0 +1,50 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="color_list">
+      <field name="name">color list</field>
+      <field name="model">color</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="code" colspan="2"/>
+          <field name="hex_code" colspan="2" widget="color"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="color_form">
+        <field name="name">Color</field>
+        <field name="model">color</field>
+        <field name="arch" type="xml">
+            <form string="Color">
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1" />
+                    <group>
+                        <field name="code" />
+                        <field name="hex_code" widget="color"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ADD default filters -->
+    <record id="view_color_filter" model="ir.ui.view">
+        <field name="name">color.select</field>
+        <field name="model">color</field>
+        <field name="arch" type="xml">
+            <search string="Search Color">
+                <field name="code" filter_domain="[('code', 'ilike', self)]"/>
+                <field name="hex_code" filter_domain="[('hex_code', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="color_action">
+      <field name="name">Color</field>
+      <field name="res_model">color</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+  </data>
+</odoo>

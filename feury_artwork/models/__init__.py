@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from . import color
 from . import artwork
 from . import artwork_line
 from . import res_partner

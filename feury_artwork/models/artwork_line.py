@@ -8,15 +8,19 @@ class ArtworkLine(models.Model):
     _name = 'artwork.line'
     _description = 'Artwork Line'
 
-    # TODO ask mike!
-    # _sql_constraints = [
-    #     ('artwork_number_uniq', 'unique(number)', 'An artwork number should be unique.')
-    # ]
+    _sql_constraints = [
+        ('artwork_color_uniq', 'unique(artwork_id, color_id)', 'Duplicate colors are not allowed in the same artwork.')
+    ]
 
     sequence = fields.Integer(
         string='Sequence',
         default=1,
         index=True,
+    )
+
+    order = fields.Integer(
+        string='Order',
+        default=1
     )
 
     artwork_id = fields.Many2one(
@@ -30,17 +34,16 @@ class ArtworkLine(models.Model):
         unique=True
     )
 
-    color_code = fields.Char(
-        string='Color code',
-        required=False,
-        unique=True
+    color_id = fields.Many2one(
+        string="Color",
+        comodel_name="color",
+        required=True
     )
 
-    color = fields.Char(
-        string='Color',
-        required=False,
-        unique=True,
-        default="#875a7b"
+    color_hex_code = fields.Char(
+        string="Color Hex Code",
+        related="color_id.hex_code",
+        readonly=True
     )
 
     active = fields.Boolean(
