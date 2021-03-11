@@ -1,0 +1,78 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="embellishment_form">
+        <field name="name">embellishment</field>
+        <field name="model">embellishment</field>
+        <field name="arch" type="xml">
+            <form string="embellishment">
+                <sheet>
+                    <group>
+                        <group string="Properties">
+                            <field name="sale_order_line_id" invisible="1"/>
+                            <field name="clothing_type" invisible="1"/>
+                            <field name="type" />
+                            <field name="hem_length" attrs="{'invisible': [('type', '!=', 'hem_pants')]}"/>
+                        </group>
+                        <group string="Material" attrs="{'invisible': [('type', 'in', ('hem_pants', 'embroider'))]}">
+                            <field string="Color" name="material_color_id" />
+                            <field string="Type" name="material_type_id" />
+                            <field string="Size" name="material_size_id" />
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- TODO hide the notebook if type = hem_pants -->
+                        <page string="Lines" attrs="{'invisible': [('type', '=', 'hem_pants')]}">
+                            <field name="line_ids">
+                                <tree editable="bottom" >
+                                    <control>
+                                        <create name="create" string="Add a Line"/>
+                                    </control>
+
+                                    <field name="is_other_location" invisible="1"/>
+                                    <field name="clothing_type" invisible="1"/>
+                                    <field string="Location" name="pant_location" invisible="not context.get('is_pant', False)"/>
+                                    <field string="Location" name="hat_location" invisible="not context.get('is_hat', False)"/>
+                                    <field string="Location" name="apron_location" invisible="not context.get('is_apron', False)"/>
+                                    <field string="Location" name="coverall_location" invisible="not context.get('is_coverall', False)"/>
+                                    <field string="Location" name="top_location" invisible="not context.get('is_top', False)"/>
+                                    <field string="Location" name="other_location" invisible="not context.get('is_other', False)"/>
+
+                                    <field name="artwork_id" />
+                                    <field name="description" widget="section_and_note_text" optional="show"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="is_other_location" />
+                                        <field name="clothing_type" />
+
+                                        <field name="other_location" attrs="{'invisible': [('is_other_location', '=', False)]}" />
+                                        <field name="pant_location" attrs="{'invisible': [('clothing_type', '=', 'pant')]}" />
+                                        <field name="top_location" attrs="{'invisible': [('clothing_type', '=', 'top')]}" />
+                                        <field name="hat_location" attrs="{'invisible': [('clothing_type', '=', 'hat')]}" />
+                                        <field name="coverall_location" attrs="{'invisible': [('clothing_type', '=', 'coverall')]}" />
+                                        <field name="apron_location" attrs="{'invisible': [('clothing_type', '=', 'apron')]}" />
+
+                                        <field name="artwork_id" />
+                                        <field name="description" widget="section_and_note_text" optional="show"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <footer>
+                    <button name="action_save" string="Save" type="object" class="btn-primary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="embellishment_action">
+      <field name="name">embellishment</field>
+      <field name="res_model">embellishment</field>
+      <field name="view_mode">form</field>
+    </record>
+  </data>
+</odoo>
