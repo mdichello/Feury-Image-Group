@@ -47,7 +47,7 @@ class EmbellishmentComposition(models.Model):
         index=True,
     )
 
-    other_locations = fields.Selection(
+    other_location = fields.Selection(
         selection=[
             ('other', 'Other'),
         ],

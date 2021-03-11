@@ -14,5 +14,10 @@
             action="material_type_action" 
             parent="menu_sale_materials"
             name="Types" />
+
+        <menuitem id="material_size_menu_list" 
+            action="material_size_action" 
+            parent="menu_sale_materials"
+            name="Sizes" />
     </data>
 </odoo>

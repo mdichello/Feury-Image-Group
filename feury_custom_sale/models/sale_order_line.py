@@ -54,6 +54,12 @@ class MaterialColor(models.Model):
         context = dict(self._context)
         context.update({
             "default_sale_order_line_id": self.id,
+            "is_pant": self.clothing_type == 'pant',
+            "is_hat": self.clothing_type == 'hat',
+            "is_apron": self.clothing_type == 'apron',
+            "is_top": self.clothing_type == 'top',
+            "is_coverall": self.clothing_type == 'coverall',
+            "is_other": self.clothing_type not in ('pant', 'hat', 'apron', 'top', 'coverall'),
         })
 
         result = {
