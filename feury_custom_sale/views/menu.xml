@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+        <menuitem id="menu_sale_materials"
+            name="Materials"
+            parent="sale.product_menu_catalog"
+            groups="base.group_user"/>
+
+        <menuitem id="material_color_menu_list" 
+            action="material_color_action" 
+            parent="menu_sale_materials"
+            name="Colors" />
+        
+        <menuitem id="material_type_menu_list" 
+            action="material_type_action" 
+            parent="menu_sale_materials"
+            name="Types" />
+    </data>
+</odoo>

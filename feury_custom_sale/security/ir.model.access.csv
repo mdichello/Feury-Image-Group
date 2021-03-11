@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_feury_material_color,feury_custom_sale.material_color,model_material_color,base.group_user,1,1,1,1
+access_feury_material_type,feury_custom_sale.material_type,model_material_type,base.group_user,1,1,1,1
+access_feury_material_size,feury_custom_sale.material_size,model_material_size,base.group_user,1,1,1,1
+access_feury_embellishment,feury_custom_sale.embellishment,model_embellishment,base.group_user,1,1,1,1
+access_feury_embellishment_composition,feury_custom_sale.embellishment_composition,model_embellishment_composition,base.group_user,1,1,1,1

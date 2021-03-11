@@ -1,0 +1,50 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="material_color_list">
+      <field name="name">Material Color list</field>
+      <field name="model">material.color</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name" colspan="2"/>
+          <field name="hex_code" colspan="2" widget="color"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="material_color_form">
+        <field name="name">Material Color</field>
+        <field name="model">material.color</field>
+        <field name="arch" type="xml">
+            <form string="Material Color">
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1" />
+                    <group>
+                        <field name="name" />
+                        <field name="hex_code" widget="color"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ADD default filters -->
+    <record id="view_color_filter" model="ir.ui.view">
+        <field name="name">color.select</field>
+        <field name="model">material.color</field>
+        <field name="arch" type="xml">
+            <search string="Search Color">
+                <field name="name" filter_domain="[('name', 'ilike', self)]"/>
+                <field name="hex_code" filter_domain="[('hex_code', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="material_color_action">
+      <field name="name">Material Color</field>
+      <field name="res_model">material.color</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+  </data>
+</odoo>

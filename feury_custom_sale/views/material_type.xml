@@ -1,0 +1,49 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="material_type_list">
+      <field name="name">Material type list</field>
+      <field name="model">material.type</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name" colspan="2"/>
+          <field name="description" colspan="2" />
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="material_type_form">
+        <field name="name">Material type</field>
+        <field name="model">material.type</field>
+        <field name="arch" type="xml">
+            <form string="Material type">
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1" />
+                    <group>
+                        <field name="name" />
+                        <field name="description" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ADD default filters -->
+    <record id="view_material_type_filter" model="ir.ui.view">
+        <field name="name">type.select</field>
+        <field name="model">material.type</field>
+        <field name="arch" type="xml">
+            <search string="Search Material Type">
+                <field name="name" filter_domain="[('name', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="material_type_action">
+      <field name="name">Material Type</field>
+      <field name="res_model">material.type</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+  </data>
+</odoo>

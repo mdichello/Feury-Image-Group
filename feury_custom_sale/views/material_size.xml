@@ -1,0 +1,48 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="material_size_list">
+      <field name="name">Material size list</field>
+      <field name="model">material.size</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name" colspan="2"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="material_size_form">
+        <field name="name">Material size</field>
+        <field name="model">material.size</field>
+        <field name="arch" type="xml">
+            <form string="Material size">
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1" />
+                    <group>
+                        <field name="name" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ADD default filters -->
+    <record id="view_material_size_filter" model="ir.ui.view">
+        <field name="name">size.select</field>
+        <field name="model">material.size</field>
+        <field name="arch" type="xml">
+            <search string="Search Size">
+                <field name="name" filter_domain="[('name', 'ilike', self)]"/>
+                <field name="hex_code" filter_domain="[('hex_code', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="material_size_action">
+      <field name="name">Material size</field>
+      <field name="res_model">material.size</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+  </data>
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Resource: material.type -->
+        <record id="material_type_flame_resistant" model="material.type">
+            <field name="name">Flame Resistant</field>
+            <field name="description">Flame Resistant</field>
+        </record>
+
+        <record id="material_type_regular" model="material.type">
+            <field name="name">Regular</field>
+            <field name="description">Regular</field>
+        </record>
+    </data>
+</odoo>
