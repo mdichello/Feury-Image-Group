@@ -17,6 +17,7 @@ class MaterialColor(models.Model):
             ('scarf', 'Scarf'),
             ('sock', 'Sock'),
             ('bag', 'Bag'),
+            ('other', 'Other'),
         ],
         required=False,
         string='Clothing Type',
@@ -54,6 +55,7 @@ class MaterialColor(models.Model):
         context = dict(self._context)
         context.update({
             "default_sale_order_line_id": self.id,
+            "partner_id": self.order_id.partner_id.id,
             "is_pant": self.clothing_type == 'pant',
             "is_hat": self.clothing_type == 'hat',
             "is_apron": self.clothing_type == 'apron',

@@ -59,6 +59,14 @@ class MaterialColor(models.Model):
         comodel_name='material.size',
     )
 
+    # TODO add constraint, can't choose both artwork and text.
+    # TODO if sew (both strip and patch) is choosen, the text option is disabled.
+    # TODO add constraint,if text option is choosen (no more than 4 lines)
+    # TODO add field "other location", put in readonly if type != 'other" 
+
+    # TODO "sew stripe", location if fixed into ("other", "Per Print") and artwork becomes invisible
+    # TODO if "Per print" is choosen the user neeed to uploda an attachment.
+    # TODO add other values for material objects
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------

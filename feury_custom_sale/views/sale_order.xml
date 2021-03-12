@@ -6,8 +6,7 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']" position="after">
-                <!-- TODO add toltip mentionging it is disabled unless you save first -->
-                <button name="action_open_embellishment_wizard" icon="fa-cog" attrs="{'invisible': [('clothing_type', '=', False)]}" type="object" style="color:#006D6B" string="Embellishment" help="Embellishment" />
+                <button name="action_open_embellishment_wizard" icon="fa-paint-brush" attrs="{'invisible': [('clothing_type', '=', False)]}" type="object" style="color:#006D6B" string="To edit embellishment save order first" help="To edit embellishment save order first" />
                 <field name="clothing_type"/>
             </xpath>
         </field>
