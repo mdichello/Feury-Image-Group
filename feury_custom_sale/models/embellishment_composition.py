@@ -146,7 +146,7 @@ class EmbellishmentComposition(models.Model):
     artwork_id = fields.Many2one(
         string='Artwork',
         comodel_name='artwork',
-        required=True,
+        required=False,
     )
 
     artwork_image = fields.Binary(
@@ -229,9 +229,13 @@ class EmbellishmentComposition(models.Model):
     @api.onchange('text')
     def onchnage_text(self):
         for record in self:
+            if not (record.text or record.artwork_id):
+                continue
+    
             line_count = len(record.text.split('\n')) if record.text else 0
             if line_count > 4:
-                raise UserError(_('You can have more than four lines in text.'))
+                raise UserError(_('You can not have more than four lines in text.'))
+
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
