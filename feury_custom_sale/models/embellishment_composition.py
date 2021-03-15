@@ -10,10 +10,9 @@ class EmbellishmentComposition(models.Model):
     _name = 'embellishment.composition'
     _description = 'Embellishment composition'
 
-    # TODO beautify error message (UX).
-    _sql_constraints = [
-        ('embellishment_composition_location_uniq', 'unique(embellishment_id, location_id)', 'No duplicate location is allowed within the same embellishment.')
-    ]
+    # _sql_constraints = [
+    #     ('embellishment_composition_location_uniq', 'unique(embellishment_id, location_id)', 'No duplicate location is allowed within the same embellishment.')
+    # ]
 
     embellishment_id = fields.Many2one(
         string='Embellishment',
@@ -40,12 +39,6 @@ class EmbellishmentComposition(models.Model):
     type = fields.Selection(
         string='Type',
         related='artwork_id.type',
-        store=True
-    )
-
-    embellishment_type = fields.Selection(
-        string='Type',
-        related='embellishment_id.type',
         store=True
     )
 

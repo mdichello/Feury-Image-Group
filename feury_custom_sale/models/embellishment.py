@@ -71,10 +71,18 @@ class MaterialColor(models.Model):
 
     @api.constrains('hem_length')
     @api.onchange('hem_length')
-    def validate_rounding(self):
+    def _check_hem_lenght(self):
         for record in self:
             if record.type == 'hem_pants' and not (22 < record.hem_length < 65):
                 raise ValidationError(_("Please choose a hem length between 22 and 65."))
+
+    @api.constrains('line_ids')
+    def _check_line_ids(self):
+        for record in self:
+            location_ids = [line.location_id.id for line in record.line_ids]
+
+            if len(set(location_ids)) != len(location_ids):
+                raise ValidationError(_('No duplicate location is allowed within the same embellishment.'))
 
     # ----------------------------------------------------------------------------------------------------
     # 3- Compute methods (namely _compute_***)
