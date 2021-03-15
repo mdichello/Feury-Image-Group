@@ -36,6 +36,12 @@ class EmbellishmentComposition(models.Model):
         store=True
     )
 
+    is_per_print_location = fields.Boolean(
+        string='IS other location',
+        compute='_compute_is_per_print_location',
+        store=True
+    )
+
     type = fields.Selection(
         string='Type',
         related='artwork_id.type',
@@ -116,8 +122,17 @@ class EmbellishmentComposition(models.Model):
     @api.depends('location_id')
     def _compute_is_other_location(self):
         other_location = self.env.ref('feury_custom_sale.clothes_location_other')
+        per_print_location = self.env.ref('feury_custom_sale.clothes_location_per_print')
+
         for record in self:
-            record.is_other_location = True if record.location_id == other_location else False
+            is_other_location = True if record.location_id == other_location else False
+            is_per_print_location = True if record.location_id == per_print_location else False
+
+            record.write({
+                'is_other_location': is_other_location,
+                'is_per_print_location': is_per_print_location
+            })
+
 
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)
