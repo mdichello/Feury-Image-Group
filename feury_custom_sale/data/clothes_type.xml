@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Resource: clothes.type -->
+        <record id="clothes_type_pant" model="clothes.type">
+            <field name="name">Pant</field>
+            <field name="location_ids" eval="[
+                (4, ref('feury_custom_sale.clothes_location_left_cargo_pocket')),
+                (4, ref('feury_custom_sale.clothes_location_right_cargo_pocket')),
+                (4, ref('feury_custom_sale.clothes_location_left_back_pocket')),
+                (4, ref('feury_custom_sale.clothes_location_right_back_pocket')),
+                (4, ref('feury_custom_sale.clothes_location_left_side_leg')),
+                (4, ref('feury_custom_sale.clothes_location_right_side_leg')),
+                (4, ref('feury_custom_sale.clothes_location_booty')),
+                (4, ref('feury_custom_sale.clothes_location_back_yoke')),
+                (4, ref('feury_custom_sale.clothes_location_other')),
+            ]"/>
+        </record>
+
+        <record id="clothes_type_top" model="clothes.type">
+            <field name="name">Top</field>
+            <field name="location_ids" eval="[
+                (4, ref('feury_custom_sale.clothes_location_left_chest')),
+                (4, ref('feury_custom_sale.clothes_location_right_chest')),
+                (4, ref('feury_custom_sale.clothes_location_left_shoulder')),
+                (4, ref('feury_custom_sale.clothes_location_right_shoulder')),
+                (4, ref('feury_custom_sale.clothes_location_left_cuff')),
+                (4, ref('feury_custom_sale.clothes_location_right_cuff')),
+                (4, ref('feury_custom_sale.clothes_location_left_sleeve')),
+                (4, ref('feury_custom_sale.clothes_location_right_sleeve')),
+                (4, ref('feury_custom_sale.clothes_location_full_back')),
+                (4, ref('feury_custom_sale.clothes_location_yoke')),
+                (4, ref('feury_custom_sale.clothes_location_other')),
+            ]"/>
+        </record>
+
+        <record id="clothes_type_hat" model="clothes.type">
+            <field name="name">Hat</field>
+            <field name="location_ids" eval="[
+                (4, ref('feury_custom_sale.clothes_location_front_center')),
+                (4, ref('feury_custom_sale.clothes_location_front_left')),
+                (4, ref('feury_custom_sale.clothes_location_front_right')),
+                (4, ref('feury_custom_sale.clothes_location_brim')),
+                (4, ref('feury_custom_sale.clothes_location_side_left')),
+                (4, ref('feury_custom_sale.clothes_location_side_right')),
+                (4, ref('feury_custom_sale.clothes_location_back')),
+                (4, ref('feury_custom_sale.clothes_location_other')),
+            ]"/>
+        </record>
+
+        <record id="clothes_type_coverall" model="clothes.type">
+            <field name="name">Coverall</field>
+            <field name="location_ids" eval="[
+                (4, ref('feury_custom_sale.clothes_location_left_cargo_pocket')),
+                (4, ref('feury_custom_sale.clothes_location_right_cargo_pocket')),
+                (4, ref('feury_custom_sale.clothes_location_left_back_pocket')),
+                (4, ref('feury_custom_sale.clothes_location_right_back_pocket')),
+                (4, ref('feury_custom_sale.clothes_location_left_side_leg')),
+                (4, ref('feury_custom_sale.clothes_location_right_side_leg')),
+                (4, ref('feury_custom_sale.clothes_location_booty')),
+                (4, ref('feury_custom_sale.clothes_location_back_yoke')),
+                (4, ref('feury_custom_sale.clothes_location_other')),
+                (4, ref('feury_custom_sale.clothes_location_left_chest')),
+                (4, ref('feury_custom_sale.clothes_location_right_chest')),
+                (4, ref('feury_custom_sale.clothes_location_left_shoulder')),
+                (4, ref('feury_custom_sale.clothes_location_right_shoulder')),
+                (4, ref('feury_custom_sale.clothes_location_left_cuff')),
+                (4, ref('feury_custom_sale.clothes_location_right_cuff')),
+                (4, ref('feury_custom_sale.clothes_location_left_sleeve')),
+                (4, ref('feury_custom_sale.clothes_location_right_sleeve')),
+                (4, ref('feury_custom_sale.clothes_location_full_back')),
+                (4, ref('feury_custom_sale.clothes_location_yoke')),
+                (4, ref('feury_custom_sale.clothes_location_other')),
+            ]"/>
+        </record>
+
+        <record id="clothes_type_apron" model="clothes.type">
+            <field name="name">Apron</field>
+            <field name="location_ids" eval="[
+                (4, ref('feury_custom_sale.clothes_location_full_center_front')),
+                (4, ref('feury_custom_sale.clothes_location_left_waist_apron')),
+                (4, ref('feury_custom_sale.clothes_location_right_waist_apron')),
+                (4, ref('feury_custom_sale.clothes_location_other')),
+            ]"/>
+        </record>
+    </data>
+</odoo>

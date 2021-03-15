@@ -20,9 +20,13 @@
         'views/material_size.xml',
         'views/sale_order.xml',
         'views/embellishment.xml',
+        'views/clothes_location.xml',
+        'views/clothes_type.xml',
         'views/menu.xml',
         'data/material_color.xml',
         'data/material_type.xml',
         'data/material_size.xml',
+        'data/clothes_location.xml',
+        'data/clothes_type.xml',
     ],
 }

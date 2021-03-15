@@ -1,0 +1,47 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="clothes_location_list">
+      <field name="name">Clothes Location list</field>
+      <field name="model">clothes.location</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name" colspan="2"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="clothes_location_form">
+        <field name="name">Clothes Location</field>
+        <field name="model">clothes.location</field>
+        <field name="arch" type="xml">
+            <form string="Clothes Location">
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1" />
+                    <group>
+                        <field name="name" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ADD default filters -->
+    <record id="view_clothes_location_filter" model="ir.ui.view">
+        <field name="name">type.select</field>
+        <field name="model">clothes.location</field>
+        <field name="arch" type="xml">
+            <search string="Search Clothes Location">
+                <field name="name" filter_domain="[('name', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="clothes_location_action">
+      <field name="name">Clothes Location</field>
+      <field name="res_model">clothes.location</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+  </data>
+</odoo>

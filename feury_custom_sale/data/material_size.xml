@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
         <!-- Resource: material.size -->
         <record id="material_size_1" model="material.size">
             <field name="name">1"</field>
@@ -8,6 +8,10 @@
 
         <record id="material_size_2" model="material.size">
             <field name="name">2"</field>
+        </record>
+
+        <record id="material_size_1_12" model="material.size">
+            <field name="name">1-1/2"</field>
         </record>
     </data>
 </odoo>

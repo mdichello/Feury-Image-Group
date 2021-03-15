@@ -8,57 +8,33 @@
                 <group>
                     <group>
                         <field name="sale_order_line_id" invisible="1"/>
-                        <field name="clothing_type" />
+                        <field name="clothing_type_id" />
                         <field name="type" />
-                        <!-- TODO invisible for everything except sew stripe -->
                         <field name="hem_length" attrs="{'invisible': [('type', '!=', 'hem_pants')]}"/>
                     </group>
-                    <group string="Material" attrs="{'invisible': [('type', 'in', ('hem_pants', 'embroider', '', False))]}">
+                    <group string="Material" attrs="{'invisible': [('type', 'not in', ('sew_patch', 'sew_stripe'))]}">
                         <field string="Color" name="material_color_id" />
                         <field string="Type" name="material_type_id" />
                         <field string="Size" name="material_size_id" />
                     </group>
                 </group>
 
-                <field name="line_ids" context="{'default_clothing_type': clothing_type}">
+                <field name="line_ids" context="{'default_clothing_type_id': clothing_type_id, 'default_embellishment_type': type }" attrs="{'invisible': [('type', 'in', (False, 'hem_pants'))]}">
                     <tree editable="bottom" class="embellishment_tree">
                         <control>
-                            <create name="create" string="Add a Line"/>
+                            <create name="create" string="Add a Location"/>
                         </control>
 
-                        <field name="is_other_location" invisible="1"/>
-                        <field name="clothing_type" invisible="1" />
-                        <field name="location" invisible="1" />
-
-                        <field string="Location" name="pant_location" invisible="not context.get('is_pant', False)"/>
-                        <field string="Location" name="hat_location" invisible="not context.get('is_hat', False)"/>
-                        <field string="Location" name="apron_location" invisible="not context.get('is_apron', False)"/>
-                        <field string="Location" name="coverall_location" invisible="not context.get('is_coverall', False)"/>
-                        <field string="Location" name="top_location" invisible="not context.get('is_top', False)"/>
-                        <field string="Location" name="other_location" invisible="not context.get('is_other', False)"/>
-                        <field name="other_location_name" attrs="{'required': [('location', '=', 'other')]}" />
-
-                        <field name="artwork_id" domain="['|', ('partner_id', '=', context.get('partner_id')), ('partner_id', '=', False)]"/>
-                        <field name="text" widget="section_and_note_text" optional="show" colspan="2" />
-                        <field name="thumbnail" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
-                        <field name="description" widget="section_and_note_text" optional="show" colspan="2" />
+                        <field name="clothing_type_id" invisible="1" />
+                        <field name="is_other_location" invisible="1" />
+                        <field name="embellishment_type" invisible="1" />
+                        <field name="location_id" domain="[('id', 'in', context.get('location_ids'))]" widget="Many2one" />
+                        <field name="artwork_id" domain="['|', ('partner_id', '=', context.get('partner_id')), ('partner_id', '=', False)]" widget="Many2one" />
+                        <field name="per_print_file" filename="per_print" string="Upload"/>
+                        <field name="text" colspan="2" widget="section_and_note_text" optional="show" attrs="{'invisible': [('embellishment_type', 'in', ('sew_stripe', 'sew_patch'))]}" />
+                        <field name="thumbnail" style="width: 50px; !important" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
+                        <field name="description" widget="section_and_note_text" optional="show" invisible="1" />
                     </tree>
-                    <form>
-                        <group>
-                            <field name="is_other_location" />
-                            <field name="clothing_type" />
-
-                            <field name="other_location" attrs="{'invisible': [('is_other_location', '=', False)]}" />
-                            <field name="pant_location" attrs="{'invisible': [('clothing_type', '=', 'pant')]}" />
-                            <field name="top_location" attrs="{'invisible': [('clothing_type', '=', 'top')]}" />
-                            <field name="hat_location" attrs="{'invisible': [('clothing_type', '=', 'hat')]}" />
-                            <field name="coverall_location" attrs="{'invisible': [('clothing_type', '=', 'coverall')]}" />
-                            <field name="apron_location" attrs="{'invisible': [('clothing_type', '=', 'apron')]}" />
-
-                            <field name="artwork_id" />
-                            <field name="description" widget="section_and_note_text" optional="show"/>
-                        </group>
-                    </form>
                 </field>
 
                 <footer>
