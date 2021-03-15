@@ -1,31 +1,20 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-
-from odoo import api, fields, models
-from odoo.modules.module import get_module_resource
+from odoo import api, fields, models, _
 
 
-class MaterialColor(models.Model):
-    _name = 'material.color'
-    _description = 'Color'
+class LocationOnClothes(models.Model):
+    _name = 'clothes.location'
+    _description = 'Clothes Location'
 
     _sql_constraints = [
-        ('color_name_uniq', 'unique(name)', 'Duplicate are not allowed for material color names.')
+        ('clothes_location_name_uniq', 'unique(name)', 'Duplicate are not allowed for clothes location names.')
     ]
 
     name = fields.Char(
-        string='Code',
-        required=True,
-        unique=True
-    )
-
-    hex_code = fields.Char(
-        string='Hex Code',
-        required=True,
-        unique=True,
-        default='#00FF00'
+        string='Name',
+        required=True
     )
 
     active = fields.Boolean(
@@ -33,7 +22,6 @@ class MaterialColor(models.Model):
         default=True
     )
 
-    # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
 

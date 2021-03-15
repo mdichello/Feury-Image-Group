@@ -20,9 +20,9 @@ class MaterialColor(models.Model):
         inverse_name="embellishment_id"
     )
 
-    clothing_type = fields.Selection(
+    clothing_type_id = fields.Many2one(
         string='Clothing type',
-        related='sale_order_line_id.clothing_type',
+        related='sale_order_line_id.clothing_type_id',
         store=True
     )
 
@@ -34,6 +34,7 @@ class MaterialColor(models.Model):
             ('sew_patch', 'Sew Patch'),
             ('sew_stripe', 'Sew Stripe'),
             ('hem_pants', 'Hem Pants'),
+            ('per_print', 'Per Print'),
         ],
         required=True,
         string='Type',
@@ -41,9 +42,10 @@ class MaterialColor(models.Model):
 
     hem_length = fields.Integer(
         string='Hem lenght',
-        default=0
+        default=22
     )
 
+    # TODO ask mike if this should be many values (Many2many)!
     material_color_id = fields.Many2one(
         string='Material Color',
         comodel_name='material.color',
@@ -59,14 +61,6 @@ class MaterialColor(models.Model):
         comodel_name='material.size',
     )
 
-    # TODO add constraint, can't choose both artwork and text.
-    # TODO if sew (both strip and patch) is choosen, the text option is disabled.
-    # TODO add constraint,if text option is choosen (no more than 4 lines)
-    # TODO add field "other location", put in readonly if type != 'other" 
-
-    # TODO "sew stripe", location if fixed into ("other", "Per Print") and artwork becomes invisible
-    # TODO if "Per print" is choosen the user neeed to uploda an attachment.
-    # TODO add other values for material objects
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------

@@ -7,26 +7,16 @@ from odoo import api, fields, models
 class MaterialColor(models.Model):
     _inherit = 'sale.order.line'
 
-    clothing_type = fields.Selection(
-        selection=[
-            ('top', 'Top'),
-            ('pant', 'Pant'),
-            ('apron', 'Apron'),
-            ('hat', 'Hat'),
-            ('coverall', 'Coverall'),
-            ('scarf', 'Scarf'),
-            ('sock', 'Sock'),
-            ('bag', 'Bag'),
-            ('other', 'Other'),
-        ],
-        required=False,
-        string='Clothing Type',
-    )
-
     embellishment_id = fields.One2many(
         string='Embellishment',
         comodel_name='embellishment',
         inverse_name="sale_order_line_id"
+    )
+
+    clothing_type_id = fields.Many2one(
+        string='Clothing type',
+        comodel_name='clothes.type',
+        required=False
     )
 
     # ----------------------------------------------------------------------------------------------------
@@ -56,12 +46,7 @@ class MaterialColor(models.Model):
         context.update({
             "default_sale_order_line_id": self.id,
             "partner_id": self.order_id.partner_id.id,
-            "is_pant": self.clothing_type == 'pant',
-            "is_hat": self.clothing_type == 'hat',
-            "is_apron": self.clothing_type == 'apron',
-            "is_top": self.clothing_type == 'top',
-            "is_coverall": self.clothing_type == 'coverall',
-            "is_other": self.clothing_type not in ('pant', 'hat', 'apron', 'top', 'coverall'),
+            "location_ids": self.clothing_type_id.location_ids.ids,
         })
 
         result = {

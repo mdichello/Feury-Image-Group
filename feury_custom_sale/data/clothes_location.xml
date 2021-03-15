@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <!-- Resource: clothes.location -->
+        <record id="clothes_location_right_sleeve" model="clothes.location">
+            <field name="name">Right sleeve</field>
+        </record>
+
+        <record id="clothes_location_side_left" model="clothes.location">
+            <field name="name">Side left</field>
+        </record>
+
+        <record id="clothes_location_front_right" model="clothes.location">
+            <field name="name">Front right</field>
+        </record>
+
+        <record id="clothes_location_right_waist_apron" model="clothes.location">
+            <field name="name">Right Waist Apron</field>
+        </record>
+        
+        <record id="clothes_location_left_waist_apron" model="clothes.location">
+            <field name="name">Left waist apron</field>
+        </record>
+
+        <record id="clothes_location_front_left" model="clothes.location">
+            <field name="name">Front left</field>
+        </record>
+
+        <record id="clothes_location_right_side_leg" model="clothes.location">
+            <field name="name">Right side leg</field>
+        </record>
+
+        <record id="clothes_location_right_cuff" model="clothes.location">
+            <field name="name">Right cuff</field>
+        </record>
+
+        <record id="clothes_location_right_shoulder" model="clothes.location">
+            <field name="name">Right shoulder</field>
+        </record>
+
+        <record id="clothes_location_left_cuff" model="clothes.location">
+            <field name="name">Left cuff</field>
+        </record>
+
+        <record id="clothes_location_booty" model="clothes.location">
+            <field name="name">Booty</field>
+        </record>
+
+        <record id="clothes_location_back_yoke" model="clothes.location">
+            <field name="name">Back yoke</field>
+        </record>
+
+        <record id="clothes_location_side_right" model="clothes.location">
+            <field name="name">Side right</field>
+        </record>
+
+        <record id="clothes_location_front_center" model="clothes.location">
+            <field name="name">Front center</field>
+        </record>
+
+        <record id="clothes_location_left_back_pocket" model="clothes.location">
+            <field name="name">Left back pocket</field>
+        </record>
+
+        <record id="clothes_location_right_chest" model="clothes.location">
+            <field name="name">Right chest</field>
+        </record>
+
+        <record id="clothes_location_yoke" model="clothes.location">
+            <field name="name">Yoke</field>
+        </record>
+
+        <record id="clothes_location_brim" model="clothes.location">
+            <field name="name">Brim</field>
+        </record>
+
+        <record id="clothes_location_right_cargo_pocket" model="clothes.location">
+            <field name="name">Right cargo pocket</field>
+        </record>
+
+        <record id="clothes_location_back" model="clothes.location">
+            <field name="name">Back</field>
+        </record>
+
+        <record id="clothes_location_left_sleeve" model="clothes.location">
+            <field name="name">Left sleeve</field>
+        </record>
+
+        <record id="clothes_location_right_back_pocket" model="clothes.location">
+            <field name="name">Right back pocket</field>
+        </record>
+
+        <record id="clothes_location_full_back" model="clothes.location">
+            <field name="name">Full back</field>
+        </record>
+
+        <record id="clothes_location_left_chest" model="clothes.location">
+            <field name="name">Left chest</field>
+        </record>
+
+        <record id="clothes_location_other" model="clothes.location">
+            <field name="name">Other</field>
+        </record>
+
+        <record id="clothes_location_left_side_leg" model="clothes.location">
+            <field name="name">Left side leg</field>
+        </record>
+
+        <record id="clothes_location_left_cargo_pocket" model="clothes.location">
+            <field name="name">Left cargo pocket</field>
+        </record>
+
+        <record id="clothes_location_left_shoulder" model="clothes.location">
+            <field name="name">Left shoulder</field>
+        </record>
+
+        <record id="clothes_location_full_center_front" model="clothes.location">
+            <field name="name">Full center front</field>
+        </record>
+
+        <record id="clothes_location_per_print" model="clothes.location">
+            <field name="name">Per Print</field>
+        </record>
+
+    </data>
+</odoo>

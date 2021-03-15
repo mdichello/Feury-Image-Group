@@ -1,0 +1,49 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="clothes_type_list">
+      <field name="name">Clothes type list</field>
+      <field name="model">clothes.type</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name" colspan="2"/>
+          <field name="location_ids" widget="many2many_tags" options="{'no_create_edit': True}" />
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="clothes_type_form">
+        <field name="name">Clothes type</field>
+        <field name="model">clothes.type</field>
+        <field name="arch" type="xml">
+            <form string="Clothes type">
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1" />
+                    <group>
+                        <field name="name" />
+                        <field name="location_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ADD default filters -->
+    <record id="view_clothes_type_filter" model="ir.ui.view">
+        <field name="name">type.select</field>
+        <field name="model">clothes.type</field>
+        <field name="arch" type="xml">
+            <search string="Search Clothes type">
+                <field name="name" filter_domain="[('name', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="clothes_type_action">
+      <field name="name">Clothes type</field>
+      <field name="res_model">clothes.type</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+  </data>
+</odoo>

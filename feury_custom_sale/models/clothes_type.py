@@ -1,31 +1,34 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import base64
-
-from odoo import api, fields, models
-from odoo.modules.module import get_module_resource
+from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 
-class MaterialColor(models.Model):
-    _name = 'material.color'
-    _description = 'Color'
+class ClothesType(models.Model):
+    _name = 'clothes.type'
+    _description = 'Location Clothes'
 
     _sql_constraints = [
-        ('color_name_uniq', 'unique(name)', 'Duplicate are not allowed for material color names.')
+        ('clothes_type_name_uniq', 'unique(name)', 'Duplicate are not allowed for clothes type names.')
     ]
 
     name = fields.Char(
-        string='Code',
-        required=True,
-        unique=True
+        string='Name',
+        required=True
     )
 
-    hex_code = fields.Char(
-        string='Hex Code',
-        required=True,
-        unique=True,
-        default='#00FF00'
+    @api.model
+    def get_default_locations(self):
+        return  [self.env.ref('feury_custom_sale.clothes_location_other').id, ]
+
+    location_ids = fields.Many2many(
+        comodel_name='clothes.location', 
+        relation='clothes_type_location_rel', 
+        column1='clothes_type_id', 
+        column2='clothes_location_id', 
+        string="Locations",
+        default=get_default_locations
     )
 
     active = fields.Boolean(
@@ -33,7 +36,6 @@ class MaterialColor(models.Model):
         default=True
     )
 
-    # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
 

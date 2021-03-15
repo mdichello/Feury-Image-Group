@@ -19,5 +19,21 @@
             action="material_size_action" 
             parent="menu_sale_materials"
             name="Sizes" />
+
+        <menuitem id="menu_sale_clothes"
+            name="Clothes"
+            parent="sale.product_menu_catalog"
+            groups="base.group_user"/>
+
+        <menuitem id="clothes_location_menu_list" 
+            action="clothes_location_action" 
+            parent="menu_sale_clothes"
+            name="Location" />
+        
+        <menuitem id="clothes_type_menu_list" 
+            action="clothes_type_action" 
+            parent="menu_sale_clothes"
+            name="Type" />
+
     </data>
 </odoo>
