@@ -105,7 +105,8 @@ class EmbellishmentComposition(models.Model):
             default_artwork = ARTWORK.search(
                 [
                     ('partner_id', '=', self._context.get('partner_id')),
-                    ('is_default', '=', True)
+                    ('is_default', '=', True),
+                    ('type', '=', self._context.get('default_type')),
                 ], 
                 limit=1
             )

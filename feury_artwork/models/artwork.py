@@ -32,8 +32,6 @@ class Artwork(models.Model):
             ('screen_print', 'Screen Print'),
             ('heat_seal', 'Heat Seal'),
             ('sew_patch', 'Sew Patch'),
-            ('sew_stripe', 'Sew Stripe'),
-            ('hem_pants', 'Hem Pants'),
         ],
         string='Type',
         required=True,
@@ -87,21 +85,6 @@ class Artwork(models.Model):
     company_id = fields.Many2one(
         comodel_name='res.company', 
         required=False,
-    )
-
-    material_color_id = fields.Many2one(
-        string='Material Color',
-        comodel_name='material.color',
-    )
-
-    material_type_id = fields.Many2one(
-        string='Material Type',
-        comodel_name='material.type',
-    )
-
-    material_size_id = fields.Many2one(
-        string='Material size',
-        comodel_name='material.size',
     )
 
     is_default = fields.Boolean(

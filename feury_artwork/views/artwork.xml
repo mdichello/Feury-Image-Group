@@ -40,9 +40,6 @@
                         <group>
                             <field name="stitch_count" widget="integer" attrs="{'invisible': [('type', '!=', 'embroider')]}" />
                             <field name="color_wave" attrs="{'invisible': [('type', '!=', 'embroider')]}" />
-                            <field name="material_color_id" attrs="{'invisible': [('type', '!=', 'sew_patch')]}" />
-                            <field name="material_type_id" attrs="{'invisible': [('type', '!=', 'sew_patch')]}" />
-                            <field name="material_size_id" attrs="{'invisible': [('type', '!=', 'sew_patch')]}" />
                         </group>
                     </group>
 
