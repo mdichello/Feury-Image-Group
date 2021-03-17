@@ -10,6 +10,7 @@ class EmbellishmentComposition(models.Model):
     _name = 'embellishment.composition'
     _description = 'Embellishment composition'
 
+    # TODO check why does not work!
     # _sql_constraints = [
     #     ('embellishment_composition_location_uniq', 'unique(embellishment_id, location_id)', 'No duplicate location is allowed within the same embellishment.')
     # ]
@@ -89,10 +90,6 @@ class EmbellishmentComposition(models.Model):
         required=False,
     )
 
-    # TODO if sew (both strip and patch) is choosen, the text option is disabled.
-
-    # TODO "sew stripe", location if fixed into ("other", "Per Print") and artwork becomes invisible
-    # TODO if "Per print" is choosen the user neeed to uploda an attachment.
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------

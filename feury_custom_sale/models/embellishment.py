@@ -34,7 +34,6 @@ class MaterialColor(models.Model):
             ('sew_patch', 'Sew Patch'),
             ('sew_stripe', 'Sew Stripe'),
             ('hem_pants', 'Hem Pants'),
-            ('per_print', 'Per Print'),
         ],
         required=True,
         string='Type',

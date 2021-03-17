@@ -5,14 +5,8 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
-
-            <!-- First page conact & address -->
-            <xpath expr="//notebook/page" position="attributes">
-                <attribute name="autofocus">0</attribute>
-            </xpath>
-
             <xpath expr="//notebook/page[@name='sales_purchases']" position="before">
-                <page string="Artwork" autofocus="autofocus" groups="base.group_user" attrs="{'invisible': [('is_customer', '!=', True)]}">
+                <page string="Artwork" groups="base.group_user" attrs="{'invisible': [('is_customer', '!=', True)]}">
                     <field name="artwork_ids" context="{'default_partner_id': id, 'hide_partner': True}">>
                          <tree>
                             <control>
