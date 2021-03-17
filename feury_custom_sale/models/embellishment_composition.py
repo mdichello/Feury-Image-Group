@@ -45,7 +45,7 @@ class EmbellishmentComposition(models.Model):
 
     type = fields.Selection(
         string='Type',
-        related='artwork_id.type',
+        related='embellishment_id.type',
         store=True
     )
 
@@ -64,10 +64,10 @@ class EmbellishmentComposition(models.Model):
     artwork_image = fields.Binary(
         related='artwork_id.image', 
         related_sudo=True, 
-        readonly=True
+        readonly=True,
+        domain=[('type', '=', False)], 
     )
 
-    # TODO ask mike about https://apps.odoo.com/apps/modules/13.0/image_preview_knk/.
     thumbnail = fields.Binary(
         readonly=1, 
         store=True, 
