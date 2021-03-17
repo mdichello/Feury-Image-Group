@@ -12,7 +12,7 @@
                         <field name="type" />
                         <field name="hem_length" attrs="{'invisible': [('type', '!=', 'hem_pants')]}"/>
                     </group>
-                    <group string="Material" attrs="{'invisible': [('type', '!=, 'sew_stripe')]}">
+                    <group string="Material" attrs="{'invisible': [('type', '!=', 'sew_stripe')]}" >
                         <field string="Color" name="material_color_id" />
                         <field string="Type" name="material_type_id" />
                         <field string="Size" name="material_size_id" />

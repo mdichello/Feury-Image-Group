@@ -47,7 +47,7 @@
                     </group>
 
                     <notebook>
-                        <page string="Lines">
+                        <page string="Colors" attrs="{'invisible': [('type', 'in', ('sew_stripe', 'hem_pants'))]}">
                             <field name="line_ids">
                                 <tree editable="bottom" >
                                     <control>
