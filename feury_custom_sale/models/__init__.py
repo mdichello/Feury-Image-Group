@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from . import material_type
-from . import material_color
-from . import material_size
 from . import clothes_location
 from . import clothes_type
 from . import embellishment

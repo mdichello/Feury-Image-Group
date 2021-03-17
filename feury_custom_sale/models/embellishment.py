@@ -44,7 +44,6 @@ class MaterialColor(models.Model):
         default=22
     )
 
-    # TODO ask mike if this should be many values (Many2many)!
     material_color_id = fields.Many2one(
         string='Material Color',
         comodel_name='material.color',

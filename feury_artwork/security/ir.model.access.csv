@@ -3,3 +3,6 @@ access_feury_artwork_artwork_user,feury_artwork.artwork,model_artwork,base.group
 access_feury_artwork_artwork_editor,feury_artwork.artwork,model_artwork,feury_artwork.group_artwork_editor,1,1,1,1
 access_feury_artwork_artwork_line,feury_artwork.artwork_line,model_artwork_line,base.group_user,1,1,1,1
 access_feury_artwork_color,feury_artwork.color,model_color,base.group_user,1,1,1,1
+access_feury_material_color,feury_custom_sale.material_color,model_material_color,base.group_user,1,1,1,1
+access_feury_material_type,feury_custom_sale.material_type,model_material_type,base.group_user,1,1,1,1
+access_feury_material_size,feury_custom_sale.material_size,model_material_size,base.group_user,1,1,1,1

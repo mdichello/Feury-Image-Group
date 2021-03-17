@@ -31,15 +31,18 @@
 
                     <group>
                         <group>
+                            <field name="reference" />
+                            <field name="type" />
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="partner_id" string="Customer" invisible="context.get('hide_partner', False)" />
+                            <field name="is_default" widget="boolean" />
                         </group>
                         <group>
-                            <field name="type" />
-                            <field name="reference" />
                             <field name="stitch_count" widget="integer" attrs="{'invisible': [('type', '!=', 'embroider')]}" />
                             <field name="color_wave" attrs="{'invisible': [('type', '!=', 'embroider')]}" />
-                            <field name="is_default" widget="boolean" />
+                            <field name="material_color_id" attrs="{'invisible': [('type', '!=', 'sew_patch')]}" />
+                            <field name="material_type_id" attrs="{'invisible': [('type', '!=', 'sew_patch')]}" />
+                            <field name="material_size_id" attrs="{'invisible': [('type', '!=', 'sew_patch')]}" />
                         </group>
                     </group>
 

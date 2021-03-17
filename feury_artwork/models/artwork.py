@@ -89,6 +89,21 @@ class Artwork(models.Model):
         required=False,
     )
 
+    material_color_id = fields.Many2one(
+        string='Material Color',
+        comodel_name='material.color',
+    )
+
+    material_type_id = fields.Many2one(
+        string='Material Type',
+        comodel_name='material.type',
+    )
+
+    material_size_id = fields.Many2one(
+        string='Material size',
+        comodel_name='material.size',
+    )
+
     is_default = fields.Boolean(
         string = 'Is default',
         default = False
