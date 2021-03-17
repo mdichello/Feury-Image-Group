@@ -86,7 +86,7 @@ class EmbellishmentComposition(models.Model):
     )
 
     text = fields.Text(
-        string='Text',
+        string='Personalization',
         required=False,
     )
 
