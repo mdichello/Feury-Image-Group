@@ -22,6 +22,11 @@ class Color(models.Model):
         unique=True
     )
 
+    name = fields.Char(
+        string='Name',
+        required=False,
+    )
+
     hex_code = fields.Char(
         string='Hex Code',
         required=True,

@@ -5,8 +5,9 @@
       <field name="model">color</field>
       <field name="arch" type="xml">
         <tree>
-          <field name="code" colspan="2"/>
-          <field name="hex_code" colspan="2" widget="color"/>
+          <field name="code"/>
+          <field name="name" colspan="2"/>
+          <field name="hex_code" widget="color"/>
         </tree>
       </field>
     </record>
@@ -22,6 +23,7 @@
                     <field name="active" invisible="1" />
                     <group>
                         <field name="code" />
+                        <field name="name" />
                         <field name="hex_code" widget="color"/>
                     </group>
                 </sheet>

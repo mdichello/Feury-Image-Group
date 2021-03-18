@@ -48,12 +48,12 @@
                             <field name="line_ids">
                                 <tree editable="bottom" >
                                     <control>
-                                        <create name="create" string="Add a color line"/>
+                                        <create name="create" string="Add a color"/>
                                     </control>
 
                                     <field name="sequence" widget="handle"/>
-                                    <field name="order" widget="integer" col="1"/>
-                                    <field name="color_id" colspan="2"/>
+                                    <field name="order" widget="integer" />
+                                    <field name="color_id" string="Code"/>
                                     <field name="name" colspan="3"/>
                                     <field name="color_hex_code" widget="color"/>
                                 </tree>
