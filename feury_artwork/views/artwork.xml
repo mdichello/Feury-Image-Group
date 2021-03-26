@@ -33,7 +33,7 @@
                         <group>
                             <field name="reference" />
                             <field name="type" />
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="company_id" groups="base.group_no_one"/>
                             <field name="partner_id" string="Customer" invisible="context.get('hide_partner', False)" />
                             <field name="is_default" widget="boolean" />
                         </group>
