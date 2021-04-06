@@ -16,5 +16,6 @@ Email Grouping by tags
     # data files always loaded at installation
     'data': [
         'views/partner_views.xml',
+        # 'data/res_partner_category_data.xml',
     ],
 }

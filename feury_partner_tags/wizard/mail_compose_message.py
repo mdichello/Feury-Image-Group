@@ -11,7 +11,7 @@ class MailComposeMessage(models.TransientModel):
     def generate_email_for_composer(self, template_id, res_ids, fields=None):
         values = super(MailComposeMessage, self).generate_email_for_composer(template_id, res_ids, fields=None)
         if self.env.context.get('default_model') and \
-            self.env.context['default_model'] in ['sale.order', 'account.move'] and \
+            self.env.context['default_model'] in ['sale.order', 'account.move', 'stock.picking'] and \
             self.env.context.get('change_partners'):
             for res_id in res_ids:
                 record = self.env[self.env.context['default_model']].browse(self.env.context['default_res_id'])
