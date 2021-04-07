@@ -28,10 +28,11 @@
                         <field name="clothing_type_id" invisible="1" />
                         <field name="is_other_location" invisible="1" />
                         <field name="location_id" domain="[('id', 'in', context.get('location_ids'))]" widget="Many2one" />
-                        <field name="artwork_id" domain="[('type', '=', parent.type), '|', ('partner_id', '=', context.get('partner_id')), ('partner_id', '=', False)]" attrs="{'readonly': [('parent.type', 'in', ('sew_stripe', 'hem_pants'))]}" widget="Many2one" />
+                        <field name="artwork_id" domain="[('type', '=', parent.type), '|', ('partner_id', '=', context.get('partner_id')), ('partner_id', '=', False)]" attrs="{'readonly': ['|', ('text', '!=', False), ('parent.type', 'in', ('sew_stripe', 'hem_pants'))], 'required': [('text', '=', False)]}" widget="Many2one" />
                         <field name="per_print_file" filename="per_print" string="Upload" attrs="{'column_invisible': [('parent.type', '!=', 'sew_stripe')], 'required': [('parent.type', '=', 'sew_stripe')]}"/>
                         <field string="Personalization" name="text" colspan="2" widget="section_and_note_text" optional="show" attrs="{'column_invisible': [('parent.type', 'in', ('sew_stripe', 'sew_patch'))]}" />
-                        <field name="thumbnail" style="width: 50px; !important" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
+                        <field name="font" colspan="1" optional="show" attrs="{'column_invisible': [('parent.type', 'in', ('sew_stripe', 'sew_patch'))], 'required': [('text', '!=', False)]}" />
+                        <field name="thumbnail" colspan="1"  style="max-width: 50px; !important" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
                         <field name="description" widget="section_and_note_text" optional="show" invisible="1" />
                     </tree>
                 </field>

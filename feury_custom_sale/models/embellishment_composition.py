@@ -10,11 +10,6 @@ class EmbellishmentComposition(models.Model):
     _name = 'embellishment.composition'
     _description = 'Embellishment composition'
 
-    # TODO check why does not work!
-    # _sql_constraints = [
-    #     ('embellishment_composition_location_uniq', 'unique(embellishment_id, location_id)', 'No duplicate location is allowed within the same embellishment.')
-    # ]
-
     embellishment_id = fields.Many2one(
         string='Embellishment',
         comodel_name='embellishment',
@@ -90,6 +85,15 @@ class EmbellishmentComposition(models.Model):
         required=False,
     )
 
+    font = fields.Selection(
+        string='Font',
+        selection=[
+            ('block', 'Block'),
+            ('script', 'Script'),
+        ],
+        required=False,
+    )
+
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
@@ -160,10 +164,15 @@ class EmbellishmentComposition(models.Model):
         for record in self:
             if not (record.text or record.artwork_id):
                 continue
+
+            lines = record.text.split('\n')
     
-            line_count = len(record.text.split('\n')) if record.text else 0
+            line_count = len(lines) if record.text else 0
             if line_count > 4:
                 raise UserError(_('You can not have more than four lines in text.'))
+
+            if any(len(line) > 22 for line in lines):
+                raise UserError(_('Each line is limited to only 22 characters'))
             
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
