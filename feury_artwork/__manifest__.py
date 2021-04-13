@@ -30,5 +30,6 @@
         'data/material_type.xml',
         'data/material_size.xml',
         'data/product_size.xml',
+        'data/product_template_cron.xml',
     ],
 }
