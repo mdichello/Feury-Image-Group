@@ -4,7 +4,12 @@
             action="color_action" 
             parent="sale.product_menu_catalog"
             name="Colors" />
-        
+
+        <menuitem id="product_size_menu_list" 
+            action="product_size_action" 
+            parent="sale.product_menu_catalog"
+            name="Product Size" />
+
         <menuitem id="artwork_menu_list" 
             action="artwork_action" 
             parent="sale.product_menu_catalog"

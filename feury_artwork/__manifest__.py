@@ -21,6 +21,7 @@
         'views/material_type.xml',
         'views/material_size.xml',
         'views/color.xml',
+        'views/product_size.xml',
         'views/artwork.xml',
         'views/res_partner.xml',
         'views/menu.xml',

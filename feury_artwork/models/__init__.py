@@ -8,3 +8,4 @@ from . import material_size
 from . import artwork
 from . import artwork_line
 from . import res_partner
+from . import product_size
