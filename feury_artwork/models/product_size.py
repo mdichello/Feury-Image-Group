@@ -10,7 +10,7 @@ class ProductSize(models.Model):
     _rec_name = 'code'
 
     _sql_constraints = [
-        ('product_size_code_uniq', 'unique(code)', 'A product_size code should be unique.')
+        ('product_size_code_uniq', 'unique(code)', 'A product size code should be unique.')
     ]
 
     code = fields.Char(

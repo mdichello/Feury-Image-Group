@@ -8,6 +8,7 @@
         <menuitem id="product_size_menu_list" 
             action="product_size_action" 
             parent="sale.product_menu_catalog"
+            groups="base.group_no_one"
             name="Product Size" />
 
         <menuitem id="artwork_menu_list" 
