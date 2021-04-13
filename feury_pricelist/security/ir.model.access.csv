@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_feury_customer_pricelist,feury_pricelist.customer_pricelist,model_customer_pricelist,base.group_user,1,1,1,1
+access_feury_customer_pricelist_line,feury_pricelist.customer_pricelist_line,model_customer_pricelist_line,base.group_user,1,1,1,1

@@ -30,6 +30,7 @@ class ProductTemplate(models.Model):
         PRODUCT_SIZE = self.env['product.size']
         COLOR = self.env['color']
 
+        # TODO optimize performance, fetch all colors and sizes once.
         for record in self:
             values = {
                 'style_code': record.x_studio_product_style_code
