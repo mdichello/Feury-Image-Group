@@ -9,3 +9,4 @@ from . import artwork
 from . import artwork_line
 from . import res_partner
 from . import product_size
+from . import product_template

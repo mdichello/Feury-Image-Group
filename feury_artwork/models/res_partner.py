@@ -1,7 +1,7 @@
 from odoo import api, fields, models, _
 
 
-class Res_Partner(models.Model):
+class ResPartner(models.Model):
 	_inherit = 'res.partner'
 
 	artwork_ids = fields.One2many(
