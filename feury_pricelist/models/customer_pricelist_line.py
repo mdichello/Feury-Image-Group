@@ -123,6 +123,30 @@ class CustomerPricelistLine(models.Model):
 
         self.margin = (self.sale_price - self.cost) * 100 / self.cost
 
+    @api.onchange('style_id')
+    def onchange_style_id(self):
+        PRODUCT_TEEMPLATE = self.env['product.template']
+        PRODUCT_SIZE = self.env['product.size']
+        COLOR = self.env['color']
+
+        colors = COLOR
+        sizes  = PRODUCT_SIZE
+        products = PRODUCT_TEEMPLATE
+
+        if self.style_id:
+            products = PRODUCT_TEEMPLATE.search([
+                ('style_id', '=', self.style_id.id)
+            ])
+
+        if products:
+            colors = products.mapped('color_id')
+            sizes = products.mapped('size_id')
+
+        self.write({
+            'color_ids': [(6, 0, colors.ids)],
+            'size_ids': [(6, 0, sizes.ids)],
+        })
+
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
