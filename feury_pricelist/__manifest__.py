@@ -16,6 +16,7 @@
         'security/ir_rule.xml',
         'views/res_partner.xml',
         'views/customer_pricelist.xml',
+        'views/menus.xml',
         'data/ir_sequence.xml',
     ],
 }

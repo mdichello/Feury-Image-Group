@@ -1,0 +1,14 @@
+<odoo>
+    <data>
+        <menuitem name="Pricelist" 
+            id="customer_pricelist_menu_root"
+            web_icon="feury_pricelist,static/description/icon.png"
+            sequence="10"/>
+
+        <menuitem 
+            name="List" 
+            id="feury_pricelist.menu_1_list" 
+            parent="customer_pricelist_menu_root"
+            action="customer_pricelist_action"/>
+    </data>
+</odoo>

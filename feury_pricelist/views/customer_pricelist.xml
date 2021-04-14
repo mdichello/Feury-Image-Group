@@ -40,7 +40,7 @@
 
                     <group>
                         <group>
-                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="company_id" groups="base.group_no_one"/>
                             <field name="currency_id" invisible="1" />
                             <field name="partner_id" required="1" />
                             <field name="margin" />
@@ -91,14 +91,5 @@
       <field name="res_model">customer.pricelist</field>
       <field name="view_mode">tree,form</field>
     </record>
-
-    <!-- TODO relocate to a menu seperate file -->
-    <menuitem name="Pricelist" id="customer_pricelist_menu_root"/>
-
-    <menuitem 
-        name="List" 
-        id="feury_pricelist.menu_1_list" 
-        parent="customer_pricelist_menu_root"
-        action="customer_pricelist_action"/>
   </data>
 </odoo>
