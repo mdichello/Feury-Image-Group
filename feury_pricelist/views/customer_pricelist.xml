@@ -48,7 +48,6 @@
                             <field name="margin" />
                         </group>
                         <group>
-                            <field name="date" />
                             <field name="start_date" />
                             <field name="end_date" />
                         </group>
@@ -86,7 +85,25 @@
                 </div>
             </form>
         </field>
-        </record>
+    </record>
+
+    <!-- ADD default filters -->
+    <record id="view_customer_pricelist_filter" model="ir.ui.view">
+        <field name="name">customer.pricelist</field>
+        <field name="model">customer.pricelist</field>
+        <field name="arch" type="xml">
+            <search string="Search Customer Pricelist">
+                <field name="partner_id" string="Customer" filter_domain="[('partner_id', 'child_of', self)]"/>
+                <group expand="1" string="Group By">
+                    <filter string="Status" name="status" context="{'group_by':'state'}"/>
+                    <filter string="Company" name="company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    <separator orientation="vertical" />
+                    <filter string="Start Date" name="start_date" context="{'group_by':'start_date'}"/>
+                    <filter string="End Date" name="end_date" context="{'group_by':'end_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
 
     <record model="ir.actions.act_window" id="customer_pricelist_action">
       <field name="name">Customer Pricelist</field>
