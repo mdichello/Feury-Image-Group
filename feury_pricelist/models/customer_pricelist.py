@@ -251,12 +251,7 @@ class CustomerPricelist(models.Model):
             'url': self.get_portal_url(),
         }
 
-    def _get_portal_return_action(self):
-        """ Return the action used to display orders when returning from customer portal. """
-        self.ensure_one()
-        return self.env.ref('sale.action_quotations_with_onboarding')
-
     def _compute_access_url(self):
         super(CustomerPricelist, self)._compute_access_url()
-        for order in self:
-            order.access_url = '/my/orders/%s' % (order.id)
+        for pricelist in self:
+            pricelist.access_url = '/my/pricelist/%s' % (pricelist.id)
