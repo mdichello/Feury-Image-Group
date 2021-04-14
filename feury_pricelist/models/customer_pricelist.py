@@ -9,7 +9,6 @@ from odoo.exceptions import UserError, ValidationError
 
 
 # TODO make margin alterable (do not alter the one on the customer sheet)
-# TODO the start date, shoudl be the date of the signature.
 class CustomerPricelist(models.Model):
     _name = 'customer.pricelist'
     _description = 'Customer Pricelist'
@@ -98,6 +97,27 @@ class CustomerPricelist(models.Model):
     active = fields.Boolean(
         string='Active',
         default=True
+    )
+
+    signature = fields.Image(
+        string='Signature',
+        help='Signature received through the portal.',
+        copy=False,
+        attachment=True,
+        max_width=1024,
+        max_height=1024
+    )
+
+    signed_by = fields.Char(
+        string='Signed By',
+        help='Name of the person that signed.',
+        copy=False
+    )
+
+    signed_on = fields.Datetime(
+        string='Signed On',
+        help='Date of the signature.',
+        copy=False
     )
 
     # ----------------------------------------------------------------------------------------------------
