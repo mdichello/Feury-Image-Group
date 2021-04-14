@@ -39,6 +39,15 @@
                 </header>
 
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="preview_pricelist" type="object" class="oe_stat_button" icon="fa-globe icon">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Customer</span>
+                                <span class="o_stat_text">Preview</span>
+                            </div>
+                        </button>
+                    </div>
+
                     <div class="oe_button_box" name="button_box"/>
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
                     <field name="active" invisible="1" />
@@ -58,6 +67,7 @@
                         <group>
                             <field name="start_date" />
                             <field name="end_date" />
+                            <field name="approved_date" attrs="{'invisible': [('state', '!=', 'approved')]}" />
                         </group>
                     </group>
 

@@ -12,7 +12,7 @@ from odoo.exceptions import UserError, ValidationError
 class CustomerPricelist(models.Model):
     _name = 'customer.pricelist'
     _description = 'Customer Pricelist'
-    _inherit = ['mail.thread']
+    _inherit = ['portal.mixin', 'mail.thread']
     _check_company_auto = True
     _rec_name = 'reference'
 
@@ -43,7 +43,7 @@ class CustomerPricelist(models.Model):
 
     partner_id = fields.Many2one(
         string='Customer',
-        comodel_name='res.partner', 
+        comodel_name='res.partner',
         ondelete='cascade', 
         index=True,
         domain=['&', ('parent_id', '=', False), ('is_customer', '=', True)], 
@@ -55,6 +55,11 @@ class CustomerPricelist(models.Model):
         required=True,
         readonly=True,
         default=lambda l: fields.Date.today()
+    )
+
+    approved_date = fields.Date(
+        string='Date Approved',
+        readonly=True
     )
 
     start_date = fields.Date(
@@ -132,6 +137,12 @@ class CustomerPricelist(models.Model):
         result = super(CustomerPricelist, self).create(vals)
         return result
 
+    def unlink(self):
+        for pricelist in self:
+            if pricelist.state not in ('draft', 'cancel'):
+                raise UserError(_('You can not delete a sent pricelist or a confirmed one. You must first cancel it.'))
+        return super(CustomerPricelist, self).unlink()
+
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)
     # ----------------------------------------------------------------------------------------------------
@@ -154,11 +165,63 @@ class CustomerPricelist(models.Model):
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
 
+    def _find_mail_template(self, force_confirmation_template=False):
+        template_id = False
+
+        if force_confirmation_template or (self.state == 'sale' and not self.env.context.get('proforma', False)):
+            template_id = int(self.env['ir.config_parameter'].sudo().get_param('sale.default_confirmation_template'))
+            template_id = self.env['mail.template'].search([('id', '=', template_id)]).id
+            if not template_id:
+                template_id = self.env['ir.model.data'].xmlid_to_res_id('sale.mail_template_sale_confirmation', raise_if_not_found=False)
+        if not template_id:
+            template_id = self.env['ir.model.data'].xmlid_to_res_id('sale.email_template_edi_sale', raise_if_not_found=False)
+
+        return template_id
+
     def action_send(self):
-        self.state = 'sent'
+        ''' Opens a wizard to compose an email, with relevant mail template loaded by default '''
+        self.ensure_one()
+        template_id = self._find_mail_template()
+        lang = self.env.context.get('lang')
+        template = self.env['mail.template'].browse(template_id)
+        if template.lang:
+            lang = template._render_template(template.lang, 'sale.order', self.ids[0])
+        ctx = {
+            'default_model': 'sale.order',
+            'default_res_id': self.ids[0],
+            'default_use_template': bool(template_id),
+            'default_template_id': template_id,
+            'default_composition_mode': 'comment',
+            'mark_so_as_sent': True,
+            'custom_layout': "mail.mail_notification_paynow",
+            'proforma': self.env.context.get('proforma', False),
+            'force_email': True,
+            'model_description': self.with_context(lang=lang).type_name,
+        }
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(False, 'form')],
+            'view_id': False,
+            'target': 'new',
+            'context': ctx,
+        }
 
     def action_approve(self):
-        self.state = 'approved'
+        if self._get_forbidden_state_confirm() & set(self.mapped('state')):
+            raise UserError(_(
+                'It is not allowed to approve a pricelist in the following states: %s'
+            ) % (', '.join(self._get_forbidden_state_confirm())))
+
+        for pricelist in self.filtered(lambda pricelist: pricelist.partner_id not in pricelist.message_partner_ids):
+            pricelist.message_subscribe([pricelist.partner_id.id])
+
+        self.write({
+            'state': 'approved',
+            'approved_date': fields.Datetime.now()
+        })
+        return True
 
     def action_cancel(self):
         self.state = 'cancel'
@@ -176,3 +239,24 @@ class CustomerPricelist(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 7- Technical methods (name must reflect the use)
     # ----------------------------------------------------------------------------------------------------
+
+    def _get_forbidden_state_confirm(self):
+        return {'approved', 'cancel'}
+
+    def preview_pricelist(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'self',
+            'url': self.get_portal_url(),
+        }
+
+    def _get_portal_return_action(self):
+        """ Return the action used to display orders when returning from customer portal. """
+        self.ensure_one()
+        return self.env.ref('sale.action_quotations_with_onboarding')
+
+    def _compute_access_url(self):
+        super(CustomerPricelist, self)._compute_access_url()
+        for order in self:
+            order.access_url = '/my/orders/%s' % (order.id)

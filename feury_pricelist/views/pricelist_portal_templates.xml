@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ====== Specific Pricelist Page ====== -->
+    <template id="pricelist_portal" name="Subscription">
+        <t t-set="o_portal_fullwidth_alert" groups="base.group_user">
+            <t t-call="portal.portal_back_in_edit_mode">
+                <t t-set="backend_url" t-value="'/web#model=%s&amp;id=%s&amp;action=%s&amp;view_type=form' % (account._name, account.id, action)" t-ignore="true"/>
+            </t>
+        </t>
+
+        <t t-call="portal.portal_layout">
+            <t t-set="wrapwrap_classes" t-value="'o_portal_bg_dark'"/>
+
+            <div class="row mt16 oe_website_contract o_portal_sidebar">
+
+                <!-- ====== Sidebar  ====== -->
+                <t t-call="portal.portal_record_sidebar">
+                    <t t-set="classes" t-value="'col-lg-auto d-print-none'"/>
+
+                    <t t-set="entries">
+                        <ul class="list-group list-group-flush flex-wrap flex-row flex-lg-column">
+                            <li class="list-group-item flex-grow-1" t-if="not account.signature">
+                                <a role="button" class="btn btn-primary btn-block mb8" data-toggle="modal" data-target="#modalaccept" href="#">
+                                    <i class="fa fa-check"/>Accept &amp; Sign
+                                </a>
+                            </li>
+                        </ul>
+                    </t>
+                </t>
+
+                <!-- ====== Page Content  ====== -->
+                <div class="col-12 col-lg">
+                    <div role="dialog" class="modal fade" id="modalaccept">
+                        <div class="modal-dialog">
+                            <form id="accept" method="POST" t-att-data-order-id="account.id" class="js_accept_json modal-content js_website_submit_form">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <header class="modal-header">
+                                    <h4 class="modal-title">Validate Subscription</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">&amp;times;</button>
+                                </header>
+                                <main class="modal-body" id="sign-dialog">
+                                    <p>
+                                        <span>By signing this proposal</span>
+                                        <ul>
+                                            <li><span>Accepted on the behalf of:</span> <b t-field="account.partner_id.commercial_partner_id"/></li>
+                                            <li><span>For an amount of:</span> <b data-id="total_amount" t-field="account.recurring_amount_total"/></li>
+                                        </ul>
+                                    </p>
+                                    <t t-call="portal.signature_form">
+                                        <t t-set="call_url" t-value="'%s/signature' % account.website_url"/>
+                                        <t t-set="default_name" t-value="account.partner_id.name"/>
+                                    </t>
+                                </main>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card oe_website_contract">
+                        <div class="card-header bg-white pb-2 pt-3">
+                            <div class="row">
+                                <div class="col-12 col-lg flex-grow-1 mb-1 mb-lg-0">
+                                    <h4 class="mb-0"><small class="text-muted">Subscription -</small> <span t-field="account.display_name"/></h4>
+                                </div>
+                                <div class="col-12 col-lg flex-grow-0 text-lg-right mb-1 mb-lg-0">
+                                    <span t-if="account.in_progress and not account.to_renew" class="badge badge-pill badge-success"><i class="fa fa-fw fa-check"/> In Progress</span>
+                                    <span t-if="account.to_renew" class="badge badge-pill badge-warning"><i class="fa fa-fw fa-refresh"/> To Renew</span>
+                                    <span t-if="not account.in_progress" class="badge badge-pill badge-default"><i class="fa fa-fw fa-remove"/> Closed</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ml-2">
+                            <style>
+                                .o_report_layout_background {
+                                    background-image: none;
+                                }
+
+                                .product-image {
+                                    max-height: 180px;
+                                    max-width: 180px;
+                                    width: auto;
+                                    height: 100%;
+                                    justify-content: center;
+                                    align-items: center;
+                                    display: block;
+                                    margin: auto;
+                                    vertical-align: middle;
+                                }
+
+                                span.custom-bold:first-line { font-weight: bold; }
+                            </style>
+                            <center>
+                                <h2 class="mt16" t-attf-style="color: #{account.company_id.report_bar_background_color};">
+                                    <span>Maintenance contract no. </span>
+                                    <span t-field="account.code"/>
+                                </h2>
+                            </center>
+                            <table class="table table-sm">
+                                <thead t-attf-style="background-color: #{account.company_id.report_bar_background_color}; color: #{account.company_id.report_bar_text_color};">
+                                    <tr>
+                                        <th class="text-left">Client</th>
+                                        <th class="text-left">Intervention site</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th class="text-left">
+                                            <div t-field="account.partner_invoice_id"
+                                                    t-options='{"widget": "contact", "fields": ["full_name", "street", "street2", "zip_city",  "phone", "mobile"], "no_marker": True, "phone_icons": True}'/>
+                                        </th>
+                                        <th class="text-left">
+                                            <div t-field="account.partner_shipping_id"
+                                                    t-options='{"widget": "contact", "fields": ["full_name", "street", "street2", "zip_city", "phone", "mobile"], "no_marker": True, "phone_icons": True}'/>
+                                        </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="oe_structure"/>
+
+                            <div class="col">
+                                <div class="row">
+                                    <strong>Valid contract from <span class="m-0" t-field="account.date_start"/> at <span class="m-0" t-if="account.date" t-field="account.date"/><t t-else=""> _</t></strong>
+                                </div>
+                                <div class="row">
+                                    <strong>Duration of the contract: <span class="m-0" t-field="account.recurring_interval"/> <span class="m-0" t-field="account.recurring_rule_type"/></strong>
+                                </div>
+                            </div>
+
+                            <br/>
+
+                            <div class="mb-5" t-if="account.subscriptin_order_line_ids">
+                                <div class="row">
+                                    <div class="col">
+                                        <span>
+                                            <b>Products under maintenance contract :</b>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col bg-100 mx-5">
+                                        <span>
+                                            <div>
+                                                <t t-foreach="account.subscriptin_order_line_ids" t-as="line">
+                                                    <span t-field="line.product_id" /><br/>
+                                                </t>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table class="table table-sm o_main_table mb-5" style="font-size: 0.8rem;">
+                                <thead t-attf-style="background-color: #{account.company_id.report_bar_background_color}; color: #{account.company_id.report_bar_text_color};"> 
+                                    <tr>
+                                        <th name="th_description" class="text-left" style="width: 390px;">Description</th>
+                                        <th name="th_quantity" class="text-right">QTE</th>
+                                        <th name="th_priceunit" class="text-right">Prix HT</th>
+                                        <th name="th_taxes" class="text-right">Discount (%)</th>
+                                        <th name="th_subtotal" class="text-right">Prix total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="sale_tbody">
+                                    <t t-foreach="account.recurring_invoice_line_ids" t-as="line">
+                                        <tr>
+                                            <td>
+                                                <strong t-field="line.product_id"/>
+                                            </td>
+                                            <td name="td_quantity" class="text-right">
+                                                <span t-esc="'%.2f'% line.quantity"/>
+                                                <span t-field="line.uom_id" groups="uom.group_uom"/>
+                                            </td>
+                                            <td name="td_priceunit" class="text-right">
+                                                <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": line.analytic_account_id.pricelist_id.currency_id}' />
+                                            </td>
+                                            <td name="td_taxes" class="text-right">
+                                                <span t-esc="'%.2f'% line.discount"/>
+                                            </td>
+
+                                            <td name="td_subtotal" class="text-right o_price_total">
+                                                <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": line.analytic_account_id.pricelist_id.currency_id}' />
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+
+                            <div class="clearfix" name="so_total_summary" style="page-break-inside: avoid">
+                                <div id="total" class="row" name="total">
+                                    <div t-attf-class="col-4 ml-auto">
+                                        <table class="table table-sm">
+                                            <tr class="border-black o_total">
+                                                <td><strong>Total TTC</strong></td>
+                                                <td class="text-right">
+                                                    <span t-field="account.recurring_total" t-options='{"widget": "monetary", "display_currency": account.pricelist_id.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                            <style>
+                                                .o_company_1_layout.o_report_layout_background thead tr th {
+                                                    color: white;
+                                                }
+                                            </style>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="oe_structure"/>
+
+                            <p t-if="account.description">
+                                <span style="font-size: 11pt; line-height: 115%;" t-raw="account.description"/>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-auto mt8" t-if="not account.signature">
+                        <a role="button" class="btn btn-primary" data-toggle="modal" data-target="#modalaccept" href="#"><i class="fa fa-check"/>Accept &amp; Sign</a>
+                    </div>
+
+                    <!-- ======  Chatter ====== -->
+                    <div t-if="is_follower">
+                        <h3 class="mt-4">History</h3>
+                        <t t-call="portal.message_thread">
+                            <t t-set="object" t-value="account"/>
+                            <t t-set="chatter_mode" t-value="'json'"/>
+                        </t>
+                    </div>
+                </div>
+
+                <!-- ======  MODAL: Close Subscription ====== -->
+                <div role="dialog" class="modal fade" id="wc-modal-close" t-if="display_close" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <header class="modal-header">
+                                <h4 class="modal-title">Close Subscription</h4>
+                            </header>
+                            <form method="post" t-attf-action="/my/subscription/#{account.id}/close/?uuid=#{account.uuid}">
+                                <input class="d-none" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <main class="modal-body">
+                                    <p>If you confirm, your subscription will be closed right away. Your current invoicing period is valid until <span t-field="account.recurring_next_date"/>.</p>
+                                    <p>We always listen to our customer. Could you specify the reason for cancelling your subscription?</p>
+                                    <div class="form-group">
+                                        <select class="form-control" name="close_reason_id">
+                                            <t t-foreach="close_reasons" t-as="close_reason">
+                                                <option  t-att-value="close_reason.id" t-esc="close_reason.name"/>
+                                            </t>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <textarea class="form-control" name="closing_text" style="width: 100%;" rows="4"></textarea>
+                                    </div>
+                                </main>
+                                <footer class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <button class="btn btn-primary contract-submit">Confirm</button>
+                                </footer>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
