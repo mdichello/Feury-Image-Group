@@ -5,11 +5,18 @@
             parent="sale.product_menu_catalog"
             name="Colors" />
 
+        <!-- TODO imbricate the size and style under product sub-menu -->
         <menuitem id="product_size_menu_list" 
             action="product_size_action" 
             parent="sale.product_menu_catalog"
-            groups="base.group_no_one"
+            groups="base.group_user"
             name="Product Size" />
+
+        <menuitem id="product_style_menu_list" 
+            action="product_style_action" 
+            parent="sale.product_menu_catalog"
+            groups="base.group_user"
+            name="Product Style" />
 
         <menuitem id="artwork_menu_list" 
             action="artwork_action" 

@@ -4,39 +4,40 @@ from odoo import api, fields, models, _
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    style_code = fields.Char(
-        string='Style Code',
-        required=True,
-        unique=True
+    style_id = fields.Many2one(
+        string="Style Code",
+        comodel_name="product.style",
+        required=True
     )
 
-    color_id  = fields.Many2one(
+    color_id = fields.Many2one(
         string="Color",
         comodel_name="color",
-        required=True
+        required=False
     )
 
-    size_id  = fields.Many2one(
+    size_id = fields.Many2one(
         string="Size",
         comodel_name="product.size",
-        required=True
+        required=False
     )
 
-    def migrate_studio_fields(self):
+
+    def migrate_studio_fields(self, complete_migration=False):
         """
         Temporary method
         """
 
+        PRODUCT_STYLE = self.env['product.style']
         PRODUCT_SIZE = self.env['product.size']
         COLOR = self.env['color']
 
         # TODO optimize performance, fetch all colors and sizes once.
         for record in self:
             values = {
-                'style_code': record.x_studio_product_style_code
             }
 
-            if not record.color_id and record.x_studio_color_code:
+            if (complete_migration or not record.color_id) and record.x_studio_color_code:
                 color = COLOR.search([
                     ('code', 'ilike', record.x_studio_color_code)
                 ], limit=1)
@@ -50,7 +51,7 @@ class ProductTemplate(models.Model):
 
                 values['color_id'] = color.id
             
-            if not record.size_id and record.x_studio_size_code:
+            if (complete_migration or not record.size_id) and record.x_studio_size_code:
                 size = PRODUCT_SIZE.search([
                     ('code', 'ilike', record.x_studio_size_code)
                 ], limit=1)
@@ -62,5 +63,18 @@ class ProductTemplate(models.Model):
 
                 values['size_id'] = size.id
 
-            record.write(values)
-            self.env.cr.commit()
+            if (complete_migration or not record.style_id) and record.x_studio_product_style_code:
+                style = PRODUCT_STYLE.search([
+                    ('code', 'ilike', record.x_studio_product_style_code)
+                ], limit=1)
+
+                if not style:
+                    style = PRODUCT_STYLE.create({
+                        'code': record.x_studio_product_style_code,
+                    })
+
+                values['style_id'] = style.id
+
+            if values:
+                record.write(values)
+                self.env.cr.commit()

@@ -29,9 +29,12 @@ class CustomerPricelistLine(models.Model):
         related='pricelist_id.currency_id'
     )
 
-    style = fields.Char(
-        string="Style",
-        required=True,
+    style_id = fields.Many2one(
+        string="Style Code",
+        comodel_name="product.style",
+        ondelete='cascade',
+        index=True,
+        required=True
     )
 
     color_ids = fields.Many2many(

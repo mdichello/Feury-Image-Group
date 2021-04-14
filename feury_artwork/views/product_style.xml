@@ -1,0 +1,47 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="product_style_list">
+      <field name="name">product style list</field>
+      <field name="model">product.style</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="code"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="product_style_form">
+        <field name="name">product style</field>
+        <field name="model">product.style</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1" />
+                    <group>
+                        <field name="code" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ADD default filters -->
+    <record id="view_product_style_filter" model="ir.ui.view">
+        <field name="name">product.style.select</field>
+        <field name="model">product.style</field>
+        <field name="arch" type="xml">
+            <search string="Search Code">
+                <field name="code" filter_domain="[('code', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="product_style_action">
+      <field name="name">Product style</field>
+      <field name="res_model">product.style</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+  </data>
+</odoo>

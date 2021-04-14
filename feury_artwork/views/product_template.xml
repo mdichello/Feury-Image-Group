@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='barcode']" position="after">
-                <field name="style_code" attrs="{'required': [('sale_ok', '=', True)]}" />
+                <field name="style_id" widget="Many2one" attrs="{'required': [('sale_ok', '=', True)]}" options="{'no_open': True}" />
                 <field name="color_id" widget="Many2one" attrs="{'required': [('sale_ok', '=', True)]}" options="{'no_open': True}" />
                 <field name="size_id" widget="Many2one" attrs="{'required': [('sale_ok', '=', True)]}" options="{'no_open': True}" />
             </xpath>
