@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
 
 
 class CustomerPricelistLine(models.Model):
@@ -102,6 +103,25 @@ class CustomerPricelistLine(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.onchange('margin')
+    def onchange_margin(self):
+        if not self.cost:
+            return
+        
+        self.sale_price = self.cost * (1 + self.margin/100)
+
+    @api.onchange('sale_price')
+    def onchange_sale_price(self):
+        if not self.cost:
+            return
+
+        if self.sale_price < self.cost:
+            raise UserError(_(
+                "Sale price can not be less than the product's cost"
+            ))
+
+        self.margin = (self.sale_price - self.cost) * 100 / self.cost
 
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
