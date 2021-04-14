@@ -145,6 +145,9 @@ class CustomerPricelist(models.Model):
     def action_sign(self):
         self.state = 'signed'
 
+    def action_draft(self):
+        self.state = 'draft'
+
     # ----------------------------------------------------------------------------------------------------
     # 6- CRONs methods
     # ----------------------------------------------------------------------------------------------------
