@@ -62,6 +62,7 @@ class EquipmentProviderDealLine(models.Model):
 
     cost = fields.Monetary(
         string='Cost', 
+        readonly=True,
         default=0
     )
 

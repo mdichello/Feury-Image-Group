@@ -10,8 +10,6 @@ from odoo.exceptions import UserError, ValidationError
 
 # TODO make margin alterable (do not alter the one on the customer sheet)
 # TODO the start date, shoudl be the date of the signature.
-# TODO the end date will be a year past the start date.
-# TODO the cost should be readonly (comes from the purchase price)
 class CustomerPricelist(models.Model):
     _name = 'customer.pricelist'
     _description = 'Customer Pricelist'
