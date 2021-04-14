@@ -3,7 +3,7 @@
 from odoo import models, fields, api
 
 
-class EquipmentProviderDealLine(models.Model):
+class CustomerPricelistLine(models.Model):
     _name = 'customer.pricelist.line'
     _description = 'Customer Pricelist Line'
 
@@ -79,6 +79,14 @@ class EquipmentProviderDealLine(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.model
+    def default_get(self, fields):
+        values = super(CustomerPricelistLine, self).default_get(fields)
+
+        # TODO temporary code.
+        values['cost'] = 12
+        return values
 
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)
