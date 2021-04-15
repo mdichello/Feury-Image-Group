@@ -56,7 +56,6 @@ class CustomerPricelistLine(models.Model):
 
     margin = fields.Float(
         string='Margin',
-        default=50
     )
 
     is_personalizable = fields.Boolean(
@@ -83,14 +82,6 @@ class CustomerPricelistLine(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
-
-    @api.model
-    def default_get(self, fields):
-        values = super(CustomerPricelistLine, self).default_get(fields)
-
-        # TODO temporary code.
-        values['cost'] = 12
-        return values
 
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)
@@ -132,6 +123,7 @@ class CustomerPricelistLine(models.Model):
         colors = COLOR
         sizes  = PRODUCT_SIZE
         products = PRODUCT_TEEMPLATE
+        cost = 0
 
         if self.style_id:
             products = PRODUCT_TEEMPLATE.search([
@@ -141,10 +133,13 @@ class CustomerPricelistLine(models.Model):
         if products:
             colors = products.mapped('color_id')
             sizes = products.mapped('size_id')
+            cost = max(products.mapped('standard_price'))
 
         self.write({
             'color_ids': [(6, 0, colors.ids)],
             'size_ids': [(6, 0, sizes.ids)],
+            'cost': cost,
+            'sale_price': cost * (1 + self.margin/100)
         })
 
     # ----------------------------------------------------------------------------------------------------

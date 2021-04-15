@@ -73,7 +73,7 @@
 
                     <notebook>
                         <page string="Lines">
-                            <field name="line_ids" nolabel="1" widget="section_and_note_one2many" mode="tree,kanban">
+                            <field name="line_ids" nolabel="1" widget="section_and_note_one2many" mode="tree,kanban" context="{'default_margin': margin}">
                                 <tree editable="bottom">
                                     <control>
                                         <create name="create" string="Add a pricelist item"/>
