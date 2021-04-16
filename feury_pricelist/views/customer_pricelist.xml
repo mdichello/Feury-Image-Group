@@ -81,6 +81,8 @@
 
                                     <field name="pricelist_id" invisible="1" />
                                     <field name="currency_id" invisible="1" />
+                                    <field name="is_atomic" invisible="1" />
+                                    <field name="sequence" widget="handle"/>
                                     <field name="style_id" options="{'no_create': True, 'no_open': True}" />
                                     <field name="color_ids" widget="many2many_tags" options="{'no_create_edit': True}" colspan="2"/>
                                     <field name="size_ids" widget="many2many_tags" options="{'no_create_edit': True}" colspan="2"/>

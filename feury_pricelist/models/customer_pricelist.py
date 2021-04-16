@@ -7,8 +7,12 @@ from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
+from collections import defaultdict
 
-# TODO make margin alterable (do not alter the one on the customer sheet)
+
+# TODO add a thumbnail (search if we can have a selection from available ones)
+
+# TODO check duplicated values in lines!
 class CustomerPricelist(models.Model):
     _name = 'customer.pricelist'
     _description = 'Customer Pricelist'
@@ -151,7 +155,7 @@ class CustomerPricelist(models.Model):
     def _check_lines(self):
         for record in self:
             if not record.line_ids:
-                raise ValidationError(_('You must have at least one operation.'))
+                raise ValidationError(_('You must have at least one item in the pricelist.'))
 
     # ----------------------------------------------------------------------------------------------------
     # 3- Compute methods (namely _compute_***)
@@ -160,6 +164,60 @@ class CustomerPricelist(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.onchange('line_ids')
+    def onchange_line_ids(self):
+        """
+        Ungroup lines according to the cost (standard price).
+        """
+
+        PRICELIST_LINE = self.env['customer.pricelist.line']
+        PRODUCT_TEMPLATE = self.env['product.template']
+
+        for record in self:
+            non_atomic_lines = record.line_ids.filtered(
+                lambda l: not l.is_atomic
+            )
+
+            for line in non_atomic_lines:
+                if not line.style_id:
+                    continue
+
+                groups = defaultdict(lambda : PRODUCT_TEMPLATE)
+                products = PRODUCT_TEMPLATE.search([
+                    ('style_id', '=', line.style_id.id)
+                ])
+
+                for product in products:
+                    groups[product.standard_price] += product
+
+                if not groups:
+                    continue
+
+                cost, products = groups.popitem()
+                colors = products.mapped('color_id')
+                sizes = products.mapped('size_id')
+                line.write({
+                    'color_ids': [(6, 0, colors.ids)],
+                    'size_ids': [(6, 0, sizes.ids)],
+                    'cost': cost,
+                    'sale_price': cost * (1 + self.margin/100),
+                    'is_atomic': True
+                })
+
+                for cost, products in groups.items():
+                    colors = products.mapped('color_id')
+                    sizes = products.mapped('size_id')
+
+                    PRICELIST_LINE.new({
+                        'pricelist_id': self.id,
+                        'style_id': line.style_id.id,
+                        'color_ids': [(6, 0, colors.ids)],
+                        'size_ids': [(6, 0, sizes.ids)],
+                        'cost': cost,
+                        'sale_price': cost * (1 + line.margin/100),
+                        'is_atomic': True
+                    })
 
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)

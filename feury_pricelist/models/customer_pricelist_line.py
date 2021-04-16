@@ -8,6 +8,12 @@ class CustomerPricelistLine(models.Model):
     _name = 'customer.pricelist.line'
     _description = 'Customer Pricelist Line'
 
+    sequence = fields.Integer(
+        string='Sequence',
+        default=1,
+        index=True,
+    )
+
     pricelist_id = fields.Many2one(
         string="Pricelist",
         comodel_name="customer.pricelist"
@@ -69,6 +75,12 @@ class CustomerPricelistLine(models.Model):
         default=0
     )
 
+    is_atomic = fields.Boolean(
+        string='Is atomic',
+        default=False,
+        help='Is atomic, meaning degrouping is needed'
+    )
+
     sale_price = fields.Monetary(
         string='Sale Price', 
         default=0
@@ -113,34 +125,6 @@ class CustomerPricelistLine(models.Model):
             ))
 
         self.margin = (self.sale_price - self.cost) * 100 / self.cost
-
-    @api.onchange('style_id')
-    def onchange_style_id(self):
-        PRODUCT_TEEMPLATE = self.env['product.template']
-        PRODUCT_SIZE = self.env['product.size']
-        COLOR = self.env['color']
-
-        colors = COLOR
-        sizes  = PRODUCT_SIZE
-        products = PRODUCT_TEEMPLATE
-        cost = 0
-
-        if self.style_id:
-            products = PRODUCT_TEEMPLATE.search([
-                ('style_id', '=', self.style_id.id)
-            ])
-
-        if products:
-            colors = products.mapped('color_id')
-            sizes = products.mapped('size_id')
-            cost = max(products.mapped('standard_price'))
-
-        self.write({
-            'color_ids': [(6, 0, colors.ids)],
-            'size_ids': [(6, 0, sizes.ids)],
-            'cost': cost,
-            'sale_price': cost * (1 + self.margin/100)
-        })
 
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
