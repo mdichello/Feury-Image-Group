@@ -60,6 +60,19 @@ class CustomerPricelistLine(models.Model):
         string="Sizes"
     )
 
+    product_ids = fields.Many2many(
+        comodel_name='product.template', 
+        relation='product_template_customer_pricelist_line_rel', 
+        column1='customer_pricelist_line_id', 
+        column2='product_template_id', 
+        string="Products"
+    )
+
+    thumbnail = fields.Image(
+        string="Thumbnail",
+        readonly=True
+    )
+
     margin = fields.Float(
         string='Margin',
     )
@@ -156,6 +169,10 @@ class CustomerPricelistLine(models.Model):
             })
 
         return result
+
+    def action_open_image_wizard(self):
+        # TODO implementation.
+        pass
 
     # ----------------------------------------------------------------------------------------------------
     # 6- CRONs methods

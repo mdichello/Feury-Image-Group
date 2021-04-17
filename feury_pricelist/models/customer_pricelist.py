@@ -210,6 +210,7 @@ class CustomerPricelist(models.Model):
                 line.write({
                     'color_ids': [(6, 0, colors.ids)],
                     'size_ids': [(6, 0, sizes.ids)],
+                    'product_ids': [(6, 0, products.ids)],
                     'cost': cost,
                     'sale_price': cost * (1 + self.margin/100),
                     'is_atomic': True
@@ -224,6 +225,7 @@ class CustomerPricelist(models.Model):
                         'style_id': line.style_id.id,
                         'color_ids': [(6, 0, colors.ids)],
                         'size_ids': [(6, 0, sizes.ids)],
+                        'product_ids': [(6, 0, products.ids)],
                         'cost': cost,
                         'sale_price': cost * (1 + line.margin/100),
                         'is_atomic': True
