@@ -39,9 +39,16 @@ class EmbellishmentComposition(models.Model):
     )
 
     type = fields.Selection(
+        selection=[
+            ('embroider', 'Embroider'),
+            ('screenp_print', 'Screen Print'),
+            ('heat_seal', 'Heat Seal'),
+            ('sew_patch', 'Sew Patch'),
+            ('sew_stripe', 'Sew Stripe'),
+            ('hem_pants', 'Hem Pants'),
+        ],
+        required=True,
         string='Type',
-        related='embellishment_id.type',
-        store=True
     )
 
     sequence = fields.Integer(
@@ -98,25 +105,25 @@ class EmbellishmentComposition(models.Model):
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
 
-    @api.model
-    def default_get(self, fields):
-        ARTWORK = self.env['artwork']
-        vals = super(EmbellishmentComposition, self).default_get(fields)
-        if 'location_id' in fields:
-            vals['location_id'] = self.env.ref('feury_custom_sale.clothes_location_other').id
+    # @api.model
+    # def default_get(self, fields):
+    #     ARTWORK = self.env['artwork']
+    #     vals = super(EmbellishmentComposition, self).default_get(fields)
+    #     if 'location_id' in fields:
+    #         vals['location_id'] = self.env.ref('feury_custom_sale.clothes_location_other').id
         
-        if 'artwork_id' in fields and self._context.get('partner_id'):
-            default_artwork = ARTWORK.search(
-                [
-                    ('partner_id', '=', self._context.get('partner_id')),
-                    ('is_default', '=', True),
-                    ('type', '=', self._context.get('default_type')),
-                ], 
-                limit=1
-            )
-            vals['artwork_id'] = default_artwork.id
+    #     if 'artwork_id' in fields and self._context.get('partner_id'):
+    #         default_artwork = ARTWORK.search(
+    #             [
+    #                 ('partner_id', '=', self._context.get('partner_id')),
+    #                 ('is_default', '=', True),
+    #                 ('type', '=', self._context.get('default_type')),
+    #             ], 
+    #             limit=1
+    #         )
+    #         vals['artwork_id'] = default_artwork.id
 
-        return vals
+    #     return vals
 
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)
@@ -162,7 +169,7 @@ class EmbellishmentComposition(models.Model):
     @api.onchange('text')
     def onchnage_text(self):
         for record in self:
-            if not (record.text or record.artwork_id):
+            if not record.text:
                 continue
 
             lines = record.text.split('\n')
@@ -173,6 +180,22 @@ class EmbellishmentComposition(models.Model):
 
             if any(len(line) > 22 for line in lines):
                 raise UserError(_('Each line is limited to only 22 characters'))
+
+    @api.onchange('type')
+    def onchnage_type(self):
+        for record in self:
+            if not record.type:
+                continue
+
+            record.write({
+                'location_id': False,
+                'artwork_id': False,
+                'artwork_image': False,
+                'thumbnail': False,
+                'per_print_file': False,
+                'text': False,
+                'font': False,
+            })
             
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)

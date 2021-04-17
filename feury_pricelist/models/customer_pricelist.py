@@ -11,7 +11,9 @@ from collections import defaultdict
 
 
 # TODO add a thumbnail (search if we can have a selection from available ones)
-
+# TODO add constraint to not allow lines with zero cost.
+# TODO add button called "refresh", actions: update the cost of each group.
+# TODO restrict extra types on the line to (heat_seal, sew_patch, embroider).
 # TODO check duplicated values in lines!
 class CustomerPricelist(models.Model):
     _name = 'customer.pricelist'
@@ -154,8 +156,15 @@ class CustomerPricelist(models.Model):
     @api.constrains('line_ids')
     def _check_lines(self):
         for record in self:
+            # We should have at least one line
             if not record.line_ids:
                 raise ValidationError(_('You must have at least one item in the pricelist.'))
+
+            # Check if we have a zero cost line.
+            if record.state in ('sent', 'signed', 'approved'):
+                costs = record.line_ids.mapped('cost')
+                if any(cost <= 0 for cost in costs):
+                    raise ValidationError(_('You can not have a zero cost line in the state.'))
 
     # ----------------------------------------------------------------------------------------------------
     # 3- Compute methods (namely _compute_***)
