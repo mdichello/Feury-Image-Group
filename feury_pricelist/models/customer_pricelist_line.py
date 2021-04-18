@@ -7,6 +7,7 @@ from odoo.exceptions import UserError, ValidationError
 class CustomerPricelistLine(models.Model):
     _name = 'customer.pricelist.line'
     _description = 'Customer Pricelist Line'
+    _order = "sequence, id"
 
     sequence = fields.Integer(
         string='Sequence',

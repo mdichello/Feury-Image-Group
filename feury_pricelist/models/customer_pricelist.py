@@ -11,9 +11,11 @@ from collections import defaultdict
 
 
 # TODO add a thumbnail (search if we can have a selection from available ones)
-# TODO add button called "refresh", actions: update the cost of each group.
 # TODO restrict extra types on the line to (heat_seal, sew_patch, embroider).
 # TODO check duplicated values in lines!
+# TODO override copy method.
+# TODO add search by style_id
+
 class CustomerPricelist(models.Model):
     _name = 'customer.pricelist'
     _description = 'Customer Pricelist'
@@ -301,6 +303,52 @@ class CustomerPricelist(models.Model):
 
     def action_draft(self):
         self.state = 'draft'
+
+    def action_refresh(self):
+        PRODUCT_TEMPLATE = self.env['product.template']
+        PRICELIST_LINE = self.env['customer.pricelist.line']
+
+        self.ensure_one()
+
+        for line in self.line_ids:
+            products = line.product_ids
+            product_costs = products.mapped('standard_price')
+
+            # products cost did not change.
+            if set(product_costs) == set([line.cost]):
+                continue
+            
+            # The entire pricelist line changed price.
+            if len(product_costs) == 1:
+                line.cost = product_costs[0]
+
+            # The line has at least two products with two different cost.
+            else:
+                groups = defaultdict(lambda : PRODUCT_TEMPLATE)
+
+                for product in products:
+                    groups[product.standard_price] += product
+
+                if not groups:
+                    continue
+
+                for cost, products in groups.items():
+                    colors = products.mapped('color_id')
+                    sizes = products.mapped('size_id')
+
+                    PRICELIST_LINE.create({
+                        'pricelist_id': self.id,
+                        'style_id': line.style_id.id,
+                        'color_ids': [(6, 0, colors.ids)],
+                        'size_ids': [(6, 0, sizes.ids)],
+                        'product_ids': [(6, 0, products.ids)],
+                        'cost': cost,
+                        'sale_price': cost * (1 + line.margin/100),
+                        'is_atomic': True,
+                        'sequence': line.sequence
+                    })
+
+                line.unlink()
 
     # ----------------------------------------------------------------------------------------------------
     # 6- CRONs methods

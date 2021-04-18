@@ -82,12 +82,14 @@
                                     <field name="pricelist_id" invisible="1"/>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="is_atomic" invisible="1"/>
+                                    <field name="product_ids" invisible="1" force_save="1"/>
+
                                     <field name="sequence" widget="handle"/>
                                     <field name="style_id" options="{'no_create': True, 'no_open': True}"/>
                                     <field name="color_ids" widget="many2many_tags" options="{'no_create_edit': True}" colspan="2"/>
                                     <field name="size_ids" widget="many2many_tags" options="{'no_create_edit': True}" colspan="2"/>
                                     <field name="clothing_type_id"/>
-                                    <button name="action_open_embellishment_wizard" width="0.1" icon="fa-paint-brush" type="object" style="color:#006D6B" string="To edit embellishment save pricelist first" help="To edit embellishment save pricelist first"/>
+                                    <button name="action_open_embellishm ent_wizard" width="0.1" icon="fa-paint-brush" type="object" style="color:#006D6B" string="To edit embellishment save pricelist first" help="To edit embellishment save pricelist first"/>
                                     <field name="thumbnail" widget="image"/>
                                     <button name="action_open_image_wizard" class="fa fa-camera mr8" type="object" style="color:#006D6B" help="To edit embellishment save pricelist first"/>
                                     <field name="is_personalizable"/>
@@ -96,6 +98,17 @@
                                     <field name="sale_price"/>
                                 </tree>
                             </field>
+
+                            <div class="oe_right">
+                                <button name="action_refresh" 
+                                    class="oe_highlight" 
+                                    string="Refresh" 
+                                    type="object" 
+                                    states="draft,sent"
+                                    confirm="Are you sure you wanna refresh the prices?"
+                                    groups="base.group_user" 
+                                    style="background-color: red; border: none;"/>
+                            </div>
                         </page>
 
                         <page string="Signature" groups="base.group_no_one" name="customer_signature" >
