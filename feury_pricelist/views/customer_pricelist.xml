@@ -71,16 +71,9 @@
                         </group>
                     </group>
 
+                    <!-- TODO UX: add form view to lines -->
                     <notebook>
                         <page string="Lines">
-                            <button name="action_refresh" 
-                                    class="oe_highlight" 
-                                    string="Refresh" 
-                                    type="object" 
-                                    states="draft,sent"
-                                    confirm="Are you sure you wanna refresh the prices?"
-                                    groups="base.group_user" />
-
                             <field name="line_ids" nolabel="1" widget="section_and_note_one2many" mode="tree,kanban" context="{'default_margin': margin}">
                                 <tree editable="bottom">
                                     <control>
@@ -106,6 +99,16 @@
                                     <field name="sale_price"/>
                                 </tree>
                             </field>
+
+                            <div class="oe_right">
+                                <button name="action_refresh" 
+                                        class="oe_highlight" 
+                                        string="Refresh" 
+                                        type="object" 
+                                        states="draft,sent"
+                                        confirm="Are you sure you wanna refresh the prices?"
+                                        groups="base.group_user" />
+                            </div>
                         </page>
 
                         <page string="Signature" groups="base.group_no_one" name="customer_signature" >

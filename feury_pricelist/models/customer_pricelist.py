@@ -103,7 +103,8 @@ class CustomerPricelist(models.Model):
     line_ids = fields.One2many(
         string="Lines",
         comodel_name="customer.pricelist.line",
-        inverse_name="pricelist_id"
+        inverse_name="pricelist_id",
+        copy=True
     )
 
     active = fields.Boolean(
