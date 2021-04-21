@@ -20,7 +20,7 @@
         'data/mail_data.xml',
         'data/pricelist_data.xml',
         'views/res_partner.xml',
-        # 'views/customer_pricelist.xml',
+        'views/customer_pricelist.xml',
         'views/pricelist_portal_templates.xml',
         'views/menus.xml',
         'data/ir_sequence.xml',

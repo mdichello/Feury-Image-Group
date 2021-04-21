@@ -11,14 +11,15 @@
             <field name="date"/>
             <field name="start_date"/>
             <field name="end_date"/>
-            <field name="state"
+            <field name="state"/>
+            <!-- <field name="state"
                 optional="show" 
                 widget="badge"
                 decoration-muted="state == 'draft'"
                 decoration-warning="state == 'sent'"
                 decoration-primary="state in ('signed', 'approved')"
                 decoration-success="state == 'approved'"
-                decoration-danger="state == 'cancel'"/>
+                decoration-danger="state == 'cancel'"/> -->
         </tree>
         </field>
     </record>
