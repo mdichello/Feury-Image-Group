@@ -4,7 +4,12 @@
 from odoo import api, fields, models, _
 
 
-SUPPORTED_MODELS = ['sale.order', 'account.move', 'stock.picking']
+SUPPORTED_MODELS = (
+    'sale.order', 
+    'account.move', 
+    'stock.picking',
+    'customer.pricelist'
+)
 
 
 class MailComposeMessage(models.TransientModel):

@@ -4,17 +4,14 @@
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import UserError, ValidationError
 
 from collections import defaultdict
 
 
-# TODO add a thumbnail (search if we can have a selection from available ones)
 # TODO restrict extra types on the line to (heat_seal, sew_patch, embroider).
 # TODO check duplicated values in lines!
-# TODO override copy method.
-# TODO add search by style_id
 
 class CustomerPricelist(models.Model):
     _name = 'customer.pricelist'
@@ -55,6 +52,16 @@ class CustomerPricelist(models.Model):
         index=True,
         domain=['&', ('parent_id', '=', False), ('is_customer', '=', True)], 
         required=False
+    )
+
+    # TODO clean
+    user_id = fields.Many2one(
+        'res.users', 
+        string='Salesperson', 
+        index=True, 
+        tracking=2, 
+        default=lambda self: self.env.user,
+        domain=lambda self: [('groups_id', 'in', self.env.ref('sales_team.group_sale_salesman').id)]
     )
 
     date = fields.Date(
@@ -238,39 +245,12 @@ class CustomerPricelist(models.Model):
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
 
-    def _find_mail_template(self, force_confirmation_template=False):
-        template_id = False
-
-        if force_confirmation_template or (self.state == 'sale' and not self.env.context.get('proforma', False)):
-            template_id = int(self.env['ir.config_parameter'].sudo().get_param('sale.default_confirmation_template'))
-            template_id = self.env['mail.template'].search([('id', '=', template_id)]).id
-            if not template_id:
-                template_id = self.env['ir.model.data'].xmlid_to_res_id('sale.mail_template_sale_confirmation', raise_if_not_found=False)
-        if not template_id:
-            template_id = self.env['ir.model.data'].xmlid_to_res_id('sale.email_template_edi_sale', raise_if_not_found=False)
-
-        return template_id
-
     def action_send(self):
         ''' Opens a wizard to compose an email, with relevant mail template loaded by default '''
         self.ensure_one()
         template_id = self._find_mail_template()
-        lang = self.env.context.get('lang')
-        template = self.env['mail.template'].browse(template_id)
-        if template.lang:
-            lang = template._render_template(template.lang, 'sale.order', self.ids[0])
-        ctx = {
-            'default_model': 'sale.order',
-            'default_res_id': self.ids[0],
-            'default_use_template': bool(template_id),
-            'default_template_id': template_id,
-            'default_composition_mode': 'comment',
-            'mark_so_as_sent': True,
-            'custom_layout': "mail.mail_notification_paynow",
-            'proforma': self.env.context.get('proforma', False),
-            'force_email': True,
-            'model_description': self.with_context(lang=lang).type_name,
-        }
+        # TODO refactore this part.
+        self.state = 'sent'
         return {
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
@@ -278,7 +258,13 @@ class CustomerPricelist(models.Model):
             'views': [(False, 'form')],
             'view_id': False,
             'target': 'new',
-            'context': ctx,
+            'context': {
+                'default_model': 'customer.pricelist',
+                'default_res_id': self.id,
+                'default_use_template': bool(template_id),
+                'default_template_id': template_id,
+                'force_email': True,
+            },
         }
 
     def action_approve(self):
@@ -373,4 +359,42 @@ class CustomerPricelist(models.Model):
     def _compute_access_url(self):
         super(CustomerPricelist, self)._compute_access_url()
         for pricelist in self:
-            pricelist.access_url = '/my/pricelist/%s' % (pricelist.id)
+            pricelist.access_url = '/my/pricelists/%s' % (pricelist.id)
+
+    def _get_portal_return_action(self):
+        """ Return the action used to display pricelists when returning from customer portal. """
+        self.ensure_one()
+        return self.env.ref('feury_pricelist.customer_pricelist_action')
+
+    def has_to_be_signed(self, include_draft=False):
+        return (self.state == 'sent' or (self.state == 'draft' and include_draft)) and not self.signature
+
+    def _get_report_base_filename(self):
+        self.ensure_one()
+        return f'Pricelist {self.reference}'
+
+    def _find_mail_template(self, force_confirmation_template=False):
+        template_id = False
+
+        if force_confirmation_template or self.state == 'approved':
+            template_id = int(self.env['ir.config_parameter'].sudo().get_param('feury_pricelist.default_confirmation_template'))
+            template_id = self.env['mail.template'].search([('id', '=', template_id)]).id
+            if not template_id:
+                template_id = self.env['ir.model.data'].xmlid_to_res_id('feury_pricelist.mail_template_pricelist_confirmation', raise_if_not_found=False)
+        if not template_id:
+            template_id = self.env['ir.model.data'].xmlid_to_res_id('feury_pricelist.email_template_edi_pricelist', raise_if_not_found=False)
+
+        return template_id
+
+    def _send_pricelist_approval_mail(self):
+        if self.env.su:
+            # sending mail in sudo was meant for it being sent from superuser
+            self = self.with_user(SUPERUSER_ID)
+        template_id = self._find_mail_template(force_confirmation_template=True)
+        if template_id:
+            for order in self:
+                order.with_context(force_send=True).message_post_with_template(
+                    template_id, 
+                    composition_mode='comment', 
+                    email_layout_xmlid="mail.mail_notification_paynow"
+                )

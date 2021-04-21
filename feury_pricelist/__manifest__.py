@@ -15,6 +15,10 @@
     'data': [
         'security/ir.model.access.csv',
         'security/ir_rule.xml',
+        'report/pricelist_report.xml',
+        'report/pricelist_report_templates.xml',
+        'data/mail_data.xml',
+        'data/pricelist_data.xml',
         'views/res_partner.xml',
         'views/customer_pricelist.xml',
         'views/pricelist_portal_templates.xml',

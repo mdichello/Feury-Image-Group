@@ -14,6 +14,7 @@ from odoo.osv import expression
 
 
 class CustomerPortal(CustomerPortal):
+    # TODO format code.
 
     def _prepare_home_portal_values(self):
         values = super(CustomerPortal, self)._prepare_home_portal_values()
@@ -38,7 +39,7 @@ class CustomerPortal(CustomerPortal):
 
         domain = [
             ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
-            ('state', 'in', ['sale', 'done'])
+            ('state', 'in', ['sent', 'signed', 'approved', 'cancel'])
         ]
 
         searchbar_sortings = {
@@ -84,14 +85,23 @@ class CustomerPortal(CustomerPortal):
     @http.route(['/my/pricelists/<int:pricelist_id>'], type='http', auth="public", website=True)
     def portal_order_page(self, pricelist_id, report_type=None, access_token=None, message=False, download=False, **kw):
         try:
-            pricelist_sudo = self._document_check_access('customer.pricelist', pricelist_id, access_token=access_token)
+            pricelist_sudo = self._document_check_access(
+                'customer.pricelist', 
+                pricelist_id, 
+                access_token=access_token
+            )
         except (AccessError, MissingError):
             return request.redirect('/my')
 
         if report_type in ('html', 'pdf', 'text'):
-            return self._show_report(model=pricelist_sudo, report_type=report_type, report_ref='feury_pricelist.action_report_pricelist', download=download)
+            return self._show_report(
+                model=pricelist_sudo, 
+                report_type=report_type, 
+                report_ref='feury_pricelist.action_report_pricelist', 
+                download=download
+            )
 
-        # use sudo to allow accessing/viewing orders for public user
+        # use sudo to allow accessing/viewing pricelists for public user
         # only if he knows the private token
         # Log only once a day
         if pricelist_sudo:
@@ -153,15 +163,14 @@ class CustomerPortal(CustomerPortal):
         except (TypeError, binascii.Error):
             return {'error': _('Invalid signature data.')}
 
-        if not pricelist_sudo.has_to_be_paid():
-            pricelist_sudo.action_confirm()
-            pricelist_sudo._send_order_confirmation_mail()
+        pricelist_sudo.action_approve()
+        pricelist_sudo._send_pricelist_approval_mail()
 
         pdf = request.env.ref('feury_pricelist.action_report_pricelist').sudo().render_qweb_pdf([pricelist_sudo.id])[0]
 
         _message_post_helper(
             'customer.pricelist', pricelist_sudo.id, _('Pricelist signed by %s') % (name,),
-            attachments=[('%s.pdf' % pricelist_sudo.name, pdf)],
+            attachments=[('%s.pdf' % pricelist_sudo.reference, pdf)],
             **({'token': access_token} if access_token else {}))
 
         query_string = '&message=sign_ok'

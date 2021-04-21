@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import base64
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
-
+from odoo.modules.module import get_module_resource
 
 class CustomerPricelistLine(models.Model):
     _name = 'customer.pricelist.line'
@@ -71,7 +72,8 @@ class CustomerPricelistLine(models.Model):
 
     thumbnail = fields.Image(
         string="Thumbnail",
-        readonly=True
+        readonly=True,
+        compute='_compute_thumbnail'
     )
 
     margin = fields.Float(
@@ -105,6 +107,15 @@ class CustomerPricelistLine(models.Model):
         default=True
     )
 
+    @api.model
+    def _default_image(self):
+        image_path = get_module_resource(
+            'feury_pricelist',
+            'static/src/img',
+            'image_not_available.png'
+        )
+        return base64.b64encode(open(image_path, 'rb').read())
+
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
@@ -116,6 +127,16 @@ class CustomerPricelistLine(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 3- Compute methods (namely _compute_***)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.depends('product_ids')
+    def _compute_thumbnail(self):
+        for record in self:
+            products_with_images = record.product_ids.filtered(
+                lambda p: p.image_1920
+            )
+            record.thumbnail = products_with_images[0].image_1920 \
+                if products_with_images \
+                else record._default_image()
 
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)

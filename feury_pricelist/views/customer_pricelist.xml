@@ -1,16 +1,17 @@
 <odoo>
   <data>
     <record model="ir.ui.view" id="customer_pricelist_list">
-      <field name="name">customer_pricelist list</field>
-      <field name="model">customer.pricelist</field>
-      <field name="arch" type="xml">
+        <field name="name">customer_pricelist list</field>
+        <field name="model">customer.pricelist</field>
+        <field name="arch" type="xml">
         <tree>
-          <field name="reference" colspan="2"/>
-          <field name="partner_id"/>
-          <field name="date"/>
-          <field name="start_date"/>
-          <field name="end_date"/>
-          <field name="state"
+            <field name="reference" colspan="2"/>
+            <field name="partner_id"/>
+            <field name="user_id"/>
+            <field name="date"/>
+            <field name="start_date"/>
+            <field name="end_date"/>
+            <field name="state"
                 optional="show" 
                 widget="badge"
                 decoration-muted="state == 'draft'"
@@ -19,7 +20,7 @@
                 decoration-success="state == 'approved'"
                 decoration-danger="state == 'cancel'"/>
         </tree>
-      </field>
+        </field>
     </record>
 
     <record model="ir.ui.view" id="customer_pricelist_form">
@@ -62,6 +63,7 @@
                             <field name="company_id" groups="base.group_no_one"/>
                             <field name="currency_id" invisible="1"/>
                             <field name="partner_id" required="1"/>
+                            <field name="user_id" required="1"/>
                             <field name="margin"/>
                         </group>
                         <group>
@@ -91,8 +93,8 @@
                                     <field name="size_ids" widget="many2many_tags" options="{'no_create_edit': True}" colspan="2"/>
                                     <field name="clothing_type_id"/>
                                     <button name="action_open_embellishm ent_wizard" width="0.1" icon="fa-paint-brush" type="object" style="color:#006D6B" string="To edit embellishment save pricelist first" help="To edit embellishment save pricelist first"/>
-                                    <field name="thumbnail" widget="image" class="oe_read_only"/>
-                                    <button name="action_open_image_wizard" class="fa fa-camera mr8" type="object" style="color:#006D6B" help="To edit embellishment save pricelist first"/>
+                                    <field name="thumbnail" widget="image" class="oe_read_only img-fluid" options='{"preview_image": "image", "size": [50, 50]}'/>
+                                    <!-- <button name="action_open_image_wizard" class="fa fa-camera mr8" type="object" style="color:#006D6B" help="To edit embellishment save pricelist first"/> -->
                                     <field name="is_personalizable"/>
                                     <field name="cost" force_save="1"/>
                                     <field name="margin"/>
@@ -142,6 +144,8 @@
                 <group expand="1" string="Group By">
                     <filter string="Status" name="status" context="{'group_by':'state'}"/>
                     <filter string="Company" name="company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    <filter string="Salesperson" name="salesperson" domain="[]" context="{'group_by': 'user_id'}"/>
+                    <filter name="customer" string="Customer" domain="[]" context="{'group_by': 'partner_id'}"/>
                     <separator orientation="vertical"/>
                     <filter string="Start Date" name="start_date" context="{'group_by':'start_date'}"/>
                     <filter string="End Date" name="end_date" context="{'group_by':'end_date'}"/>
@@ -151,9 +155,16 @@
     </record>
 
     <record model="ir.actions.act_window" id="customer_pricelist_action">
-      <field name="name">Customer Pricelist</field>
-      <field name="res_model">customer.pricelist</field>
-      <field name="view_mode">tree,form</field>
+        <field name="name">Customer Pricelist</field>
+        <field name="res_model">customer.pricelist</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new pricelist, the first step of a new Pricelist!
+                </p><p>
+                Once the pricelist is accepted/signed by the customer, it is used in quotation for the custmer.
+            </p>
+        </field>
     </record>
   </data>
 </odoo>

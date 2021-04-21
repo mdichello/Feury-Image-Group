@@ -3,7 +3,10 @@
 {
     'name': "Email Grouping by tags",
     'version': '1.0',
-    'depends': ['sale'],
+    'depends': [
+        'sale',
+        'feury_pricelist'
+    ],
     'author': 'Odoo Inc',
     'license': 'OEEL-1',
     'mainainer': 'Odoo Inc',

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_pricelist_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+            <t t-set="address">
+                <div t-field="doc.partner_id"
+                    t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}' />
+                <p t-if="doc.partner_id.vat"><t t-esc="doc.company_id.country_id.vat_label or 'Tax ID'"/>: <span t-field="doc.partner_id.vat"/></p>
+            </t>
+            <div class="page">
+                <div class="oe_structure"/>
+
+                <h2 class="mt16">
+                    <span>Pricelist #</span>
+                    <span t-field="doc.reference"/>
+                </h2>
+
+                <div class="row mt32 mb32" id="informations" style="font-size: 0.8rem;">
+                    <div t-if="doc.start_date" class="col-auto mw-100 mb-2">
+                        <strong>Start Date:</strong>
+                        <p class="m-0" t-field="doc.start_date"/>
+                    </div>
+                    <div t-if="doc.end_date" class="col-auto mw-100 mb-2">
+                        <strong>End Date:</strong>
+                        <p class="m-0" t-field="doc.end_date" t-options='{"widget": "date"}'/>
+                    </div>
+                    <div t-if="doc.user_id.name" class="col-auto mw-100 mb-2" style="white-space: nowrap;">
+                        <strong>Salesperson:</strong>
+                        <p class="m-0" t-field="doc.user_id"/>
+                    </div>
+                </div>
+
+                <style>
+                    .product-image {
+                        max-height: 150px;
+                        max-width: 150px;
+                        width: auto;
+                        height: 100%;
+                        justify-content: center;
+                        align-items: center;
+                        display: block;
+                        margin: auto;
+                        vertical-align: middle;
+                    }
+                </style>
+
+                <table class="table table-sm o_main_table" style="font-size: 0.8rem;">
+                    <thead>
+                        <tr>
+                            <th name="th_thumbnail" class="text-left">Image</th>
+                            <th name="th_style_code" class="text-left">Style Code</th>
+                            <th name="th_colors" class="text-left">Colors</th>
+                            <th name="th_sizes" class="text-left">Sizes</th>
+                            <th name="th_clothing_type" class="text-left">Clothing Type</th>
+                            <th name="th_personalizable" class="text-left">Can be personalized</th>
+                            <th name="th_unit_price" class="text-right">Unit Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="pricelist_tbody">
+                        <t t-foreach="doc.line_ids" t-as="line">
+                            <tr>    
+                                <td name="td_image" class="text-right" style="vertical-align: middle;">
+                                    <img class="product-image img-fluid" t-if="line.thumbnail" t-att-src="'data:image/png;base64,%s' % to_text(line.thumbnail)"/>
+                                </td>
+                                <td name="td_style_code" class="ml-3">
+                                    <span t-field="line.style_id"/>
+                                </td>
+                                <td name="td_colors" class="text-left">
+                                    <span t-field="line.color_ids" widget='many2many_tags'/>
+                                </td>
+                                <td name="td_sized" class="text-left">
+                                    <span t-field="line.size_ids" widget='many2many_tags'/>
+                                </td>
+                                <td name="td_clothing_type" class="text-left">
+                                    <span t-field="line.clothing_type_id"/>
+                                </td>
+                                <td name="td_personalizable" class="text-left">
+                                    <t t-if="line.is_personalizable">
+                                        <span>Yes</span>
+                                    </t>
+                                    <t t-else="">
+                                        <span>No</span>
+                                    </t>
+                                </td>
+                                <td name="td_unit_price" class="text-right">
+                                    <span t-field="line.sale_price"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div t-if="doc.signature" class="mt32 ml64 mr4" name="signature">
+                    <div class="offset-8">
+                        <strong>Signature</strong>
+                    </div>
+                    <div class="offset-8">
+                        <img t-att-src="image_data_uri(doc.signature)" style="max-height: 4cm; max-width: 8cm;"/>
+                    </div>
+                    <div class="offset-8 text-center">
+                        <p t-field="doc.signed_by"/>
+                    </div>
+                </div>
+
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_pricelist">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="feury_pricelist.report_pricelist_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+</odoo>
