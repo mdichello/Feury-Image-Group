@@ -7,7 +7,7 @@ class ProductTemplate(models.Model):
     style_id = fields.Many2one(
         string="Style Code",
         comodel_name="product.style",
-        required=True
+        required=False
     )
 
     color_id = fields.Many2one(
