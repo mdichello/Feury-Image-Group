@@ -8,7 +8,7 @@ from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import UserError, ValidationError
 
 from collections import defaultdict
-
+from werkzeug.urls import url_encode
 
 # TODO restrict extra types on the line to (heat_seal, sew_patch, embroider).
 # TODO check duplicated values in lines!
@@ -134,6 +134,11 @@ class CustomerPricelist(models.Model):
         copy=False
     )
 
+    portal_url = fields.Char(
+        string='Portal URL',
+        compute='_compute_portal_url'
+    )
+
     signed_on = fields.Datetime(
         string='Signed On',
         help='Date of the signature.',
@@ -181,6 +186,11 @@ class CustomerPricelist(models.Model):
     # 3- Compute methods (namely _compute_***)
     # ----------------------------------------------------------------------------------------------------
 
+    @api.depends('access_token')
+    def _compute_portal_url(self):
+        base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+        for record in self:
+            record.portal_url = f'{base_url}/my/pricelists/{self.id}?access_token={self.access_token}'
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)
     # ----------------------------------------------------------------------------------------------------

@@ -100,13 +100,16 @@
             <field name="email_from">${(object.user_id.email_formatted or user.email_formatted) | safe}</field>
             <field name="partner_to">${object.partner_id.id}</field>
             <field name="body_html" type="html">
-                <div style="margin: 0px; padding: 0px;">
+                <div style="margin: 0px; padding: 0px; text-align: center;" >
                     <p style="margin: 0px; padding: 0px; font-size: 13px;">
-                        % set doc_name = 'Pricelist'
                         Hello,
                         <br/><br/>
-                        Your
-                        ${doc_name} <strong>${object.reference}</strong> is ready to be accepted and signed.
+                        Your Pricelist is ready to be accepted and signed.
+                        <br/><br/>
+
+                        <a href="${object.portal_url}" style="background-color: #875A7B; padding: 8px 16px 8px 16px; text-decoration: none; color: #fff; border-radius: 5px; font-size:13px;">
+                            <strong>See Pricelist</strong>
+                        </a>
                         <br/><br/>
                         Do not hesitate to contact us if you have any questions.
                         <br/>

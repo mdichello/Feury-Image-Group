@@ -56,11 +56,14 @@ class ProductTemplate(models.Model):
         """
 
         PRODUCT_STYLE = self.env['product.style']
+        PRODUCT_TEMPLATE = self.env['product.template']
         PRODUCT_SIZE = self.env['product.size']
         COLOR = self.env['color']
 
+        products = PRODUCT_TEMPLATE.search([])
+
         # TODO optimize performance, fetch all colors and sizes once.
-        for record in self:
+        for record in products:
             values = {
             }
 
