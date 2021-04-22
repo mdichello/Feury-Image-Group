@@ -276,7 +276,7 @@
                                     </p>
                                     <t t-call="portal.signature_form">
                                         <t t-set="call_url" t-value="pricelist.get_portal_url(suffix='/accept')"/>
-                                        <t t-set="default_name" t-value="pricelist.partner_id.name"/>
+                                        <t t-set="default_name" t-value=""/>
                                     </t>
                                 </main>
                             </form>

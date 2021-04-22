@@ -1,4 +1,9 @@
+import logging
+
 from odoo import api, fields, models, _
+
+
+log = logging.getLogger(__name__)
 
 
 class ProductTemplate(models.Model):
@@ -115,19 +120,29 @@ class ProductTemplate(models.Model):
 
                 values['size_id'] = size.id
 
-            if (complete_migration or not record.style_id) and record.x_studio_product_style_code:
-                style = PRODUCT_STYLE.search([
-                    ('code', 'ilike', record.x_studio_product_style_code),
-                    ('vendor_code', 'ilike', record.x_studio_vendor_code),
-                ], limit=1)
+            vendor_code = record.x_studio_vendor_code
+            style_code = record.x_studio_product_style_code
+            if (complete_migration or not record.style_id) and style_code:
+                try:
+                    domain = [
+                        ('code', 'ilike', style_code)
+                    ]
 
-                if not style:
-                    style = PRODUCT_STYLE.create({
-                        'code': record.x_studio_product_style_code,
-                        'vendor_code': record.x_studio_vendor_code
-                    })
+                    if vendor_code:
+                        domain.append(('vendor_code', 'ilike', vendor_code))
 
-                values['style_id'] = style.id
+                    style = PRODUCT_STYLE.search(domain, limit=1)
+
+                    if not style:
+                        style = PRODUCT_STYLE.create({
+                            'code': style_code,
+                            'vendor_code': vendor_code
+                        })
+
+                    values['style_id'] = style.id
+                except:
+                    log.error(f'Found duplicate key in style module {vendor_code}:{style_code}')
+                    continue
 
             if values:
                 record.write(values)
