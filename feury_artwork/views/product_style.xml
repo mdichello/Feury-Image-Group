@@ -6,6 +6,7 @@
       <field name="arch" type="xml">
         <tree>
           <field name="code"/>
+          <field name="vendor_code"/>
         </tree>
       </field>
     </record>
@@ -21,6 +22,7 @@
                     <field name="active" invisible="1" />
                     <group>
                         <field name="code" />
+                        <field name="vendor_code" />
                     </group>
                 </sheet>
             </form>
@@ -34,6 +36,7 @@
         <field name="arch" type="xml">
             <search string="Search Code">
                 <field name="code" filter_domain="[('code', 'ilike', self)]"/>
+                <field name="vendor_code" filter_domain="[('code', 'ilike', self)]"/>
             </search>
         </field>
     </record>

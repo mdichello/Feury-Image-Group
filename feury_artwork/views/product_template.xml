@@ -12,4 +12,18 @@
             </xpath>
         </field>
     </record>
+
+    <record id="product_template_search_view_feury_artwork_inherit" model="ir.ui.view">
+        <field name="name">product.template.search.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view" />
+        <field name="arch" type="xml">
+        <xpath expr="//filter[@name='inactive']" position="after">
+                <field string="Style Code" name="style_id" filter_domain="[('style_id.code', '=', self)]"/>
+                <field string="Vendor Code" name="style_id" filter_domain="[('style_id.vendor_code', '=', self)]"/>
+                <field string="Color" name="color_id" filter_domain="[('color_id', '=', self)]"/>
+                <field string="Size" name="size_id" filter_domain="[('size_id', '=', self)]"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>

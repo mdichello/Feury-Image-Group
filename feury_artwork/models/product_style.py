@@ -10,13 +10,17 @@ class ProductStyle(models.Model):
     _rec_name = 'code'
 
     _sql_constraints = [
-        ('product_style_code_uniq', 'unique(code)', 'A product style code should be unique.')
+        ('product_style_vendor_code_uniq', 'unique(code, vendor_code)', 'A product style code / vendor code should be unique.')
     ]
 
     code = fields.Char(
-        string='Code',
-        required=True,
-        unique=True
+        string='Style Code',
+        required=True
+    )
+
+    vendor_code = fields.Char(
+        string='Vendor Code',
+        required=False
     )
 
     active = fields.Boolean(
@@ -27,6 +31,13 @@ class ProductStyle(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
+
+    def name_get(self):
+        return [
+            (
+                record.id, f'{record.code}{record.vendor_code or ""}')
+            for record in self
+        ]
 
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)

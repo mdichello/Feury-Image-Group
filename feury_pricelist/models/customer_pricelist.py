@@ -55,7 +55,6 @@ class CustomerPricelist(models.Model):
         required=False
     )
 
-    # TODO clean
     user_id = fields.Many2one(
         'res.users', 
         string='Salesperson', 
