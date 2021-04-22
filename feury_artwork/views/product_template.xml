@@ -9,6 +9,7 @@
                 <field name="style_id" widget="Many2one" attrs="{'required': [('sale_ok', '=', True)]}" options="{'no_open': True}" />
                 <field name="color_id" widget="Many2one" attrs="{'required': [('sale_ok', '=', True)]}" options="{'no_open': True}" />
                 <field name="size_id" widget="Many2one" attrs="{'required': [('sale_ok', '=', True)]}" options="{'no_open': True}" />
+                <field name="vendor_code" />
             </xpath>
         </field>
     </record>

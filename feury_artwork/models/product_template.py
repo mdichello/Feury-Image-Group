@@ -22,6 +22,13 @@ class ProductTemplate(models.Model):
         required=False
     )
 
+    vendor_code = fields.Char(
+        string='Vendor Code',
+        related='style_id.vendor_code',
+        required=False,
+        readonly=False,
+    )
+
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
@@ -55,8 +62,8 @@ class ProductTemplate(models.Model):
         Temporary method
         """
 
-        PRODUCT_STYLE = self.env['product.style']
         PRODUCT_TEMPLATE = self.env['product.template']
+        PRODUCT_STYLE = self.env['product.style']
         PRODUCT_SIZE = self.env['product.size']
         COLOR = self.env['color']
 
@@ -77,7 +84,7 @@ class ProductTemplate(models.Model):
                         'name': record.x_studio_color_code,
                         'hex_code': '#FFFFF'
                     })
-
+                
                 values['color_id'] = color.id
             
             if (complete_migration or not record.size_id) and record.x_studio_size_code:
@@ -94,13 +101,18 @@ class ProductTemplate(models.Model):
 
             if (complete_migration or not record.style_id) and record.x_studio_product_style_code:
                 style = PRODUCT_STYLE.search([
-                    ('code', 'ilike', record.x_studio_product_style_code)
+                    ('code', 'ilike', record.x_studio_product_style_code),
+                    ('vendor_code', 'ilike', record.x_studio_vendor_code),
                 ], limit=1)
 
                 if not style:
                     style = PRODUCT_STYLE.create({
                         'code': record.x_studio_product_style_code,
+                        'vendor_code': record.x_studio_vendor_code
                     })
+
+                else:
+                    style.vendor_code = record.x_studio_vendor_code
 
                 values['style_id'] = style.id
 
