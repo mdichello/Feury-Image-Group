@@ -35,7 +35,9 @@ class ProductStyle(models.Model):
     def name_get(self):
         return [
             (
-                record.id, f'{record.code}{record.vendor_code or ""}')
+                record.id, 
+                f'{record.code}-{record.vendor_code}' if record.vendor_code else f'{record.code}'
+            )
             for record in self
         ]
 

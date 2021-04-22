@@ -134,6 +134,11 @@ class ProductTemplate(models.Model):
                     style = PRODUCT_STYLE.search(domain, limit=1)
 
                     if not style:
+                        style = PRODUCT_STYLE.search([
+                            ('code', 'ilike', style_code)
+                        ], limit=1)
+
+                    if not style:
                         style = PRODUCT_STYLE.create({
                             'code': style_code,
                             'vendor_code': vendor_code

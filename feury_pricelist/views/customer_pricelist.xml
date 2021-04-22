@@ -63,22 +63,22 @@
                         <group>
                             <field name="company_id" groups="base.group_no_one"/>
                             <field name="currency_id" invisible="1"/>
-                            <field name="partner_id" required="1"/>
-                            <field name="user_id" required="1"/>
+                            <field name="partner_id" required="1" attrs="{'readonly':[('state','=','approved')]}"/>
+                            <field name="user_id" required="1" attrs="{'readonly':[('state','=','approved')]}"/>
                             <field name="margin"/>
                         </group>
                         <group>
-                            <field name="start_date"/>
-                            <field name="end_date"/>
-                            <field name="expiration_date" states="draft,sent"/>
-                            <field name="approved_date" states="approved"/>
+                            <field name="start_date" attrs="{'readonly':[('state','=','approved')]}"/>
+                            <field name="end_date" attrs="{'readonly':[('state','=','approved')]}"/>
+                            <field name="expiration_date" states="draft,sent" attrs="{'readonly':[('state','=','approved')]}"/>
+                            <field name="approved_date" states="approved" attrs="{'readonly':[('state','=','approved')]}"/>
                         </group>
                     </group>
 
                     <!-- TODO UX: add form view to lines -->
                     <notebook>
                         <page string="Lines">
-                            <field name="line_ids" nolabel="1" widget="section_and_note_one2many" mode="tree,kanban" context="{'default_margin': margin}">
+                            <field name="line_ids" attrs="{'readonly':[('state','=','approved')]}" nolabel="1" widget="section_and_note_one2many" mode="tree,kanban" context="{'default_margin': margin}">
                                 <tree editable="bottom">
                                     <control>
                                         <create name="create" string="Add a pricelist item"/>
