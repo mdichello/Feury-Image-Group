@@ -10,5 +10,18 @@
             id="feury_pricelist.menu_1_list" 
             parent="customer_pricelist_menu_root"
             action="customer_pricelist_action"/>
+
+        <menuitem 
+            name="Configuration"
+            id="menu_pricelist_config"
+            parent="customer_pricelist_menu_root"
+            groups="base.group_user"/>
+        
+        <menuitem id="menu_feury_pricelist_general_settings"
+            name="Settings"
+            parent="menu_pricelist_config"
+            sequence="12"
+            action="sale.action_sale_config_settings"
+            groups="base.group_system"/>
     </data>
 </odoo>

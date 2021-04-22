@@ -3,6 +3,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from dateutil.relativedelta import relativedelta
+from datetime import datetime, timedelta
 
 from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import UserError, ValidationError
@@ -87,6 +88,26 @@ class CustomerPricelist(models.Model):
         default=lambda l: fields.Date.today() + relativedelta(years=1)
     )
 
+    expiration_date = fields.Date(
+        string='Expiration date',
+        default=lambda l: fields.Date.today() + relativedelta(months=1)
+    )
+
+    def _default_validity_date(self):
+        if self.env['ir.config_parameter'].sudo().get_param('sale.use_quotation_validity_days'):
+            days = self.env.company.quotation_validity_days
+            if days > 0:
+                return fields.Date.to_string(datetime.now() + timedelta(days))
+        return False
+
+    validity_date = fields.Date(
+        string='Expiration', 
+        readonly=True, 
+        copy=False, 
+        states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+        default=_default_validity_date
+    )
+
     margin = fields.Float(
         string='Margin',
         related='partner_id.margin'
@@ -99,6 +120,8 @@ class CustomerPricelist(models.Model):
             ('signed', 'Signed'),
             ('approved', 'Approved'),
             ('cancel', 'Cancel'),
+            ('expired', 'Expired'),
+            ('rejected', 'Rejected'),
         ], 
         string='Status', 
         required=True, 

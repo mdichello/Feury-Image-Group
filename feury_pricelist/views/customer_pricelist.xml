@@ -11,6 +11,7 @@
             <field name="date"/>
             <field name="start_date"/>
             <field name="end_date"/>
+            <field name="expiration_date" states="draft,sent"/>
             <field name="state"
                 optional="show" 
                 widget="badge"
@@ -18,7 +19,7 @@
                 decoration-warning="state == 'sent'"
                 decoration-primary="state in ('signed', 'approved')"
                 decoration-success="state == 'approved'"
-                decoration-danger="state == 'cancel'"/>
+                decoration-danger="state in ('cancel', 'expired', 'rejected')"/>
         </tree>
         </field>
     </record>
