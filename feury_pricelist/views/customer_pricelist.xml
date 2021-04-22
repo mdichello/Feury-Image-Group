@@ -70,7 +70,8 @@
                         <group>
                             <field name="start_date"/>
                             <field name="end_date"/>
-                            <field name="approved_date" attrs="{'invisible': [('state', '!=', 'approved')]}"/>
+                            <field name="expiration_date" states="draft,sent"/>
+                            <field name="approved_date" states="approved"/>
                         </group>
                     </group>
 

@@ -59,6 +59,148 @@
         </t>
     </template>
 
+    <template id="portal_my_home_menu_feury_pricelist" name="Portal layout : pricelists menu entries" inherit_id="portal.portal_breadcrumbs" priority="21">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'pricelist' or pricelist" t-attf-class="breadcrumb-item #{'active ' if not pricelist else ''}">
+                <a t-if="pricelist" t-attf-href="/my/pricelists?{{ keep_query() }}">Pricelists</a>
+                <t t-else="">Pricelists</t>
+            </li>
+            <li t-if="pricelist" class="breadcrumb-item active">
+                Pricelist
+                <t t-esc="pricelist.reference"/>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_feury_pricelist" name="Portal My Home : pricelist entries" inherit_id="portal.portal_my_home" priority="20">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-if="pricelist_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Pricelists</t>
+                <t t-set="url" t-value="'/my/pricelists'"/>
+                <t t-set="count" t-value="quotation_count"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal.portal_breadcrumbs" name="Portal Breadcrumbs">
+        <ol t-if="page_name != 'home'" class="o_portal_submenu breadcrumb mb-0 py-2 flex-grow-1">
+            <li class="breadcrumb-item"><a href="/my/pricelists" aria-label="Home" title="Home"><i class="fa fa-home"/></a></li>
+            <li t-if="page_name == 'my_details'" class="breadcrumb-item">Details</li>
+        </ol>
+    </template>
+
+    <template id="pricelist_portal_content" name="Pricelist Portal Content">
+        <t t-set="doc" t-value="pricelist.with_context(lang=pricelist.partner_id.lang)" />
+        <t t-set="address">
+            <div t-field="doc.partner_id"
+                t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}' />
+            <p t-if="doc.partner_id.vat"><t t-esc="doc.company_id.country_id.vat_label or 'Tax ID'"/>: <span t-field="doc.partner_id.vat"/></p>
+        </t>
+        <div id="pricelist_content" class="col-12 col-lg pb-2 pt-3 card-header bg-white" >
+            <div class="oe_structure"/>
+
+            <h2 class="mt16">
+                <span>Pricelist </span>
+                <span t-field="doc.reference"/>
+            </h2>
+
+            <hr/>
+
+            <div class="row mt32 mb32" id="informations">
+                <div t-if="doc.start_date" class="col-auto mw-100 mb-2">
+                    <strong>Start Date:</strong>
+                    <p class="m-0" t-field="doc.start_date"/>
+                </div>
+                <div t-if="doc.end_date" class="col-auto mw-100 mb-2">
+                    <strong>End Date:</strong>
+                    <p class="m-0" t-field="doc.end_date" t-options='{"widget": "date"}'/>
+                </div>
+                <div t-if="doc.expiration_date" class="col-auto mw-100 mb-2">
+                    <strong>Expiration Date:</strong>
+                    <p class="m-0" t-field="doc.expiration_date" t-options='{"widget": "date"}'/>
+                </div>
+                <div t-if="doc.user_id.name" class="col-auto mw-100 mb-2" style="white-space: nowrap;">
+                    <strong>Salesperson:</strong>
+                    <p class="m-0" t-field="doc.user_id"/>
+                </div>
+            </div>
+
+            <style>
+                .product-image {
+                    max-height: 150px;
+                    max-width: 150px;
+                    width: auto;
+                    height: 100%;
+                    justify-content: center;
+                    align-items: center;
+                    display: block;
+                    margin: auto;
+                    vertical-align: middle;
+                }
+            </style>
+
+            <table class="table table-sm o_main_table" style="font-size: 0.8rem;">
+                <thead>
+                    <tr>
+                        <th name="th_thumbnail" class="text-left">Image</th>
+                        <th name="th_style_code" class="text-left">Style Code</th>
+                        <th name="th_colors" class="text-left">Colors</th>
+                        <th name="th_sizes" class="text-left">Sizes</th>
+                        <th name="th_clothing_type" class="text-left">Clothing Type</th>
+                        <th name="th_personalizable" class="text-left">Can be personalized</th>
+                        <th name="th_unit_price" class="text-right">Unit Price</th>
+                    </tr>
+                </thead>
+                <tbody class="pricelist_tbody">
+                    <t t-foreach="doc.line_ids" t-as="line">
+                        <tr>    
+                            <td name="td_image" class="text-right" style="vertical-align: middle;">
+                                <img class="product-image img-fluid" t-if="line.thumbnail" t-att-src="'data:image/png;base64,%s' % to_text(line.thumbnail)"/>
+                            </td>
+                            <td name="td_style_code" class="ml-3">
+                                <span t-field="line.style_id"/>
+                            </td>
+                            <td name="td_colors" class="text-left">
+                                <span t-field="line.color_ids" widget='many2many_tags'/>
+                            </td>
+                            <td name="td_sized" class="text-left">
+                                <span t-field="line.size_ids" widget='many2many_tags'/>
+                            </td>
+                            <td name="td_clothing_type" class="text-left">
+                                <span t-field="line.clothing_type_id"/>
+                            </td>
+                            <td name="td_personalizable" class="text-left">
+                                <t t-if="line.is_personalizable" class="badge badge-pill badge-success">
+                                    <span>Yes</span>
+                                </t>
+                                <t t-else="" class="badge badge-pill badge-danger">
+                                    <span>No</span>
+                                </t>
+                            </td>
+                            <td name="td_unit_price" class="text-right">
+                                <span t-field="line.sale_price"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+
+            <div t-if="doc.signature" class="mt32 ml64 mr4" name="signature">
+                <div class="offset-8">
+                    <strong>Signature</strong>
+                </div>
+                <div class="offset-8">
+                    <img t-att-src="image_data_uri(doc.signature)" style="max-height: 4cm; max-width: 8cm;"/>
+                </div>
+                <div class="offset-8 text-center">
+                    <p t-field="doc.signed_by"/>
+                </div>
+            </div>
+
+            <div class="oe_structure"/>
+        </div>
+    </template>
+
     <!-- Complete page of the pricelist -->
     <template id="pricelist_portal_template" name="Pricelist Portal Template" inherit_id="portal.portal_sidebar" primary="True">
         <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
@@ -182,112 +324,10 @@
                         <strong>This pricelist has been canceled.</strong> <a role="button" href="#discussion"><i class="fa fa-comment"/> Contact us to get a new pricelist.</a>
                     </div>
 
-                    <!-- TODO main content -->
-                    <t t-call="web.external_layout">
-                        <t t-set="doc" t-value="pricelist.with_context(lang=pricelist.partner_id.lang)" />
-                        <t t-set="address">
-                            <div t-field="doc.partner_id"
-                                t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}' />
-                            <p t-if="doc.partner_id.vat"><t t-esc="doc.company_id.country_id.vat_label or 'Tax ID'"/>: <span t-field="doc.partner_id.vat"/></p>
-                        </t>
-                        <div class="page">
-                            <div class="oe_structure"/>
-
-                            <h2 class="mt16">
-                                <span>Pricelist #</span>
-                                <span t-field="doc.reference"/>
-                            </h2>
-
-                            <div class="row mt32 mb32" id="informations" style="font-size: 0.8rem;">
-                                <div t-if="doc.start_date" class="col-auto mw-100 mb-2">
-                                    <strong>Start Date:</strong>
-                                    <p class="m-0" t-field="doc.start_date"/>
-                                </div>
-                                <div t-if="doc.end_date" class="col-auto mw-100 mb-2">
-                                    <strong>End Date:</strong>
-                                    <p class="m-0" t-field="doc.end_date" t-options='{"widget": "date"}'/>
-                                </div>
-                                <div t-if="doc.user_id.name" class="col-auto mw-100 mb-2" style="white-space: nowrap;">
-                                    <strong>Salesperson:</strong>
-                                    <p class="m-0" t-field="doc.user_id"/>
-                                </div>
-                            </div>
-
-                            <style>
-                                .product-image {
-                                    max-height: 150px;
-                                    max-width: 150px;
-                                    width: auto;
-                                    height: 100%;
-                                    justify-content: center;
-                                    align-items: center;
-                                    display: block;
-                                    margin: auto;
-                                    vertical-align: middle;
-                                }
-                            </style>
-
-                            <table class="table table-sm o_main_table" style="font-size: 0.8rem;">
-                                <thead>
-                                    <tr>
-                                        <th name="th_thumbnail" class="text-left">Image</th>
-                                        <th name="th_style_code" class="text-left">Style Code</th>
-                                        <th name="th_colors" class="text-left">Colors</th>
-                                        <th name="th_sizes" class="text-left">Sizes</th>
-                                        <th name="th_clothing_type" class="text-left">Clothing Type</th>
-                                        <th name="th_personalizable" class="text-left">Can be personalized</th>
-                                        <th name="th_unit_price" class="text-right">Unit Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="pricelist_tbody">
-                                    <t t-foreach="doc.line_ids" t-as="line">
-                                        <tr>    
-                                            <td name="td_image" class="text-right" style="vertical-align: middle;">
-                                                <img class="product-image img-fluid" t-if="line.thumbnail" t-att-src="'data:image/png;base64,%s' % to_text(line.thumbnail)"/>
-                                            </td>
-                                            <td name="td_style_code" class="ml-3">
-                                                <span t-field="line.style_id"/>
-                                            </td>
-                                            <td name="td_colors" class="text-left">
-                                                <span t-field="line.color_ids" widget='many2many_tags'/>
-                                            </td>
-                                            <td name="td_sized" class="text-left">
-                                                <span t-field="line.size_ids" widget='many2many_tags'/>
-                                            </td>
-                                            <td name="td_clothing_type" class="text-left">
-                                                <span t-field="line.clothing_type_id"/>
-                                            </td>
-                                            <td name="td_personalizable" class="text-left">
-                                                <t t-if="line.is_personalizable" class="badge badge-pill badge-success">
-                                                    <span>Yes</span>
-                                                </t>
-                                                <t t-else="" class="badge badge-pill badge-danger">
-                                                    <span>No</span>
-                                                </t>
-                                            </td>
-                                            <td name="td_unit_price" class="text-right">
-                                                <span t-field="line.sale_price"/>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                </tbody>
-                            </table>
-
-                            <div t-if="doc.signature" class="mt32 ml64 mr4" name="signature">
-                                <div class="offset-8">
-                                    <strong>Signature</strong>
-                                </div>
-                                <div class="offset-8">
-                                    <img t-att-src="image_data_uri(doc.signature)" style="max-height: 4cm; max-width: 8cm;"/>
-                                </div>
-                                <div class="offset-8 text-center">
-                                    <p t-field="doc.signed_by"/>
-                                </div>
-                            </div>
-
-                            <div class="oe_structure"/>
-                        </div>
-                    </t>
+                    <!-- main content -->
+                    <div t-attf-class="card #{'pb-5' if report_type == 'html' else ''}">
+                        <div t-call="feury_pricelist.pricelist_portal_content"/>
+                    </div>
 
                     <!-- bottom actions -->
                     <div t-if="pricelist.has_to_be_signed(True)" class="row justify-content-center text-center d-print-none pt-1 pb-4">

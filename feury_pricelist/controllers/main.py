@@ -39,7 +39,7 @@ class CustomerPortal(CustomerPortal):
 
         domain = [
             ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
-            ('state', 'in', ['sent', 'signed', 'approved', 'cancel'])
+            ('state', '!=', 'draft')
         ]
 
         searchbar_sortings = {
@@ -184,13 +184,13 @@ class CustomerPortal(CustomerPortal):
         try:
             pricelist_sudo = self._document_check_access('customer.pricelist', pricelist_id, access_token=access_token)
         except (AccessError, MissingError):
-            return request.redirect('/my')
+            return request.redirect('/my/pricelists')
 
         message = post.get('decline_message')
 
         query_string = False
         if pricelist_sudo.has_to_be_signed() and message:
-            pricelist_sudo.action_cancel()
+            pricelist_sudo.action_reject()
             _message_post_helper('customer.pricelist', pricelist_id, message, **{'token': access_token} if access_token else {})
         else:
             query_string = "&message=cant_reject"

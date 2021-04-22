@@ -60,7 +60,7 @@ class CustomerPricelist(models.Model):
         'res.users', 
         string='Salesperson', 
         index=True, 
-        tracking=2, 
+        tracking=True,
         default=lambda self: self.env.user,
         domain=lambda self: [('groups_id', 'in', self.env.ref('sales_team.group_sale_salesman').id)]
     )
@@ -88,24 +88,25 @@ class CustomerPricelist(models.Model):
         default=lambda l: fields.Date.today() + relativedelta(years=1)
     )
 
-    expiration_date = fields.Date(
-        string='Expiration date',
-        default=lambda l: fields.Date.today() + relativedelta(months=1)
-    )
-
-    def _default_validity_date(self):
-        if self.env['ir.config_parameter'].sudo().get_param('sale.use_quotation_validity_days'):
-            days = self.env.company.quotation_validity_days
+    def _default_expiration_date(self):
+        if self.env['ir.config_parameter'].sudo().get_param('feury_pricelist.use_pricelist_validity_days'):
+            days = self.env.company.pricelist_validity_days
             if days > 0:
-                return fields.Date.to_string(datetime.now() + timedelta(days))
+                return fields.Date.today() + relativedelta(days=days)
         return False
 
-    validity_date = fields.Date(
+    expiration_date = fields.Date(
         string='Expiration', 
-        readonly=True, 
+        readonly=True,
         copy=False, 
         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-        default=_default_validity_date
+        default=_default_expiration_date,
+        required=True
+    )
+
+    is_expired = fields.Boolean(
+        string="Is expired",
+        compute='_compute_is_expired', 
     )
 
     margin = fields.Float(
@@ -124,7 +125,8 @@ class CustomerPricelist(models.Model):
             ('rejected', 'Rejected'),
         ], 
         string='Status', 
-        required=True, 
+        required=True,
+        tracking=True,
         readonly=True, 
         copy=False,
         default='draft'
@@ -214,6 +216,12 @@ class CustomerPricelist(models.Model):
         base_url = self.env['ir.config_parameter'].get_param('web.base.url')
         for record in self:
             record.portal_url = f'{base_url}/my/pricelists/{self.id}?access_token={self.access_token}'
+
+    def _compute_is_expired(self):
+        today = fields.Date.today()
+        for order in self:
+            order.is_expired = order.state == 'sent' and order.expiration_date and order.expiration_date < today
+
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)
     # ----------------------------------------------------------------------------------------------------
@@ -318,6 +326,9 @@ class CustomerPricelist(models.Model):
     def action_cancel(self):
         self.state = 'cancel'
 
+    def action_reject(self):
+        self.state = 'rejected'
+
     def action_sign(self):
         self.state = 'signed'
 
@@ -400,7 +411,7 @@ class CustomerPricelist(models.Model):
         return self.env.ref('feury_pricelist.customer_pricelist_action')
 
     def has_to_be_signed(self, include_draft=False):
-        return (self.state == 'sent' or (self.state == 'draft' and include_draft)) and not self.signature
+        return (self.state == 'sent' or (self.state == 'draft' and include_draft)) and not self.is_expired and not self.signature
 
     def _get_report_base_filename(self):
         self.ensure_one()
