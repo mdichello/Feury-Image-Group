@@ -324,6 +324,11 @@
                         <strong>This pricelist has been canceled.</strong> <a role="button" href="#discussion"><i class="fa fa-comment"/> Contact us to get a new pricelist.</a>
                     </div>
 
+                    <div t-if="pricelist.state == 'rejected'" class="alert alert-danger alert-dismissable d-print-none" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="close">&amp;times;</button>
+                        <strong>This pricelist has been rejected.</strong> <a role="button" href="#discussion"><i class="fa fa-comment"/> Contact us to get a new pricelist.</a>
+                    </div>
+
                     <!-- main content -->
                     <div t-attf-class="card #{'pb-5' if report_type == 'html' else ''}">
                         <div t-call="feury_pricelist.pricelist_portal_content"/>
