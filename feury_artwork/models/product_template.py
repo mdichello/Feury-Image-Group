@@ -62,7 +62,6 @@ class ProductTemplate(models.Model):
 
         products = PRODUCT_TEMPLATE.search([])
 
-        # TODO optimize performance, fetch all colors and sizes once.
         for record in products:
             values = {
             }

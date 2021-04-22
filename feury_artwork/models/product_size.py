@@ -13,6 +13,12 @@ class ProductSize(models.Model):
         ('product_size_code_uniq', 'unique(code)', 'A product size code should be unique.')
     ]
 
+    name = fields.Char(
+        string='Name',
+        required=False,
+        unique=True
+    )
+
     code = fields.Char(
         string='Code',
         required=True,

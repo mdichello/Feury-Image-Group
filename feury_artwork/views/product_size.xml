@@ -5,6 +5,7 @@
       <field name="model">product.size</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="name"/>
           <field name="code"/>
         </tree>
       </field>
@@ -20,6 +21,7 @@
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
                     <field name="active" invisible="1" />
                     <group>
+                        <field name="name" />
                         <field name="code" />
                     </group>
                 </sheet>
@@ -34,6 +36,7 @@
         <field name="arch" type="xml">
             <search string="Search Code">
                 <field name="code" filter_domain="[('code', 'ilike', self)]"/>
+                <field name="name" filter_domain="[('name', 'ilike', self)]"/>
             </search>
         </field>
     </record>
