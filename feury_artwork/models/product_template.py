@@ -57,7 +57,7 @@ class ProductTemplate(models.Model):
     # 7- Technical methods (name must reflect the use)
     # ----------------------------------------------------------------------------------------------------
 
-    def migrate_studio_fields(self, complete_migration=False):
+    def migrate_studio_fields(self, complete_migration=True):
         """
         Temporary method
         """
@@ -66,6 +66,21 @@ class ProductTemplate(models.Model):
         PRODUCT_STYLE = self.env['product.style']
         PRODUCT_SIZE = self.env['product.size']
         COLOR = self.env['color']
+
+
+        if complete_migration:
+            # Clean existins records.
+            sql = """
+                delete from customer_pricelist;
+                update product_template set style_id = null;
+                update product_template set color_id = null;
+                update product_template set size_id = null;
+                delete from product_style;
+                delete from product_size;
+            """
+
+            self.env.cr.execute(sql)
+            self.env.cr.commit()
 
         products = PRODUCT_TEMPLATE.search([])
 
@@ -89,12 +104,13 @@ class ProductTemplate(models.Model):
             
             if (complete_migration or not record.size_id) and record.x_studio_size_code:
                 size = PRODUCT_SIZE.search([
-                    ('code', 'ilike', record.x_studio_size_code)
+                    ('code', 'ilike', record.x_studio_size_code),
                 ], limit=1)
 
                 if not size:
                     size = PRODUCT_SIZE.create({
                         'code': record.x_studio_size_code,
+                        'name': record.x_studio_size_code,
                     })
 
                 values['size_id'] = size.id
@@ -110,9 +126,6 @@ class ProductTemplate(models.Model):
                         'code': record.x_studio_product_style_code,
                         'vendor_code': record.x_studio_vendor_code
                     })
-
-                else:
-                    style.vendor_code = record.x_studio_vendor_code
 
                 values['style_id'] = style.id
 
