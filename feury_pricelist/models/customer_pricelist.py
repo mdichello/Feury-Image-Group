@@ -100,7 +100,7 @@ class CustomerPricelist(models.Model):
         copy=False, 
         states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
         default=_default_expiration_date,
-        required=True
+        required=False
     )
 
     is_expired = fields.Boolean(
