@@ -36,7 +36,7 @@ class ProductStyle(models.Model):
         return [
             (
                 record.id, 
-                f'{record.code}-{record.vendor_code}' if record.vendor_code else f'{record.code}'
+                f'{record.vendor_code}-{record.code}' if record.vendor_code else f'{record.code}'
             )
             for record in self
         ]

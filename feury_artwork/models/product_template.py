@@ -62,7 +62,7 @@ class ProductTemplate(models.Model):
     # 7- Technical methods (name must reflect the use)
     # ----------------------------------------------------------------------------------------------------
 
-    def migrate_studio_fields(self, complete_migration=True):
+    def migrate_studio_fields(self, complete_migration=False):
         """
         Temporary method
         """

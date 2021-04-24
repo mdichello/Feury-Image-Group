@@ -94,7 +94,7 @@
                                     <field name="color_ids" widget="many2many_tags" options="{'no_create_edit': True}" colspan="2"/>
                                     <field name="size_ids" widget="many2many_tags" options="{'no_create_edit': True}" colspan="2"/>
                                     <field name="clothing_type_id"/>
-                                    <button name="action_open_embellishm ent_wizard" width="0.1" icon="fa-paint-brush" type="object" style="color:#006D6B" string="To edit embellishment save pricelist first" help="To edit embellishment save pricelist first"/>
+                                    <button name="action_open_embellishment_wizard" width="0.1" icon="fa-paint-brush" type="object" style="color:#006D6B" string="To edit embellishment save pricelist first" help="To edit embellishment save pricelist first"/>
                                     <field name="thumbnail" widget="image" class="oe_read_only img-fluid" options='{"preview_image": "image", "size": [50, 50]}'/>
                                     <!-- <button name="action_open_image_wizard" class="fa fa-camera mr8" type="object" style="color:#006D6B" help="To edit embellishment save pricelist first"/> -->
                                     <field name="is_personalizable"/>

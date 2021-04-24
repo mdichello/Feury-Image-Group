@@ -1,55 +1,9 @@
 from odoo import api, fields, models, _
 
 
-class ResPartner(models.Model):
-    _inherit = 'res.partner'
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
 
-    # TODO add res.settings.
-    margin = fields.Float(
-        string="Margin",
-        default=100
-    )
-
-    # is_locked_pricelist = fields.Boolean(
-    #     string='Locked pricelist',
-    #     default=False
-    # )
-
-    def _get_partner_pricelist_multi(self, partner_ids, company_id=None):
-        results = super(ResPartner, self)._get_partner_pricelist_multi(
-            self, 
-            partner_ids, 
-            company_id=company_id
-        )
-        return results
-
-    property_product_pricelist = fields.Many2one(
-        string='Pricelist',
-        comodel_name='product.pricelist',
-        compute='_compute_product_pricelist',
-        inverse='_inverse_product_pricelist',
-        company_dependent=False,
-        help='This pricelist will be used, instead of the default one, for sales to the current partner',
-    )
-
-    @api.depends('country_id')
-    @api.depends_context('force_company')
-    def _compute_product_pricelist(self):
-        PRODUCT_PRICELIST = self.env['product.pricelist']
-        company = self.env.context.get('force_company', False)
-        res = PRODUCT_PRICELIST._get_partner_pricelist_multi(
-            self.ids, 
-            company_id=company
-        )
-        for p in self:
-
-            p.property_product_pricelist = res.get(p.id)
-
-    def _inverse_product_pricelist(self):
-        for partner in self:
-            if partner.is_locked_pricelist:
-                continue
-            super(ResPartner, partner)._inverse_product_pricelist()
 
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
@@ -66,6 +20,13 @@ class ResPartner(models.Model):
     # 4- Onchange methods (namely onchange_***)
     # ----------------------------------------------------------------------------------------------------
 
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        if self.partner_id:
+            self.pricelist_id = self.partner_id.with_context(force_company=self.company_id.id).property_product_pricelist.id
+        if self.partner_id.user_id:
+            self.user_id = self.partner_id.user_id
+
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
@@ -77,3 +38,16 @@ class ResPartner(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 7- Technical methods (name must reflect the use)
     # ----------------------------------------------------------------------------------------------------
+
+    def _get_default_pricelist(self):
+        """
+        Return a system pricelist if found otherwise return system default one.
+        """
+        PRODUCT_PRICELIST = self.env['product.pricelist']
+        customer_pricelist = PRODUCT_PRICELIST.search([
+            ('partner_id', '=', self.partner_id),
+            ('company_id', '=', self.env.company.id),
+        ], limit=1)
+        return (customer_pricelist and customer_pricelist.id) or PRODUCT_PRICELIST.search([
+            ('currency_id', '=', self.env.company.currency_id.id
+        )], limit=1).id

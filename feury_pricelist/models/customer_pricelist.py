@@ -13,6 +13,15 @@ from werkzeug.urls import url_encode
 
 # TODO restrict extra types on the line to (heat_seal, sew_patch, embroider).
 # TODO check duplicated values in lines!
+# TODO change label from personalizable to extra emeblis....
+# TODO change validity to expiration in configuration part.
+
+# TODO bug on embillis. type 
+
+
+# New devs
+# TODO add extra check box to show/hide emeblish. cost on the website view
+# ADD new column emeblishment cost
 
 class CustomerPricelist(models.Model):
     _name = 'customer.pricelist'
@@ -84,7 +93,8 @@ class CustomerPricelist(models.Model):
     
     end_date = fields.Date(
         string='End date',
-        default=lambda l: fields.Date.today() + relativedelta(years=1)
+        required=False,
+        default=lambda l: fields.Date.today() + relativedelta(years=1),
     )
 
     def _default_expiration_date(self):
@@ -206,6 +216,28 @@ class CustomerPricelist(models.Model):
                         'Sorry: You can not have a pricelist item with cost zero in the state %s.'
                     ) % (record.state, ))
 
+    @api.constrains('start_date', 'end_date', 'expiration_date')
+    def _check_dates(self):
+        for record in self:
+            expiration_date = record.expiration_date
+            start_date = record.start_date
+            end_date = record.end_date
+
+            if end_date and start_date > end_date:
+                raise ValidationError(_(
+                    'End date can not be less than the start date'
+                ))
+
+            if expiration_date and start_date > expiration_date:
+                raise ValidationError(_(
+                    'Expiration date can not be less than the start date'
+                ))
+            
+            if end_date and expiration_date and expiration_date > end_date:
+                raise ValidationError(_(
+                    'Expiration date can not be more than the end date'
+                ))
+
     # ----------------------------------------------------------------------------------------------------
     # 3- Compute methods (namely _compute_***)
     # ----------------------------------------------------------------------------------------------------
@@ -307,6 +339,12 @@ class CustomerPricelist(models.Model):
             },
         }
 
+    def _create_product_pricelist_items(self):
+        pass
+
+    def _disable_product_pricelist_items(self):
+        PRODUCT_PRICELIST = self.env['product.pricelist']
+
     def action_approve(self):
         if self._get_forbidden_state_confirm() & set(self.mapped('state')):
             raise UserError(_(
@@ -316,6 +354,7 @@ class CustomerPricelist(models.Model):
         for pricelist in self.filtered(lambda pricelist: pricelist.partner_id not in pricelist.message_partner_ids):
             pricelist.message_subscribe([pricelist.partner_id.id])
 
+        self._create_product_pricelist_items()
         self.write({
             'state': 'approved',
             'approved_date': fields.Datetime.now()
@@ -323,6 +362,7 @@ class CustomerPricelist(models.Model):
         return True
 
     def action_cancel(self):
+        self._disable_product_pricelist_items()
         self.state = 'cancel'
 
     def action_reject(self):

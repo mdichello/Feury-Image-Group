@@ -7,3 +7,5 @@ from . import res_partner
 from . import customer_pricelist
 from . import customer_pricelist_line
 from . import embellishment
+from . import sale_order
+from . import product_pricelist
