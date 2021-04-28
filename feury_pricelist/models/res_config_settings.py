@@ -13,7 +13,7 @@ class ResConfigSettings(models.TransientModel):
         readonly=False
     )
     use_pricelist_validity_days = fields.Boolean(
-        "Default Pricelist Validity", 
+        "Default Pricelist Expiration", 
         config_parameter='feury_pricelist.use_pricelist_validity_days'
     )
 
@@ -35,6 +35,6 @@ class ResConfigSettings(models.TransientModel):
             return {
                 'warning': {
                     'title': "Warning", 
-                    'message': "Pricelist Validity is required and must be greater than 0."
+                    'message': "Pricelist Expiration (days) is required and must be greater than 0."
                 },
             }

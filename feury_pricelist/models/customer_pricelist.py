@@ -14,7 +14,6 @@ from werkzeug.urls import url_encode
 # TODO restrict extra types on the line to (heat_seal, sew_patch, embroider).
 # TODO check duplicated values in lines!
 # TODO change label from personalizable to extra emeblis....
-# TODO change validity to expiration in configuration part.
 
 # TODO bug on embillis. type 
 
