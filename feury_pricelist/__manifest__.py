@@ -23,6 +23,7 @@
         'views/customer_pricelist.xml',
         'views/pricelist_portal_templates.xml',
         'views/product_pricelist.xml',
+        'views/res_company.xml',
         'views/menus.xml',
         'views/res_config_settings_views.xml',
         'data/ir_sequence.xml',

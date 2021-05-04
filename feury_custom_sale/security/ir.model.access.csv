@@ -4,3 +4,9 @@ access_feury_embellishment_composition,feury_custom_sale.embellishment_compositi
 access_feury_embellishment_composition,feury_custom_sale.embellishment_composition,model_embellishment_composition,base.group_user,1,1,1,1
 access_feury_clothes_location,feury_custom_sale.clothes_location,model_clothes_location,base.group_user,1,1,1,1
 access_feury_clothes_type,feury_custom_sale.clothes_type,model_clothes_type,base.group_user,1,1,1,1
+access_feury_hem_pant,feury_custom_sale.hem_pant,model_hem_pant,base.group_user,1,1,1,1
+access_feury_embroider,feury_custom_sale.embroider,model_embroider,base.group_user,1,1,1,1
+access_feury_sew_patch,feury_custom_sale.sew_patch,model_sew_patch,base.group_user,1,1,1,1
+access_feury_sew_stripe,feury_custom_sale.sew_stripe,model_sew_stripe,base.group_user,1,1,1,1
+access_feury_heat_seal,feury_custom_sale.heat_seal,model_heat_seal,base.group_user,1,1,1,1
+access_feury_screen_print,feury_custom_sale.screen_print,model_screen_print,base.group_user,1,1,1,1

@@ -19,3 +19,18 @@ class ResCompany(models.Model):
         default=30,
         string="Default Pricelist Validity (Days)"
     )
+
+    def _get_default_pricelist_catalog_cover_page(self):
+        pdf_path = get_resource_path('feury_pricelist', 'static/src/pdf/catalog_cover_page.pdf')
+        pdf = False
+        
+        with open(pdf_path, 'rb') as f:
+            pdf = f.read()
+
+        return base64.encodestring(pdf)
+
+    pricelist_catalog_cover_page = fields.Binary(
+        string='Pricelist Catalog cover page',
+        required=True,
+        default=_get_default_pricelist_catalog_cover_page
+    )

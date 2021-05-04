@@ -115,4 +115,34 @@
             </t>
         </t>
     </template>
+
+    <!-- Pricelist Catalog -->
+    <template id="report_pricelist_catalog_document">
+        <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+        
+        <div class="page">
+            <div class="oe_structure"/>
+            <p style="page-break-after:always;"></p>
+            <div class="cover-image"></div>
+            <h2 class="mt16" style="background-image:url('/feury_pricelist/static/src/img/catalog_cover_image_default.jpg');">
+                <span>Cover page</span>
+                <span t-field="doc.reference"/>
+            </h2>
+
+            <div class="oe_structure"/>
+        </div>
+
+        <div class="page">
+            <p style="page-break-after:always;"></p>
+            New page
+        </div>
+    </template>
+
+    <template id="report_pricelist_catalog">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="feury_pricelist.report_pricelist_catalog_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
 </odoo>

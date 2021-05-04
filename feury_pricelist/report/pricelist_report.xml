@@ -10,5 +10,15 @@
             name="feury_pricelist.report_pricelist"
             print_report_name="'Pricelist - %s' % (object.reference)"
         />
+
+        <report 
+            id="action_report_pricelist_catalog"
+            string="Pricelist Catalog"
+            model="customer.pricelist" 
+            report_type="qweb-pdf"
+            file="feury_pricelist.report_pricelist_catalog" 
+            name="feury_pricelist.report_pricelist_catalog"
+            print_report_name="'Pricelist Catalog - %s' % (object.reference)"
+        />
     </data>
 </odoo>

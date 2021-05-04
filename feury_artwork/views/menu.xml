@@ -5,7 +5,6 @@
             parent="sale.product_menu_catalog"
             name="Colors" />
 
-        <!-- TODO imbricate the size and style under product sub-menu -->
         <menuitem id="product_size_menu_list" 
             action="product_size_action" 
             parent="sale.product_menu_catalog"

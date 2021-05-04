@@ -8,18 +8,11 @@
                 <group>
                     <group>
                         <field name="sale_order_line_id" invisible="1"/>
-                        <field name="clothing_type_id" />
-                        <field name="type" />
-                        <field name="hem_length" attrs="{'invisible': [('type', '!=', 'hem_pants')]}"/>
-                    </group>
-                    <group string="Material" attrs="{'invisible': [('type', '!=', 'sew_stripe')]}" >
-                        <field string="Color" name="material_color_id" />
-                        <field string="Type" name="material_type_id" />
-                        <field string="Size" name="material_size_id" />
+                        <field name="clothing_type_id" invisible="1"/>
                     </group>
                 </group>
 
-                <field name="line_ids" context="{'default_clothing_type_id': clothing_type_id, 'default_type': type }" attrs="{'invisible': [('type', 'in', (False, 'hem_pants'))]}">
+                <!-- <field name="line_ids" context="{'default_clothing_type_id': clothing_type_id, 'default_type': type }" attrs="{'invisible': [('type', 'in', (False, 'hem_pants'))]}">
                     <tree editable="bottom" class="embellishment_tree">
                         <control>
                             <create name="create" string="Add a Location"/>
@@ -36,7 +29,112 @@
                         <field name="thumbnail" colspan="1"  style="max-width: 50px; !important" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
                         <field name="description" widget="section_and_note_text" optional="show" invisible="1" />
                     </tree>
-                </field>
+                </field> -->
+
+                <notebook>
+                    <page string="Embroider" name="Embroider">
+                        <field name="embroider_ids">
+                            <tree editable="bottom" class="embellishment_tree">
+                                <control>
+                                    <create name="create" string="Add an Embroider"/>
+                                </control>
+
+                                <field name="sequence" widget="handle"/>
+                                <field name="clothing_type_id" invisible="1" />
+                                <field name="is_other_location" invisible="1" />
+                                <field name="location_id" domain="[('id', 'in', context.get('location_ids'))]" widget="Many2one" />
+                                <field name="artwork_id" domain="[('type', '=', 'embroider'), '|', ('partner_id', '=', context.get('partner_id')), ('partner_id', '=', False)]" attrs="{'readonly': [('text', '!=', False)], 'required': [('text', '=', False)]}" widget="Many2one" />
+                                <field string="Personalization" name="text" colspan="2" widget="section_and_note_text" optional="show"/>
+                                <field name="font" colspan="1" optional="show" attrs="{'required': [('text', '!=', False)]}" />
+                                <field name="thumbnail" colspan="1"  style="max-width: 50px; !important" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
+                            </tree>
+                        </field>
+                    </page>
+
+                    <page string="Screen Print" name="screen_print">
+                        <field name="screen_print_ids">
+                            <tree editable="bottom" class="embellishment_tree">
+                                <control>
+                                    <create name="create" string="Add a Screen Print"/>
+                                </control>
+
+                                <field name="sequence" widget="handle"/>
+                                <field name="clothing_type_id" invisible="1" />
+                                <field name="is_other_location" invisible="1" />
+                                <field name="location_id" domain="[('id', 'in', context.get('location_ids'))]" widget="Many2one" />
+                                <field name="artwork_id" domain="[('type', '=', 'screen_print'), '|', ('partner_id', '=', context.get('partner_id')), ('partner_id', '=', False)]" attrs="{'readonly': [('text', '!=', False)], 'required': [('text', '=', False)]}" widget="Many2one" />
+                                <field string="Personalization" name="text" colspan="2" widget="section_and_note_text" optional="show"/>
+                                <field name="font" colspan="1" optional="show" attrs="{'required': [('text', '!=', False)]}" />
+                                <field name="thumbnail" colspan="1"  style="max-width: 50px; !important" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
+                            </tree>
+                        </field>
+                    </page>
+
+                    <page string="Heat Seal" name="heat_seal">
+                        <field name="heat_seal_ids">
+                            <tree editable="bottom" class="embellishment_tree">
+                                <control>
+                                    <create name="create" string="Add a Heat Seal"/>
+                                </control>
+
+                                <field name="sequence" widget="handle"/>
+                                <field name="clothing_type_id" invisible="1" />
+                                <field name="is_other_location" invisible="1" />
+                                <field name="location_id" domain="[('id', 'in', context.get('location_ids'))]" widget="Many2one" />
+                                <field name="artwork_id" domain="[('type', '=', 'heat_seal'), '|', ('partner_id', '=', context.get('partner_id')), ('partner_id', '=', False)]" attrs="{'readonly': [('text', '!=', False)], 'required': [('text', '=', False)]}" widget="Many2one" />
+                                <field string="Personalization" name="text" colspan="2" widget="section_and_note_text" optional="show"/>
+                                <field name="font" colspan="1" optional="show" attrs="{'required': [('text', '!=', False)]}" />
+                                <field name="thumbnail" colspan="1"  style="max-width: 50px; !important" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
+                            </tree>
+                        </field>
+                    </page>
+
+                    <page string="Sew Patch" name="sew_patch">
+                        <field name="sew_patch_ids">
+                            <tree editable="bottom" class="embellishment_tree">
+                                <control>
+                                    <create name="create" string="Add an Sew Patch"/>
+                                </control>
+
+                                <field name="sequence" widget="handle"/>
+                                <field name="clothing_type_id" invisible="1" />
+                                <field name="is_other_location" invisible="1" />
+                                <field name="location_id" domain="[('id', 'in', context.get('location_ids'))]" widget="Many2one" />
+                                <field name="artwork_id" domain="[('type', '=', 'sew_patch'), '|', ('partner_id', '=', context.get('partner_id')), ('partner_id', '=', False)]" attrs="{'readonly': [('text', '!=', False)], 'required': [('text', '=', False)]}" widget="Many2one" />
+                                <field string="Personalization" name="text" colspan="2" widget="section_and_note_text" optional="show"/>
+                                <field name="font" colspan="1" optional="show" attrs="{'required': [('text', '!=', False)]}" />
+                                <field name="thumbnail" colspan="1"  style="max-width: 50px; !important" nolabel="1" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;thumbnail&quot;}" attrs="{ 'invisible' : [('thumbnail', '=', False)]}"/>
+                            </tree>
+                        </field>
+                    </page>
+
+                    <page string="Sew Stripe" name="sew_stripe">
+                        <field name="sew_stripe_ids">
+                            <tree editable="bottom" class="embellishment_tree">
+                                <control>
+                                    <create name="create" string="Add an Sew Patch"/>
+                                </control>
+
+                                <field name="sequence" widget="handle"/>
+                                <field name="clothing_type_id" invisible="1" />
+                                <field name="is_other_location" invisible="1" />
+                                <field name="location_id" domain="[('id', 'in', context.get('location_ids'))]" widget="Many2one" />
+                                <field string="Color" name="material_color_id" />
+                                <field string="Type" name="material_type_id" />
+                                <field string="Size" name="material_size_id" />
+                                <field name="per_print_file" filename="per_print" string="Upload" attrs="{'required': [('is_other_location', '=', True)]}"/>
+                            </tree>
+                        </field>
+                    </page>
+
+                    <page string="Hem Pants" name="hem_pants">
+                        <group>
+                            <field name="hem_length"/>
+                        </group>
+                        <group>
+                        </group>
+                    </page>
+                </notebook>
 
                 <footer>
                     <button name="action_save" string="Save" type="object" class="btn-primary" />

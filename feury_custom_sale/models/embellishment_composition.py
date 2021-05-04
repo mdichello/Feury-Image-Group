@@ -105,25 +105,25 @@ class EmbellishmentComposition(models.Model):
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
 
-    # @api.model
-    # def default_get(self, fields):
-    #     ARTWORK = self.env['artwork']
-    #     vals = super(EmbellishmentComposition, self).default_get(fields)
-    #     if 'location_id' in fields:
-    #         vals['location_id'] = self.env.ref('feury_custom_sale.clothes_location_other').id
+    @api.model
+    def default_get(self, fields):
+        ARTWORK = self.env['artwork']
+        vals = super(EmbellishmentComposition, self).default_get(fields)
+        if 'location_id' in fields:
+            vals['location_id'] = self.env.ref('feury_custom_sale.clothes_location_other').id
         
-    #     if 'artwork_id' in fields and self._context.get('partner_id'):
-    #         default_artwork = ARTWORK.search(
-    #             [
-    #                 ('partner_id', '=', self._context.get('partner_id')),
-    #                 ('is_default', '=', True),
-    #                 ('type', '=', self._context.get('default_type')),
-    #             ], 
-    #             limit=1
-    #         )
-    #         vals['artwork_id'] = default_artwork.id
+        if 'artwork_id' in fields and self._context.get('partner_id'):
+            default_artwork = ARTWORK.search(
+                [
+                    ('partner_id', '=', self._context.get('partner_id')),
+                    ('is_default', '=', True),
+                    ('type', '=', self._context.get('default_type')),
+                ], 
+                limit=1
+            )
+            vals['artwork_id'] = default_artwork.id
 
-    #     return vals
+        return vals
 
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)

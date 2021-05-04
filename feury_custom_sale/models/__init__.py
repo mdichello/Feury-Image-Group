@@ -5,4 +5,5 @@ from . import clothes_location
 from . import clothes_type
 from . import embellishment
 from . import embellishment_composition
+from . import embellishment_types
 from . import sale_order_line

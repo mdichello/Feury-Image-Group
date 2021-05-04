@@ -20,6 +20,36 @@ class MaterialColor(models.Model):
         inverse_name="embellishment_id"
     )
 
+    embroider_ids = fields.One2many(
+        string="Embroider",
+        comodel_name="embroider",
+        inverse_name="embellishment_id"
+    )
+
+    sew_patch_ids = fields.One2many(
+        string="Sew Patch",
+        comodel_name="sew.patch",
+        inverse_name="embellishment_id"
+    )
+
+    sew_stripe_ids = fields.One2many(
+        string="Sew Stripe",
+        comodel_name="sew.stripe",
+        inverse_name="embellishment_id"
+    )
+
+    heat_seal_ids = fields.One2many(
+        string="Heat Seal",
+        comodel_name="heat.seal",
+        inverse_name="embellishment_id"
+    )
+
+    screen_print_ids = fields.One2many(
+        string="Screen Print",
+        comodel_name="screen.print",
+        inverse_name="embellishment_id"
+    )
+
     clothing_type_id = fields.Many2one(
         string='Clothing type',
         related='sale_order_line_id.clothing_type_id',
@@ -29,7 +59,7 @@ class MaterialColor(models.Model):
     type = fields.Selection(
         selection=[
             ('embroider', 'Embroider'),
-            ('screenp_print', 'Screen Print'),
+            ('screen_print', 'Screen Print'),
             ('heat_seal', 'Heat Seal'),
             ('sew_patch', 'Sew Patch'),
             ('sew_stripe', 'Sew Stripe'),
@@ -40,7 +70,7 @@ class MaterialColor(models.Model):
     )
 
     hem_length = fields.Integer(
-        string='Hem lenght',
+        string='Length',
         default=22
     )
 
@@ -67,11 +97,12 @@ class MaterialColor(models.Model):
     # 2- Constraints methods (_check_***)
     # ----------------------------------------------------------------------------------------------------
 
+    # TODO not triggered.
     @api.constrains('hem_length')
     @api.onchange('hem_length')
     def _check_hem_lenght(self):
         for record in self:
-            if record.type == 'hem_pants' and not (22 < record.hem_length < 65):
+            if record.type == 'hem_pants' and not (22 <= record.hem_length <= 65):
                 raise ValidationError(_("Please choose a hem length between 22 and 65."))
 
     @api.constrains('line_ids')
