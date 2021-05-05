@@ -16,6 +16,13 @@ class Color(models.Model):
         ('color_code_uniq', 'unique(code)', 'A color code should be unique.')
     ]
 
+    image = fields.Image(
+        string="Image",
+        max_width=128, 
+        max_height=128,
+        required=False
+    )
+
     code = fields.Char(
         string='Code',
         required=True,

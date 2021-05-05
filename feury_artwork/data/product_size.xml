@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="0">
+    <data noupdate="1">
         <!-- Resource: product.size -->
         <record id="product_size_extra_large" model="product.size">
             <field name="code">XL</field>
@@ -10,8 +10,8 @@
             <field name="code">L</field>
         </record>
 
-        <record id="product_size_small" model="product.size">
+        <!-- <record id="product_size_small" model="product.size">
             <field name="code">S</field>
-        </record>
+        </record> -->
     </data>
 </odoo>
