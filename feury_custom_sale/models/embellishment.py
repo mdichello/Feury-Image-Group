@@ -67,6 +67,7 @@ class MaterialColor(models.Model):
         ],
         required=True,
         string='Type',
+        default='embroider'
     )
 
     hem_length = fields.Integer(
