@@ -9,7 +9,6 @@ from odoo import api, fields, models, SUPERUSER_ID, _
 from odoo.exceptions import UserError, ValidationError
 
 from collections import defaultdict
-from werkzeug.urls import url_encode
 
 # TODO restrict extra types on the line to (heat_seal, sew_patch, embroider).
 # TODO check duplicated values in lines!
