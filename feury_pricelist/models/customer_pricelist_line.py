@@ -5,6 +5,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.modules.module import get_module_resource
 
+
 class CustomerPricelistLine(models.Model):
     _name = 'customer.pricelist.line'
     _description = 'Customer Pricelist Line'
@@ -73,7 +74,6 @@ class CustomerPricelistLine(models.Model):
     thumbnail = fields.Image(
         string="Thumbnail",
         readonly=True,
-        compute='_compute_thumbnail'
     )
 
     margin = fields.Float(
@@ -128,15 +128,15 @@ class CustomerPricelistLine(models.Model):
     # 3- Compute methods (namely _compute_***)
     # ----------------------------------------------------------------------------------------------------
 
-    @api.depends('product_ids')
-    def _compute_thumbnail(self):
-        for record in self:
-            products_with_images = record.product_ids.filtered(
-                lambda p: p.image_1920
-            )
-            record.thumbnail = products_with_images[0].image_1920 \
-                if products_with_images \
-                else record._default_image()
+    # @api.depends('product_ids')
+    # def _compute_thumbnail(self):
+    #     for record in self:
+    #         products_with_images = record.product_ids.filtered(
+    #             lambda p: p.image_1920
+    #         )
+    #         record.thumbnail = products_with_images[0].image_1920 \
+    #             if products_with_images \
+    #             else record._default_image()
 
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)
@@ -193,8 +193,29 @@ class CustomerPricelistLine(models.Model):
         return result
 
     def action_open_image_wizard(self):
-        # TODO implementation.
-        pass
+        wizard_view_id = self.env.ref('feury_pricelist.customer_pricelist_product_image_wizard').id
+
+        context = dict(self._context)
+        context.update({
+            "default_customer_pricelist_line_id": self.id,
+        })
+
+        result = {
+            'type': 'ir.actions.act_window',
+            'name': 'Select Picture',
+            'res_model': 'customer.pricelist.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'view_id': wizard_view_id,
+            'context': context,
+        }
+
+        if self.embellishment_id:
+            result.update({
+                'res_id': self.embellishment_id[0].id
+            })
+
+        return result
 
     # ----------------------------------------------------------------------------------------------------
     # 6- CRONs methods

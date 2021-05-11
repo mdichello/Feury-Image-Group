@@ -1,0 +1,49 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="customer_pricelist_product_image_wizard">
+        <field name="name">Select Displayed Picture</field>
+        <field name="model">customer.pricelist.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="pricelist_line_id" invisible="1"/>
+                <field name="uploaded_image" widget="image" width="50" height="50"/>
+
+                <p><strong>Or Select existing image</strong></p>
+                <field name="image_ids" mode="kanban">
+                    <kanban class="o_res_partner_kanban" create="0" edit="0">
+                        <field name="id"/>
+                        <field name="color"/>
+                        <field name="product_id"/>
+                        <field name="is_selected"/>
+                        <templates>
+                            <t t-name="kanban-box">
+                                <div class="o_kanban_record_has_image_fill o_res_partner_kanban">
+                                    <t>
+                                        <t t-set="placeholder" t-value="'/base/static/img/company_image.png'"/>
+                                        <div class="o_kanban_image_fill_left o_kanban_image_full" t-attf-style="background-image: url(#{kanban_image('product.template', 'image_1920', record.product_id.raw_value, placeholder)})" role="img"/>
+                                    </t>
+                                    <div class="oe_kanban_details">
+                                        <button type="object" name="unselect" string="Deselect" attrs="{'invisible': [('is_selected', '!=', True)]}" style="background-color: red" class="btn btn-sm btn-primary float-right">Deselect</button>
+                                        <button type="object" name="select" string="Select" attrs="{'invisible': [('is_selected', '=', True)]}" class="btn btn-sm btn-primary float-right">Select</button>
+                                        <div class="oe_kanban_partner_links"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </templates>
+                    </kanban>
+                </field>
+
+                <footer>
+                    <button name="save_selection" string="Save" type="object" class="btn-primary" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="customer_pricelist_product_image_wizard_action">
+      <field name="name">Select Displayed Picture</field>
+      <field name="res_model">customer.pricelist.wizard</field>
+      <field name="view_mode">form</field>
+    </record>
+  </data>
+</odoo>

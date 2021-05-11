@@ -26,6 +26,7 @@
         'views/res_company.xml',
         'views/menus.xml',
         'views/res_config_settings_views.xml',
+        'wizard/customer_pricelist_image.xml',
         'data/ir_sequence.xml',
     ],
 }
