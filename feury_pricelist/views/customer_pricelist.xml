@@ -66,6 +66,7 @@
                             <field name="partner_id" required="1" attrs="{'readonly':[('state','=','approved')]}"/>
                             <field name="user_id" required="1" attrs="{'readonly':[('state','=','approved')]}"/>
                             <field name="margin"/>
+                            <field name="is_embellishment_cost_visible"/>
                         </group>
                         <group>
                             <field name="start_date" attrs="{'readonly':[('state','=','approved')]}"/>
@@ -99,6 +100,7 @@
                                     <button name="action_open_image_wizard" accesskey="" class="fa fa-camera mr8" type="object" style="color:#006D6B" help="To select image save pricelist first"/>
                                     <field name="is_personalizable"/>
                                     <field name="cost" force_save="1"/>
+                                    <field name="embellishment_cost" />
                                     <field name="margin"/>
                                     <field name="sale_price"/>
                                 </tree>

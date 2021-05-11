@@ -116,6 +116,12 @@ class CustomerPricelist(models.Model):
         compute='_compute_is_expired', 
     )
 
+    is_embellishment_cost_visible = fields.Boolean(
+        string="Embellishment cost visible",
+        default=False,
+        help='Is embellishment cost visible for the customer'
+    )
+
     margin = fields.Float(
         string='Margin',
         related='partner_id.margin'
@@ -300,6 +306,14 @@ class CustomerPricelist(models.Model):
                     colors = products.mapped('color_id')
                     sizes = products.mapped('size_id')
 
+                    # First pic found is the default on for the line
+                    products_with_images = products.filtered(
+                        lambda p: p.image_1920
+                    )
+                    thumbnail = products_with_images[0].image_1920 \
+                        if products_with_images \
+                        else PRICELIST_LINE._default_image()
+
                     PRICELIST_LINE.new({
                         'pricelist_id': self.id,
                         'style_id': line.style_id.id,
@@ -308,7 +322,8 @@ class CustomerPricelist(models.Model):
                         'product_ids': [(6, 0, products.ids)],
                         'cost': cost,
                         'sale_price': cost * (1 + line.margin/100),
-                        'is_atomic': True
+                        'is_atomic': True,
+                        'thumbnail': thumbnail
                     })
 
     # ----------------------------------------------------------------------------------------------------

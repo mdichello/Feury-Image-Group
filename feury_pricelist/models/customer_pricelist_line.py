@@ -91,6 +91,11 @@ class CustomerPricelistLine(models.Model):
         default=0
     )
 
+    embellishment_cost = fields.Monetary(
+        string='Embellishment Cost', 
+        default=0
+    )
+
     is_atomic = fields.Boolean(
         string='Is atomic',
         default=False,
@@ -147,7 +152,7 @@ class CustomerPricelistLine(models.Model):
         if not self.cost:
             return
         
-        self.sale_price = self.cost * (1 + self.margin/100)
+        self.sale_price = (self.cost + self.embellishment_cost) * (1 + self.margin/100)
 
     @api.onchange('sale_price')
     def onchange_sale_price(self):
@@ -159,7 +164,7 @@ class CustomerPricelistLine(models.Model):
                 "Sale price can not be less than the product's cost"
             ))
 
-        self.margin = (self.sale_price - self.cost) * 100 / self.cost
+        self.margin = (self.sale_price - self.cost - self.embellishment_cost) * 100 / self.cost
 
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
