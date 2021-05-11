@@ -6,7 +6,9 @@
         <field name="arch" type="xml">
             <form>
                 <field name="pricelist_line_id" invisible="1"/>
-                <field name="uploaded_image" widget="image" width="50" height="50"/>
+                <group>
+                    <field name="uploaded_image" widget="image" width="50" height="50"/>
+                </group>
 
                 <p><strong>Or Select existing image</strong></p>
                 <field name="image_ids" mode="kanban">
