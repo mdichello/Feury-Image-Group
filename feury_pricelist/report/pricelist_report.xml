@@ -16,6 +16,7 @@
             string="Pricelist Catalog"
             model="customer.pricelist" 
             report_type="qweb-pdf"
+            menu="False"
             file="feury_pricelist.report_pricelist_catalog" 
             name="feury_pricelist.report_pricelist_catalog"
             print_report_name="'Pricelist Catalog - %s' % (object.reference)"
