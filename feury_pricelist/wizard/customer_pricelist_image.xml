@@ -17,13 +17,13 @@
                         <field name="is_selected"/>
                         <templates>
                             <t t-name="kanban-box">
-                                <div class="o_kanban_record_has_image_fill o_res_partner_kanban">
+                                <div class="o_kanban_record_has_image_fill o_res_partner_kanban" style="max-width: 170px;">
                                     <t>
                                         <t t-set="placeholder" t-value="'/base/static/img/company_image.png'"/>
                                         <div class="o_kanban_image_fill_left o_kanban_image_full" t-attf-style="background-image: url(#{kanban_image('product.template', 'image_1920', record.product_id.raw_value, placeholder)})" role="img"/>
                                     </t>
                                     <div class="oe_kanban_details">
-                                        <button type="object" name="unselect" string="Deselect" attrs="{'invisible': [('is_selected', '!=', True)]}" style="background-color: red" class="btn btn-sm btn-primary float-right">Deselect</button>
+                                        <button type="object" name="unselect" string="Deselect" attrs="{'invisible': [('is_selected', '!=', True)]}" style="background-color: red; border: none;" class="btn btn-sm btn-primary float-right">Deselect</button>
                                         <button type="object" name="select" string="Select" attrs="{'invisible': [('is_selected', '=', True)]}" class="btn btn-sm btn-primary float-right">Select</button>
                                         <div class="oe_kanban_partner_links"/>
                                     </div>
