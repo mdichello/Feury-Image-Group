@@ -353,7 +353,7 @@ class CustomerPricelist(models.Model):
         }
 
     def _create_product_pricelist_items(self):
-        pass
+        PRODUCT_PRICELIST = self.env['product.pricelist']
 
     def _disable_product_pricelist_items(self):
         PRODUCT_PRICELIST = self.env['product.pricelist']

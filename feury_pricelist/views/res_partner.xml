@@ -10,6 +10,11 @@
 					<xpath expr="//page[@name='sales_purchases']//field[@name='user_id']" position="before">
 						<field name="margin" />
 					</xpath>
+
+					<field name="property_product_pricelist" position="replace">
+						<field name="is_locked_pricelist" invisible="1"/>
+						<field name="property_product_pricelist" attrs="{'readonly': [('is_locked_pricelist','=', True)]}"/>
+					</field>
 				</data>
 			</field>
 		</record>
