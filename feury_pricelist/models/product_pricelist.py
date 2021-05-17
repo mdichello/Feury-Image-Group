@@ -13,6 +13,10 @@ class ProductPricelist(models.Model):
         required=False,
     )
 
+    is_locked = fields.Boolean(
+        related='partner_id.is_locked_pricelist'
+    )
+
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
 
