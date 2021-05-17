@@ -99,7 +99,7 @@ class CustomerPricelistLine(models.Model):
     is_atomic = fields.Boolean(
         string='Is atomic',
         default=False,
-        help='Is atomic, meaning degrouping is needed'
+        help='Is atomic, meaning ungrouping is needed'
     )
 
     sale_price = fields.Monetary(
