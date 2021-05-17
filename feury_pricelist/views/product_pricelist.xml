@@ -2,13 +2,40 @@
 <odoo>
 	<data>
 		<record id="customer_product_pricelist_form_inherit" model="ir.ui.view">
-			<field name="name">res.partner.form.view</field>
+			<field name="name">feury.product.pricelist.form.view</field>
 			<field name="model">product.pricelist</field>
 			<field name="inherit_id" ref="product.product_pricelist_view" />
 			<field name="arch" type="xml">
 				<data>
 					<xpath expr="//field[@name='company_id']" position="after">
 						<field name="partner_id"/>
+					</xpath>
+				</data>
+			</field>
+		</record>
+
+		<record id="feury_customer_product_pricelist_tree_inherit" model="ir.ui.view">
+			<field name="name">feury.product.pricelist.tree.view</field>
+			<field name="model">product.pricelist</field>
+			<field name="inherit_id" ref="product.product_pricelist_view_tree" />
+			<field name="arch" type="xml">
+				<data>
+					<xpath expr="//field[@name='company_id']" position="before">
+						<field name="partner_id"/>
+					</xpath>
+				</data>
+			</field>
+		</record>
+
+		<!-- ADD default filters -->
+		<record id="feury_product_pricelist_view_search_inherit" model="ir.ui.view">
+			<field name="name">feury.product.pricelist.search.inherit</field>
+			<field name="model">product.pricelist</field>
+			<field name="inherit_id" ref="product.product_pricelist_view_search" />
+			<field name="arch" type="xml">
+				<data>
+					<xpath expr="//field[@name='currency_id']" position="after">
+						<field name="partner_id" string="Customer" filter_domain="[('partner_id', 'child_of', self)]"/>
 					</xpath>
 				</data>
 			</field>
