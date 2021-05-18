@@ -147,12 +147,12 @@ class CustomerPricelistLine(models.Model):
     # 4- Onchange methods (namely onchange_***)
     # ----------------------------------------------------------------------------------------------------
 
-    @api.onchange('margin')
+    @api.onchange('margin', 'embellishment_cost')
     def onchange_margin(self):
         if not self.cost:
             return
         
-        self.sale_price = (self.cost + self.embellishment_cost) * (1 + self.margin/100)
+        self.sale_price = self.cost * (1 + self.margin/100) + self.embellishment_cost
 
     @api.onchange('sale_price')
     def onchange_sale_price(self):
