@@ -54,7 +54,9 @@
                             <th name="th_sizes" class="text-left">Sizes</th>
                             <th name="th_clothing_type" class="text-left">Clothing Type</th>
                             <th name="th_personalizable" class="text-left">Can be personalized</th>
-                            <th t-if="doc.is_embellishment_cost_visible" name="th_embellishment_cost" class="text-left">Embellishment Cost</th>
+                            <t t-if="doc.is_embellishment_cost_visible">
+                                <th name="th_embellishment_cost" class="text-left">Embellishment Cost</th>
+                            </t>
                             <th name="th_unit_price" class="text-right">Unit Price</th>
                         </tr>
                     </thead>
@@ -67,7 +69,7 @@
                                 <td name="td_style_code" class="ml-3">
                                     <span t-field="line.style_id"/>
                                 </td>
-                                <td name="td_colors" class="text-left">
+                                <td name="td_colors" class="text-left" style="max-width: 20vw;">
                                     <span t-field="line.color_ids" widget='many2many_tags'/>
                                 </td>
                                 <td name="td_sized" class="text-left">
