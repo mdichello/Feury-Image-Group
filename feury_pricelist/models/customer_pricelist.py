@@ -353,10 +353,54 @@ class CustomerPricelist(models.Model):
         }
 
     def _create_product_pricelist_items(self):
+        PRODUCT_PRICELIST_ITEM = self.env['product.pricelist.item']
         PRODUCT_PRICELIST = self.env['product.pricelist']
+        IR_SEQUENCE = self.env['ir.sequence']
+
+        # The customer has already a custom pricelist.
+        if self.partner_id.has_custom_pricelist:
+            pricelist = self.partner_id.property_product_pricelist
+        else:
+            code = IR_SEQUENCE.next_by_code('customer.pricelist') or self.partner_id
+            pricelist = PRODUCT_PRICELIST.with_context(
+                force_company=self.company_id.id
+            ).create({
+                'partner_id': self.partner_id,
+                'name': f'Custom Pricelist {code}',
+                'discount_policy': 'with_discount'
+            })
+        
+        # Lock pricelist.
+        self.partner_id.is_locked_pricelist = True
+
+        values = [
+            {
+                'min_quantity': 0,
+                'pricelist_id': pricelist.id,
+                'base': 'list_price',
+                'applied_on': '1_product',
+                'product_tmpl_id': product.id,
+                'product_id': False,
+                'fixed_price': line.sale_price,
+                'date_start': self.start_date,
+                'date_end': self.end_date,
+                'customer_pricelist_id': self.id
+            }
+            for line in self.line_ids
+            for product in line.product_ids
+        ]
+
+        PRODUCT_PRICELIST_ITEM.create(values)
+
 
     def _disable_product_pricelist_items(self):
-        PRODUCT_PRICELIST = self.env['product.pricelist']
+        PRODUCT_PRICELIST_ITEM = self.env['product.pricelist.item']
+
+        pricelist_items = PRODUCT_PRICELIST_ITEM.search([
+            ('customer_pricelist_id', '=', self.id)
+        ])
+
+        pricelist_items.unlink()
 
     def action_approve(self):
         if self._get_forbidden_state_confirm() & set(self.mapped('state')):

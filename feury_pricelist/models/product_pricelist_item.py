@@ -1,26 +1,13 @@
 from odoo import api, fields, models, _
 
 
-class ResPartner(models.Model):
-    _inherit = 'res.partner'
+class PricelistItem(models.Model):
+    _inherit = "product.pricelist.item"
 
-    margin = fields.Float(
-        string="Margin",
-        default=100
+    customer_pricelist_id = fields.Many2one(
+        comodel_name='customer.pricelist', 
+        required=False,
     )
-
-    # TODO add trigger to change value, for example once we disable the pricelist, then it should be unlocked.
-    is_locked_pricelist = fields.Boolean(
-        string='Locked pricelist',
-        company_dependent=True,
-        default=False
-    )
-
-    @property
-    def has_custom_pricelist(self):
-        PRODUCT_PRICELIST = self.env['product.pricelist']
-        self.ensure_one()
-        return self.property_product_pricelist.partner_id == self
 
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
