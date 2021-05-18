@@ -54,6 +54,7 @@
                             <th name="th_sizes" class="text-left">Sizes</th>
                             <th name="th_clothing_type" class="text-left">Clothing Type</th>
                             <th name="th_personalizable" class="text-left">Can be personalized</th>
+                            <th t-if="doc.is_embellishment_cost_visible" name="th_embellishment_cost" class="text-left">Embellishment Cost</th>
                             <th name="th_unit_price" class="text-right">Unit Price</th>
                         </tr>
                     </thead>
@@ -82,6 +83,9 @@
                                     <t t-else="">
                                         <span>No</span>
                                     </t>
+                                </td>
+                                <td t-if="doc.is_embellishment_cost_visible" name="td_embellishment_cost" class="text-right">
+                                    <span t-field="line.embellishment_cost"/>
                                 </td>
                                 <td name="td_unit_price" class="text-right">
                                     <span t-field="line.sale_price"/>
