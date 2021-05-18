@@ -96,6 +96,11 @@ class CustomerPricelistLine(models.Model):
         default=0
     )
 
+    extra_embellishment_cost = fields.Monetary(
+        string='Extra Embellishment Cost', 
+        default=0
+    )
+
     is_atomic = fields.Boolean(
         string='Is atomic',
         default=False,
@@ -165,6 +170,11 @@ class CustomerPricelistLine(models.Model):
             ))
 
         self.margin = (self.sale_price - self.cost - self.embellishment_cost) * 100 / self.cost
+
+    @api.onchange('is_personalizable')
+    def onchange_is_personalizable(self):
+        if not self.is_personalizable:
+            self.extra_embellishment_cost = 0
 
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
