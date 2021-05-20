@@ -89,7 +89,7 @@
                         <field name="sew_stripe_ids">
                             <tree editable="bottom" class="embellishment_tree">
                                 <control>
-                                    <create name="create" string="Add a Sew Patch"/>
+                                    <create name="create" string="Add a Sew Stripe"/>
                                 </control>
 
                                 <field name="sequence" widget="handle"/>
