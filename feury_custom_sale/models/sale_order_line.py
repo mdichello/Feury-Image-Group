@@ -19,6 +19,12 @@ class MaterialColor(models.Model):
         required=False
     )
 
+    embellishment_cost = fields.Monetary(
+        string='Embellishment Cost', 
+        readonly=False,
+        default=0
+    )
+
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
