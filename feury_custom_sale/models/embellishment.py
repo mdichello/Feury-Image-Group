@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from itertools import chain
+
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
-class MaterialColor(models.Model):
+class Embellishment(models.Model):
     _name = 'embellishment'
     _description = 'embellishment'
 
     sale_order_line_id = fields.Many2one(
         string='Sale order line',
         comodel_name='sale.order.line'
-    )
-
-    line_ids = fields.One2many(
-        string="Embellishment Composition",
-        comodel_name="embellishment.composition",
-        inverse_name="embellishment_id"
     )
 
     embroider_ids = fields.One2many(
@@ -98,21 +94,49 @@ class MaterialColor(models.Model):
     # 2- Constraints methods (_check_***)
     # ----------------------------------------------------------------------------------------------------
 
-    # TODO not triggered.
     @api.constrains('hem_length')
     @api.onchange('hem_length')
     def _check_hem_lenght(self):
         for record in self:
-            if record.type == 'hem_pants' and not (22 <= record.hem_length <= 65):
+            if not (22 <= record.hem_length <= 65):
                 raise ValidationError(_("Please choose a hem length between 22 and 65."))
 
-    @api.constrains('line_ids')
-    def _check_line_ids(self):
+    @api.constrains(
+        'embroider_ids', 
+        'sew_patch_ids', 
+        'sew_stripe_ids', 
+        'heat_seal_ids', 
+        'screen_print_ids'
+    )
+    def _check_duplicate_locations(self):
         for record in self:
-            location_ids = [line.location_id.id for line in record.line_ids]
+            locations = set()
+            duplicate_locations = set()
 
-            if len(set(location_ids)) != len(location_ids):
-                raise ValidationError(_('No duplicate location is allowed within the same embellishment.'))
+            for item in chain(
+                record.embroider_ids,
+                record.sew_patch_ids,
+                record.sew_stripe_ids,
+                record.heat_seal_ids,
+                record.screen_print_ids
+            ):
+                if item.location_id.is_other_location:
+                    continue
+
+                elif item.location_id in locations:
+                    duplicate_locations.add(item.location_id)
+                
+                else:
+                    locations.add(item.location_id)
+
+            if duplicate_locations:
+
+                raise ValidationError(_(
+                    'No duplicate location is allowed within the same '
+                    'embellishment. \nFound duplicates: \n%s' % (
+                        '\n'.join(location.name for location in duplicate_locations)
+                    )
+                ))
 
     # ----------------------------------------------------------------------------------------------------
     # 3- Compute methods (namely _compute_***)
@@ -121,6 +145,10 @@ class MaterialColor(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.depends('embroider_ids.location_id')
+    def onchange_embroiders_location(self):
+        pass
 
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)

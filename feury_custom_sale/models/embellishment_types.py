@@ -5,8 +5,6 @@ from odoo import api, fields, models, _
 from odoo.tools import image_process
 from odoo.exceptions import ValidationError, UserError
 
-# TODO Establish inheritence.
-# TODO once we create an artwork the type should be passed using context (same for customer)
 
 class HemPants(models.Model):
     _name = 'hem.pant'

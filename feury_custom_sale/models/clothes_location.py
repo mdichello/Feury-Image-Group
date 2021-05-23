@@ -48,3 +48,8 @@ class LocationOnClothes(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 7- Technical methods (name must reflect the use)
     # ----------------------------------------------------------------------------------------------------
+
+    @property
+    def is_other_location(self):
+        self.ensure_one()
+        return self == self.env.ref('feury_custom_sale.clothes_location_other')
