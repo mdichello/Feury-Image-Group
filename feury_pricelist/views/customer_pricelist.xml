@@ -105,6 +105,24 @@
                                     <field name="margin"/>
                                     <field name="sale_price"/>
                                 </tree>
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="style_id" options="{'no_create': True, 'no_open': True}"/>
+                                            <field name="color_ids" widget="many2many_tags" options="{'no_create_edit': True}" style="min-width:100%%"/>
+                                            <field name="size_ids" widget="many2many_tags" options="{'no_create_edit': True}" colspan="2"/>
+                                            <field name="clothing_type_id"/>
+                                        </group>
+                                        <group>
+                                            <field name="cost" force_save="1"/>
+                                            <field name="embellishment_cost" string="Embell- Cost" colspan="1"/>
+                                            <field name="is_personalizable" style="max-width:50%%"/>
+                                            <field name="extra_embellishment_cost" string="Extra Embell- Cost" attrs="{'readonly': [('is_personalizable', '=', False)]}" colspan="1"/>
+                                            <field name="margin"/>
+                                            <field name="sale_price"/>
+                                        </group>
+                                    </group>
+                                </form>
                             </field>
 
                             <div class="oe_right">
