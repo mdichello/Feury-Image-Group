@@ -365,7 +365,7 @@ class CustomerPricelist(models.Model):
             pricelist = PRODUCT_PRICELIST.with_context(
                 force_company=self.company_id.id
             ).create({
-                'partner_id': self.partner_id,
+                'partner_id': self.partner_id.id,
                 'name': f'Custom Pricelist {code}',
                 'discount_policy': 'with_discount'
             })
