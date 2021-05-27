@@ -19,6 +19,7 @@
         'views/embellishment.xml',
         'views/clothes_location.xml',
         'views/clothes_type.xml',
+        'views/res_partner.xml',
         'views/menu.xml',
         'data/clothes_location.xml',
         'data/clothes_type.xml',

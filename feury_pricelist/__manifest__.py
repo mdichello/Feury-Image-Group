@@ -6,6 +6,7 @@
     'depends': [
         'feury_artwork',
         'widget_badge',
+        'feury_custom_sale'
     ],
     'author': 'Business Software Development Solutions',
     'license': 'AGPL-3',
