@@ -65,7 +65,7 @@
                             <field name="currency_id" invisible="1"/>
                             <field name="partner_id" required="1" attrs="{'readonly':[('state','=','approved')]}"/>
                             <field name="user_id" required="1" attrs="{'readonly':[('state','=','approved')]}"/>
-                            <field name="margin"/>
+                            <field name="margin" invisible="1"/>
                             <field name="is_embellishment_cost_visible"/>
                         </group>
                         <group>
