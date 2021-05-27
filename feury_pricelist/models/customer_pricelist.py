@@ -10,16 +10,6 @@ from odoo.exceptions import UserError, ValidationError
 
 from collections import defaultdict
 
-# TODO restrict extra types on the line to (heat_seal, sew_patch, embroider).
-# TODO check duplicated values in lines!
-# TODO change label from personalizable to extra emeblis....
-
-# TODO bug on embillis. type 
-
-
-# New devs
-# TODO add extra check box to show/hide emeblish. cost on the website view
-# ADD new column emeblishment cost
 
 class CustomerPricelist(models.Model):
     _name = 'customer.pricelist'
@@ -54,12 +44,27 @@ class CustomerPricelist(models.Model):
     )
 
     partner_id = fields.Many2one(
-        string='Customer',
+        string='Parent Customer',
         comodel_name='res.partner',
         ondelete='cascade', 
         index=True,
         domain=['&', ('parent_id', '=', False), ('is_customer', '=', True)], 
         required=False
+    )
+
+    is_applied_on_parent_partner = fields.Boolean(
+        string='Apply on parent customer',
+        default=True
+    )
+
+    partner_ids = fields.Many2many(
+        comodel_name='res.partner', 
+        relation='res_partner_customer_pricelist_rel', 
+        column1='partner_id', 
+        column2='customer_pricelist_id', 
+        string="Applies on",
+        help='The pricelist will be applied on theses customers'
+            ', which are the children of the chosen customer'
     )
 
     user_id = fields.Many2one(
@@ -117,9 +122,9 @@ class CustomerPricelist(models.Model):
     )
 
     is_embellishment_cost_visible = fields.Boolean(
-        string="Embellishment cost visible",
+        string="Show Embellishment Cost",
         default=False,
-        help='Is embellishment cost visible for the customer'
+        help='Show embellishment cost for the customer'
     )
 
     margin = fields.Float(
@@ -270,61 +275,89 @@ class CustomerPricelist(models.Model):
         PRICELIST_LINE = self.env['customer.pricelist.line']
         PRODUCT_TEMPLATE = self.env['product.template']
 
-        for record in self:
-            non_atomic_lines = record.line_ids.filtered(
-                lambda l: not l.is_atomic
-            )
+        non_atomic_lines = self.line_ids.filtered(
+            lambda l: not l.is_atomic
+        )
 
-            for line in non_atomic_lines:
-                if not line.style_id:
-                    continue
+        for line in non_atomic_lines:
+            if not line.style_id:
+                continue
 
-                groups = defaultdict(lambda : PRODUCT_TEMPLATE)
-                products = PRODUCT_TEMPLATE.search([
-                    ('style_id', '=', line.style_id.id)
-                ])
+            groups = defaultdict(lambda : PRODUCT_TEMPLATE)
+            products = PRODUCT_TEMPLATE.search([
+                ('style_id', '=', line.style_id.id)
+            ])
 
-                for product in products:
-                    groups[product.standard_price] += product
+            for product in products:
+                groups[product.standard_price] += product
 
-                if not groups:
-                    continue
+            if not groups:
+                continue
 
-                cost, products = groups.popitem()
+            cost, products = groups.popitem()
+            colors = products.mapped('color_id')
+            sizes = products.mapped('size_id')
+            line.write({
+                'color_ids': [(6, 0, colors.ids)],
+                'size_ids': [(6, 0, sizes.ids)],
+                'product_ids': [(6, 0, products.ids)],
+                'cost': cost,
+                'sale_price': cost * (1 + self.margin/100),
+                'is_atomic': True
+            })
+
+            for cost, products in groups.items():
                 colors = products.mapped('color_id')
                 sizes = products.mapped('size_id')
-                line.write({
+
+                # First pic found is the default on for the line
+                products_with_images = products.filtered(
+                    lambda p: p.image_1920
+                )
+                thumbnail = products_with_images[0].image_1920 \
+                    if products_with_images \
+                    else PRICELIST_LINE._default_image()
+
+                PRICELIST_LINE.new({
+                    'pricelist_id': self.id,
+                    'style_id': line.style_id.id,
                     'color_ids': [(6, 0, colors.ids)],
                     'size_ids': [(6, 0, sizes.ids)],
                     'product_ids': [(6, 0, products.ids)],
                     'cost': cost,
-                    'sale_price': cost * (1 + self.margin/100),
-                    'is_atomic': True
+                    'sale_price': cost * (1 + line.margin/100),
+                    'is_atomic': True,
+                    'thumbnail': thumbnail
                 })
 
-                for cost, products in groups.items():
-                    colors = products.mapped('color_id')
-                    sizes = products.mapped('size_id')
+    
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        RES_PARTNER = self.env['res.partner']
 
-                    # First pic found is the default on for the line
-                    products_with_images = products.filtered(
-                        lambda p: p.image_1920
-                    )
-                    thumbnail = products_with_images[0].image_1920 \
-                        if products_with_images \
-                        else PRICELIST_LINE._default_image()
+        values = {
+            'partner_ids': ([6, 0, False])
+        }
 
-                    PRICELIST_LINE.new({
-                        'pricelist_id': self.id,
-                        'style_id': line.style_id.id,
-                        'color_ids': [(6, 0, colors.ids)],
-                        'size_ids': [(6, 0, sizes.ids)],
-                        'product_ids': [(6, 0, products.ids)],
-                        'cost': cost,
-                        'sale_price': cost * (1 + line.margin/100),
-                        'is_atomic': True,
-                        'thumbnail': thumbnail
-                    })
+        if self.partner_id:
+            domain = [
+                '|',
+                ('parent_id', '=', self.partner_id.id),
+                ('partner_parent_company_id', '=', self.partner_id.id)
+            ]
+            child_partners = RES_PARTNER.search(domain)
+            values['partner_ids'] = [(6, 0, child_partners.ids)]
+
+            # No children hence it should be applied on parent.
+            if not child_partners:
+                values['is_applied_on_parent_partner'] = True
+
+        self.write(values) 
+
+    @api.onchange('partner_ids')
+    def onchange_partner_ids(self):
+        if not self.partner_ids:
+            self.is_applied_on_parent_partner = True
 
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
