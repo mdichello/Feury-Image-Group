@@ -188,6 +188,25 @@ class CustomerPricelist(models.Model):
         copy=False
     )
 
+    parent_has_children = fields.Boolean(
+        string='Parent customer has children',
+        compute='_compute_parent_has_children',
+        store=True
+    )
+
+    @api.depends('partner_id')
+    def _compute_parent_has_children(self):
+        RES_PARTNER = self.env['res.partner']
+
+        for record in self:
+            domain = [
+                '|',
+                ('parent_id', '=', record.partner_id.id),
+                ('partner_parent_company_id', '=', record.partner_id.id)
+            ]
+            children = RES_PARTNER.search(domain, count=True)
+            record.parent_has_children = True if children else False
+
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------

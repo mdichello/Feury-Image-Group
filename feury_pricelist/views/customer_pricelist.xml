@@ -63,15 +63,23 @@
                         <group>
                             <field name="company_id" groups="base.group_no_one"/>
                             <field name="currency_id" invisible="1"/>
+                            <field name="parent_has_children" invisible="1"/>
+
                             <field name="partner_id" required="1" attrs="{'readonly':[('state','=','approved')]}"/>
                             <field name="user_id" required="1" attrs="{'readonly':[('state','=','approved')]}"/>
                             <field name="partner_ids" 
                                 domain="['|', ('parent_id', '=', partner_id), ('partner_parent_company_id', '=', partner_id)]" 
                                 widget="many2many_tags" 
-                                attrs="{'readonly':['|', ('state','=','approved'), ('partner_id', '=', False)]}"
+                                attrs="{
+                                    'readonly':['|', ('state','=','approved'), ('partner_id', '=', False)],
+                                    'invisible':[('parent_has_children', '=', False)],
+                                }"
                                 options="{'no_create_edit': True}"/>
                             <field name="is_applied_on_parent_partner"
-                                attrs="{'readonly':['|', ('state','=','approved'), ('partner_ids', '=', [])]}"/>
+                                attrs="{
+                                    'readonly':['|', ('state','=','approved'), ('partner_id', '=', False)],
+                                    'invisible':[('parent_has_children', '=', False)],
+                                }"/>
                             <field name="margin" invisible="1"/>
                             <field name="is_embellishment_cost_visible"/>
                         </group>
