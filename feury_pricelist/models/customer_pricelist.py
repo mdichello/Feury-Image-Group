@@ -363,12 +363,26 @@ class CustomerPricelist(models.Model):
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
 
+    def partners_send_list(self):
+        self.ensure_one()
+        send_to_partners = self.partner_ids
+
+        if self.is_applied_on_parent_partner:
+            send_to_partners += self.partner_id
+
+        send_list = send_to_partners.filtered(
+            lambda p: p.email
+        )
+        return send_list
+
+
     def action_send(self):
         ''' Opens a wizard to compose an email, with relevant mail template loaded by default '''
         self.ensure_one()
         template_id = self._find_mail_template()
         # TODO refactore this part.
         self.state = 'sent'
+
         return {
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
@@ -382,6 +396,7 @@ class CustomerPricelist(models.Model):
                 'default_use_template': bool(template_id),
                 'default_template_id': template_id,
                 'force_email': True,
+                'is_batch': True
             },
         }
 
@@ -390,40 +405,46 @@ class CustomerPricelist(models.Model):
         PRODUCT_PRICELIST = self.env['product.pricelist']
         IR_SEQUENCE = self.env['ir.sequence']
 
-        # The customer has already a custom pricelist.
-        if self.partner_id.has_custom_pricelist:
-            pricelist = self.partner_id.property_product_pricelist
-        else:
-            code = IR_SEQUENCE.next_by_code('customer.pricelist') or self.partner_id
-            pricelist = PRODUCT_PRICELIST.with_context(
-                force_company=self.company_id.id
-            ).create({
-                'partner_id': self.partner_id.id,
-                'name': f'Custom Pricelist {code}',
-                'discount_policy': 'with_discount'
-            })
-        
-        # Lock pricelist.
-        self.partner_id.is_locked_pricelist = True
+        partners = self.partner_ids
 
-        values = [
-            {
-                'min_quantity': 0,
-                'pricelist_id': pricelist.id,
-                'base': 'list_price',
-                'applied_on': '1_product',
-                'product_tmpl_id': product.id,
-                'product_id': False,
-                'fixed_price': line.sale_price,
-                'date_start': self.start_date,
-                'date_end': self.end_date,
-                'customer_pricelist_id': self.id
-            }
-            for line in self.line_ids
-            for product in line.product_ids
-        ]
+        if self.is_applied_on_parent_partner:
+            partners += self.partner_id
 
-        PRODUCT_PRICELIST_ITEM.create(values)
+        for partner in partners:
+            # The customer has already a custom pricelist.
+            if partner.has_custom_pricelist:
+                pricelist = partner.property_product_pricelist
+            else:
+                code = IR_SEQUENCE.next_by_code('customer.pricelist') or partner
+                pricelist = PRODUCT_PRICELIST.with_context(
+                    force_company=self.company_id.id
+                ).create({
+                    'partner_id': partner.id,
+                    'name': f'Custom Pricelist {code}',
+                    'discount_policy': 'with_discount'
+                })
+            
+            # Lock pricelist.
+            partner.is_locked_pricelist = True
+
+            values = [
+                {
+                    'min_quantity': 0,
+                    'pricelist_id': pricelist.id,
+                    'base': 'list_price',
+                    'applied_on': '1_product',
+                    'product_tmpl_id': product.id,
+                    'product_id': False,
+                    'fixed_price': line.sale_price,
+                    'date_start': self.start_date,
+                    'date_end': self.end_date,
+                    'customer_pricelist_id': self.id
+                }
+                for line in self.line_ids
+                for product in line.product_ids
+            ]
+
+            PRODUCT_PRICELIST_ITEM.create(values)
 
 
     def _disable_product_pricelist_items(self):
@@ -441,8 +462,18 @@ class CustomerPricelist(models.Model):
                 'It is not allowed to approve a pricelist in the following states: %s'
             ) % (', '.join(self._get_forbidden_state_confirm())))
 
-        for pricelist in self.filtered(lambda pricelist: pricelist.partner_id not in pricelist.message_partner_ids):
-            pricelist.message_subscribe([pricelist.partner_id.id])
+        for pricelist in self:
+            subject_partners = pricelist.partner_ids
+
+            if pricelist.is_applied_on_parent_partner:
+                subject_partners += pricelist.partner_id
+
+            unsubscribed_partners = subject_partners.filtered(
+                lambda partner: partner not in pricelist.message_partner_ids
+            )
+
+            if unsubscribed_partners:
+                pricelist.message_subscribe(unsubscribed_partners.ids)
 
         self._create_product_pricelist_items()
         self.write({
