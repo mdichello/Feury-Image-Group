@@ -335,20 +335,7 @@ class CustomerPricelist(models.Model):
         RES_PARTNER = self.env['res.partner']
 
         for record in self:
-            if record.partner_id:
-                domain = [
-                    '|',
-                    ('parent_id', '=', record.partner_id.id),
-                    ('partner_parent_company_id', '=', record.partner_id.id)
-                ]
-                child_partners = RES_PARTNER.search(domain)
-                self.partner_ids = [(6, 0, child_partners.ids)]
-
-                # No children hence it should be applied on parent.
-                if not child_partners:
-                    self.is_applied_on_parent_partner = True
-            
-            else:
+            if not record.partner_id:
                 record.partner_ids = False
 
     @api.onchange('partner_ids')
