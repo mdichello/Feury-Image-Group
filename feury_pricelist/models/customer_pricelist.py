@@ -275,89 +275,87 @@ class CustomerPricelist(models.Model):
         PRICELIST_LINE = self.env['customer.pricelist.line']
         PRODUCT_TEMPLATE = self.env['product.template']
 
-        non_atomic_lines = self.line_ids.filtered(
-            lambda l: not l.is_atomic
-        )
+        for record in self:
+            non_atomic_lines = record.line_ids.filtered(
+                lambda l: not l.is_atomic
+            )
+            for line in non_atomic_lines:
+                if not line.style_id:
+                    continue
 
-        for line in non_atomic_lines:
-            if not line.style_id:
-                continue
+                groups = defaultdict(lambda : PRODUCT_TEMPLATE)
+                products = PRODUCT_TEMPLATE.search([
+                    ('style_id', '=', line.style_id.id)
+                ])
 
-            groups = defaultdict(lambda : PRODUCT_TEMPLATE)
-            products = PRODUCT_TEMPLATE.search([
-                ('style_id', '=', line.style_id.id)
-            ])
+                for product in products:
+                    groups[product.standard_price] += product
 
-            for product in products:
-                groups[product.standard_price] += product
+                if not groups:
+                    continue
 
-            if not groups:
-                continue
-
-            cost, products = groups.popitem()
-            colors = products.mapped('color_id')
-            sizes = products.mapped('size_id')
-            line.write({
-                'color_ids': [(6, 0, colors.ids)],
-                'size_ids': [(6, 0, sizes.ids)],
-                'product_ids': [(6, 0, products.ids)],
-                'cost': cost,
-                'sale_price': cost * (1 + self.margin/100),
-                'is_atomic': True
-            })
-
-            for cost, products in groups.items():
+                cost, products = groups.popitem()
                 colors = products.mapped('color_id')
                 sizes = products.mapped('size_id')
-
-                # First pic found is the default on for the line
-                products_with_images = products.filtered(
-                    lambda p: p.image_1920
-                )
-                thumbnail = products_with_images[0].image_1920 \
-                    if products_with_images \
-                    else PRICELIST_LINE._default_image()
-
-                PRICELIST_LINE.new({
-                    'pricelist_id': self.id,
-                    'style_id': line.style_id.id,
+                line.write({
                     'color_ids': [(6, 0, colors.ids)],
                     'size_ids': [(6, 0, sizes.ids)],
                     'product_ids': [(6, 0, products.ids)],
                     'cost': cost,
-                    'sale_price': cost * (1 + line.margin/100),
-                    'is_atomic': True,
-                    'thumbnail': thumbnail
+                    'sale_price': cost * (1 + self.margin/100),
+                    'is_atomic': True
                 })
 
-    
+                for cost, products in groups.items():
+                    colors = products.mapped('color_id')
+                    sizes = products.mapped('size_id')
+
+                    # First pic found is the default on for the line
+                    products_with_images = products.filtered(
+                        lambda p: p.image_1920
+                    )
+                    thumbnail = products_with_images[0].image_1920 \
+                        if products_with_images \
+                        else PRICELIST_LINE._default_image()
+
+                    PRICELIST_LINE.new({
+                        'pricelist_id': self.id,
+                        'style_id': line.style_id.id,
+                        'color_ids': [(6, 0, colors.ids)],
+                        'size_ids': [(6, 0, sizes.ids)],
+                        'product_ids': [(6, 0, products.ids)],
+                        'cost': cost,
+                        'sale_price': cost * (1 + line.margin/100),
+                        'is_atomic': True,
+                        'thumbnail': thumbnail
+                    })
+
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         RES_PARTNER = self.env['res.partner']
 
-        values = {
-            'partner_ids': ([6, 0, False])
-        }
+        for record in self:
+            if record.partner_id:
+                domain = [
+                    '|',
+                    ('parent_id', '=', record.partner_id.id),
+                    ('partner_parent_company_id', '=', record.partner_id.id)
+                ]
+                child_partners = RES_PARTNER.search(domain)
+                self.partner_ids = [(6, 0, child_partners.ids)]
 
-        if self.partner_id:
-            domain = [
-                '|',
-                ('parent_id', '=', self.partner_id.id),
-                ('partner_parent_company_id', '=', self.partner_id.id)
-            ]
-            child_partners = RES_PARTNER.search(domain)
-            values['partner_ids'] = [(6, 0, child_partners.ids)]
-
-            # No children hence it should be applied on parent.
-            if not child_partners:
-                values['is_applied_on_parent_partner'] = True
-
-        self.write(values) 
+                # No children hence it should be applied on parent.
+                if not child_partners:
+                    self.is_applied_on_parent_partner = True
+            
+            else:
+                record.partner_ids = False
 
     @api.onchange('partner_ids')
     def onchange_partner_ids(self):
-        if not self.partner_ids:
-            self.is_applied_on_parent_partner = True
+        for record in self:
+            if not record.partner_ids:
+                record.is_applied_on_parent_partner = True
 
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
