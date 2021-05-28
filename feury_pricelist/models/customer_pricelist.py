@@ -199,12 +199,15 @@ class CustomerPricelist(models.Model):
         RES_PARTNER = self.env['res.partner']
 
         for record in self:
-            domain = [
-                '|',
-                ('parent_id', '=', record.partner_id.id),
-                ('partner_parent_company_id', '=', record.partner_id.id)
-            ]
-            children = RES_PARTNER.search(domain, count=True)
+            children = False
+
+            if record.partner_id:
+                domain = [
+                    '|',
+                    ('parent_id', '=', record.partner_id.id),
+                    ('partner_parent_company_id', '=', record.partner_id.id)
+                ]
+                children = RES_PARTNER.search(domain, count=True)
             record.parent_has_children = True if children else False
 
     # ----------------------------------------------------------------------------------------------------
