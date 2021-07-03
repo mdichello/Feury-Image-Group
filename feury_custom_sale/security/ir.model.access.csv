@@ -10,3 +10,4 @@ access_feury_sew_patch,feury_custom_sale.sew_patch,model_sew_patch,base.group_us
 access_feury_sew_stripe,feury_custom_sale.sew_stripe,model_sew_stripe,base.group_user,1,1,1,1
 access_feury_heat_seal,feury_custom_sale.heat_seal,model_heat_seal,base.group_user,1,1,1,1
 access_feury_screen_print,feury_custom_sale.screen_print,model_screen_print,base.group_user,1,1,1,1
+access_feury_sellerscommerce_product_catalog,feury_custom_sale.sellerscommerce_product_catalog,model_sellerscommerce_product_catalog,base.group_user,1,1,1,1
