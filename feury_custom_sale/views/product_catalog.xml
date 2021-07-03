@@ -1,0 +1,84 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="sellerscommerce_product_catalog_list">
+      <field name="name">Sellerscommerce product catalog list</field>
+      <field name="model">sellerscommerce.product.catalog</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name" colspan="2"/>
+          <field name="partner_id" string="Customer"/>
+          <field name="product_count"/>
+          <field name="sku_count"/>
+          <field name="last_update_timestamp"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="sellerscommerce_product_catalog_form">
+        <field name="name">sellerscommerce.product.catalog form</field>
+        <field name="model">sellerscommerce.product.catalog</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="logo" widget="image" class="oe_avatar" />
+                    <field name="active" invisible="1" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" default_focus="1" placeholder="Name" required="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_no_one"/>
+                            <field name="partner_id" string="Supplier" />
+                            <field name="external_id"/>
+                        </group>
+                        <group>
+                            <field name="last_update_timestamp"/>
+                            <field name="approval_status"/>
+                            <field name="catalog_account_id"/>
+                            <field name="product_count"/>
+                            <field name="sku_count"/>
+                            <field name="has_inventory" widget="boolean"/>
+                            <field name="has_dropship" widget="boolean"/>
+                            <field name="hash"/>
+                        </group>
+                    </group>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"
+                        groups="base.group_user" />
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ADD default filter logo number -->
+    <record id="view_artwork_filter" model="ir.ui.view">
+        <field name="name">sellerscommerce.product.catalog.select</field>
+        <field name="model">sellerscommerce.product.catalog</field>
+        <field name="arch" type="xml">
+            <search string="Search Catalogs">
+                <field name="name" filter_domain="[('name', 'ilike', self)]"/>
+                <field name="partner_id" filter_domain="[('partner_id', 'ilike', self)]"/>
+                <separator/>
+                <group expand="1" name="group_by" string="Group By">
+                    <filter name="has_inventory" string="Has inventory" domain="[]" context="{'group_by' : 'has_inventory'}" />
+                    <filter name="has_dropship" string="Has dropship" domain="[]" context="{'group_by' : 'has_dropship'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="sellerscommerce_product_catalog_action">
+      <field name="name">Product Catalog</field>
+      <field name="res_model">sellerscommerce.product.catalog</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+  </data>
+</odoo>

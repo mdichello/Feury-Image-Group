@@ -15,5 +15,10 @@
             parent="menu_sale_clothes"
             name="Type" />
 
+        <menuitem id="product_catalog_menu_list" 
+            action="sellerscommerce_product_catalog_action" 
+            parent="menu_sale_clothes"
+            name="Product Catalog" />
+
     </data>
 </odoo>

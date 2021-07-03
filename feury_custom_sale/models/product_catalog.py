@@ -102,7 +102,7 @@ class ProductCatalog(models.Model):
         comodel_name='res.partner', 
         ondelete='cascade', 
         index=True,
-        domain=['&', ('parent_id', '=', False), ('is_customer', '=', True)], 
+        domain=['&', ('parent_id', '=', False), ('is_supplier', '=', True)], 
         required=False
     )
 
@@ -124,6 +124,7 @@ class ProductCatalog(models.Model):
 
     @api.model
     def api_catalog_sync(self):
+        # TODO start a new thread.
         CONFIG_PARAMETER = self.env['ir.config_parameter']
 
         log.info('Started sellerscommerce product catalog synchronization')
@@ -155,10 +156,6 @@ class ProductCatalog(models.Model):
                 ]
                 catalog = self.search(domain, limit=1)
 
-                # Source record hash.
-                hash_object = hashlib.md5(json.dumps(external_catalog).encode())
-                hash = hash_object.hexdigest()
-
                 # Prepare values.
                 values = {
                     'name': external_catalog.name,
@@ -171,13 +168,13 @@ class ProductCatalog(models.Model):
                     'last_update_timestamp': external_catalog.lastPublishedDate,
                     'has_inventory': external_catalog.hasInventory,
                     'has_dropship': external_catalog.hasDropship,
-                    'hash': hash,
+                    'hash': external_catalog.hash,
                     'company_id': False,
                     'active': True
                 }
 
                 # Already exists and changed on the API.
-                if catalog and catalog.hash != hash:
+                if catalog and catalog.hash != external_catalog.hash:
                     catalog.write(values)
 
                 # Is not synced yet.
@@ -187,6 +184,9 @@ class ProductCatalog(models.Model):
 
             except Exception as e:
                 log.error('Unexpected error', e)
+
+            else:
+                self.env.cr.commit()
 
     @api.model
     def api_data_sync(self):

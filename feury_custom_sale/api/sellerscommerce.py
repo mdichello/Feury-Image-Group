@@ -7,6 +7,8 @@ import requests
 import json
 import logging
 import base64
+import hashlib
+
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +18,7 @@ ACCESS_TOKEN_EXPIRATION_COEFFICIENT = 0.8
 
 Catalog = namedtuple(
     'Catalog', 
-    ('name', 'logo', 'approvalStatus', 'catalogAccountID', 'productCount', 'skuCount', 'lastPublishedDate', 'hasInventory', 'hasDropship', 'id')
+    ('name', 'logo', 'approvalStatus', 'catalogAccountID', 'productCount', 'skuCount', 'lastPublishedDate', 'hasInventory', 'hasDropship', 'id', 'hash')
 )
 
 
@@ -90,11 +92,19 @@ class API():
         data = json.loads(response.content)
 
         for item in data:
+            # Source record hash.
+            hash_object = hashlib.md5(json.dumps(item).encode())
+            hash = hash_object.hexdigest()
+
             # Parse dates.
             last_published_date = item.get('lastPublishedDate', False)
-            item['lastPublishedDate'] = parser.parse(last_published_date) \
+            last_published_date = parser.parse(last_published_date) \
                 if last_published_date \
                 else False
+            item.update({
+                'lastPublishedDate': last_published_date,
+                'hash': hash
+            })
 
         catalog_objects = [Catalog(*item.values()) for item in data]
         return catalog_objects
