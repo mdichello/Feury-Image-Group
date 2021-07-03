@@ -15,10 +15,14 @@
             parent="menu_sale_clothes"
             name="Type" />
 
+        <menuitem id="menu_sale_sellerscommerce"
+            name="SellersCommerce"
+            parent="sale.product_menu_catalog"
+            groups="base.group_user"/>
+
         <menuitem id="product_catalog_menu_list" 
             action="sellerscommerce_product_catalog_action" 
-            parent="menu_sale_clothes"
+            parent="menu_sale_sellerscommerce"
             name="Product Catalog" />
-
     </data>
 </odoo>
