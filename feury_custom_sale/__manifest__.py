@@ -12,9 +12,8 @@
     'category': 'Customization',
     'description': "Sale customization",
     'data': [
-        # 'security/groups.xml',
         'security/ir.model.access.csv',
-        # 'security/ir_rule.xml',
+        'views/res_config_settings.xml',
         'views/sale_order.xml',
         'views/embellishment.xml',
         'views/clothes_location.xml',
