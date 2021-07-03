@@ -8,6 +8,7 @@ import hashlib
 import json
 
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 from odoo.modules.module import get_module_resource
 from odoo.addons.feury_custom_sale.api.sellerscommerce import API as SellersCommerceConnector
 
@@ -102,7 +103,7 @@ class ProductCatalog(models.Model):
         comodel_name='res.partner', 
         ondelete='cascade', 
         index=True,
-        domain=['&', ('parent_id', '=', False), ('is_supplier', '=', True)], 
+        domain=['&', ('parent_id', '=', False), ('is_vendor', '=', True)], 
         required=False
     )
 
@@ -196,7 +197,18 @@ class ProductCatalog(models.Model):
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
 
-    # TODO: override write to create partner_id if not exists.
+    @api.model
+    def create(self, values):
+        PARTNER = self.env['res.partner']
+
+        if not values.get('partner_id', False):
+            partner = PARTNER.create({
+                'name': values.get('name'),
+                'is_vendor': True,
+                'is_customer': False
+            })
+            values['partner_id'] = partner.id
+        return super(ProductCatalog, self).create(values)
 
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)
