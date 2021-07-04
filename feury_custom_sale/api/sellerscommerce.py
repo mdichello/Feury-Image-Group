@@ -18,8 +18,83 @@ ACCESS_TOKEN_EXPIRATION_COEFFICIENT = 0.8
 
 Catalog = namedtuple(
     'Catalog', 
-    ('name', 'logo', 'approvalStatus', 'catalogAccountID', 'productCount', 'skuCount', 'lastPublishedDate', 'hasInventory', 'hasDropship', 'id', 'hash')
+    (
+        'name', 
+        'logo', 
+        'approvalStatus', 
+        'catalogAccountID', 
+        'productCount', 
+        'skuCount', 
+        'lastPublishedDate', 
+        'hasInventory', 
+        'hasDropship', 
+        'id', 
+        'hash'
+    )
 )
+
+Category = namedtuple(
+    'Category', 
+    (
+        'name',
+        'image',
+        'code',
+        'categoryPath',
+        'categoryCodePath',
+        'parentID',
+        'categoryIDPath',
+        'id',
+        'hash'
+    )
+)
+
+Product = namedtuple(
+    'Product', 
+    (
+        'catalogID', 
+        'supplierName', 
+        'productName', 
+        'productCode', 
+        'thumbnailImage', 
+        'largeImage', 
+        'description',
+        'technicalSpecification',
+        'additionalInformation',
+        'msrp',
+        'map',
+        'costPrice',
+        'sortOrder',
+        'width',
+        'height',
+        'length',
+        'brandName',
+        'brandImage',
+        'videoPath',
+        'status',
+        'sizeChart',
+        'categories',
+        'id'
+        'hash'
+    )
+)
+
+
+def download_image(url, encode_base64=False):
+    try:
+        response = requests.get(url, allow_redirects=True)
+        response.raise_for_status()
+        
+        if encode_base64:
+            return base64.b64encode(response.content)
+        
+        return response.content
+    except:
+        return False
+
+
+def dict_hash(d):
+    hash_object = hashlib.md5(json.dumps(d).encode())
+    return hash_object.hexdigest()
 
 
 class API():
@@ -92,9 +167,7 @@ class API():
         data = json.loads(response.content)
 
         for item in data:
-            # Source record hash.
-            hash_object = hashlib.md5(json.dumps(item).encode())
-            hash = hash_object.hexdigest()
+            hash = dict_hash(item)
 
             # Parse dates.
             last_published_date = item.get('lastPublishedDate', False)
@@ -109,15 +182,52 @@ class API():
         catalog_objects = [Catalog(*item.values()) for item in data]
         return catalog_objects
 
+    def products(self, catalog_id, product_count, batch_size=500):
+        base_url = 'https://ccm.sellerscommerce.com/gateway/product/getproducts.json'
 
-def download_image(url, encode_base64=False):
-    try:
-        response = requests.get(url, allow_redirects=True)
-        response.raise_for_status()
+        # Use generator.
+        upper_bound = product_count \
+            if product_count % batch_size == 0 \
+            else product_count + batch_size
+
+        product_data = []
+
+        for batch_count in range(0, upper_bound, batch_size):
+            headers = self.headers
+
+            # Reached the end page.
+            if batch_count > product_count:
+                break
+
+            url = f'{base_url}/{catalog_id}/{batch_count}/{batch_size}'
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            data = json.loads(response.content)
+
+            for item in data:
+                item['hash'] = dict_hash(item)
+
+                categories = []
+                for category in item.get('categories', []):
+                    category['hash'] = dict_hash(category)
+                    categories.append(
+                        Category(*category.values())
+                    )
+                
+                item['categories'] = categories
+                product_data.append(item)
+
+        products_cleaned = [Product(*item.values()) for item in product_data]
+        return products_cleaned
         
-        if encode_base64:
-            return base64.b64encode(response.content)
-        
-        return response.content
-    except:
-        return False
+
+def main():
+    username = "feury"
+    password = "8eb47c07f0aa41fe9e0b94c44c723be4"
+    api = API(username=username, password=password)
+    products = api.products(40, 4229)
+    a = 10
+
+
+if __name__ == '__main__':
+    main()
