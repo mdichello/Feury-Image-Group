@@ -73,7 +73,8 @@ Product = namedtuple(
         'status',
         'sizeChart',
         'categories',
-        'id'
+        'id',
+        'images',
         'hash'
     )
 )
@@ -205,7 +206,7 @@ class API():
             data = json.loads(response.content)
 
             for item in data:
-                item['hash'] = dict_hash(item)
+                hash = dict_hash(item)
 
                 categories = []
                 for category in item.get('categories', []):
@@ -213,8 +214,13 @@ class API():
                     categories.append(
                         Category(*category.values())
                     )
+                images = item.get('largeImage', '').split('|')
                 
-                item['categories'] = categories
+                item.update({
+                    'categories': categories,
+                    'images': images,
+                    'hash': hash
+                })
                 product_data.append(item)
 
         products_cleaned = [Product(*item.values()) for item in product_data]

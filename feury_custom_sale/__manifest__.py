@@ -5,10 +5,11 @@
     'version': '1.0',
     'depends': [
         'feury_artwork',
+        'sale_management',
     ],
     'author': 'Business Software Development Solutions',
     'license': 'AGPL-3',
-    'mainainer': 'Business Software Development Solutions',
+    'maintainer': 'Business Software Development Solutions',
     'category': 'Customization',
     'description': "Sale customization",
     'data': [
@@ -20,6 +21,8 @@
         'views/clothes_type.xml',
         'views/res_partner.xml',
         'views/product_catalog.xml',
+        'views/product_template.xml',
+        'views/templates.xml',
         'views/menu.xml',
         'data/clothes_location.xml',
         'data/clothes_type.xml',
