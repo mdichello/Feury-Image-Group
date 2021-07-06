@@ -4,60 +4,28 @@
 from odoo import api, fields, models, _
 
 
-class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+class ProductBrand(models.Model):
+    _name = 'product.brand'
+    _description = 'Product brand'
 
-    category_ids = fields.Many2many(
-        comodel_name='product.category', 
-        relation='product_category_product_template_rel', 
-        column1='product_category_id', 
-        column2='product_template_id', 
-        string="Categories"
+    _sql_constraints = [
+        ('product_brand_name_uniq', 'unique(name)', 'Duplicate are not allowed for product brand names.')
+    ]
+
+    name = fields.Char(
+        string='Name',
+        required=True,
+        index=True
     )
 
-    image_ids = fields.One2many(
-        comodel_name='product.image', 
-        inverse_name='product_tmpl_id', 
-        string="Extra Product Media", 
-        copy=True
+    image = fields.Image(
+        string='Image',
+        required=False
     )
 
-    brand_id = fields.Many2one(
-        string='Brand',
-        comodel_name='product.brand',
-    )
-
-    msrp = fields.Monetary(
-        string='MSRP',
-        default=0
-    )
-
-    description_html = fields.Html(
-        string="Description HTML"
-    )
-
-    map = fields.Monetary(
-        string='MAP',
-        default=0
-    )
-
-    height = fields.Float(
-        string='Height (inch)',
-        default=0.0
-    )
-
-    width = fields.Float(
-        string='Width (inch)',
-        default=0.0
-    )
-
-    length = fields.Float(
-        string='Length (inch)',
-        default=0.0
-    )
-
-    size_chart = fields.Image(
-        string='Size chart'
+    active = fields.Boolean(
+        string='Active',
+        default=True
     )
 
     # 1- ORM Methods (create, write, unlink)
@@ -86,3 +54,8 @@ class ProductTemplate(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 7- Technical methods (name must reflect the use)
     # ----------------------------------------------------------------------------------------------------
+
+    @property
+    def is_other_location(self):
+        self.ensure_one()
+        return self == self.env.ref('feury_custom_sale.clothes_location_other')

@@ -17,9 +17,9 @@
                             <field name="msrp" />
                             <field name="map" />
                         </group>
-                        <group>
+                        <group string="Classification">
                             <field name="category_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
-                            <field name="description_html" />
+                            <field name="brand_id" widget="Many2one" options="{'no_open': True}"/>
                         </group>
                     </group>
                     <group>
@@ -29,7 +29,8 @@
                             <field name="length" />
                             <field name="size_chart" widget="image"/>
                         </group>
-                        <group>
+                        <group string="Description">
+                            <field name="description_html" />
                         </group>
                     </group>
                 </page>
