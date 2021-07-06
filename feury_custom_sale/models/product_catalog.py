@@ -124,8 +124,7 @@ class ProductCatalog(models.Model):
     )
 
     @api.model
-    def api_catalog_sync(self):
-        # TODO start a new thread.
+    def get_api_connection(self):
         CONFIG_PARAMETER = self.env['ir.config_parameter']
 
         log.info('Started sellerscommerce product catalog synchronization')
@@ -142,6 +141,11 @@ class ProductCatalog(models.Model):
             password=api_password
         )
 
+        return api
+
+    @api.model
+    def api_catalog_sync(self):
+        api = self.get_api_connection()
         external_catalogs = api.catalogs()
 
         # Archive all catalogs before sync.
@@ -190,8 +194,14 @@ class ProductCatalog(models.Model):
                 self.env.cr.commit()
 
     @api.model
+    def api_product_sync(self):
+        pass
+
+    @api.model
     def api_data_sync(self):
+        # TODO start a new thread.
         self.api_catalog_sync()
+        self.api_product_sync()
 
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)

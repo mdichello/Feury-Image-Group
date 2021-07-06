@@ -20,6 +20,7 @@
                         <group string="Classification">
                             <field name="category_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
                             <field name="brand_id" widget="Many2one" options="{'no_open': True}"/>
+                            <field name="catalog_id" widget="Many2one" options="{'no_open': True}"/>
                         </group>
                     </group>
                     <group>
@@ -31,6 +32,11 @@
                         </group>
                         <group string="Description">
                             <field name="description_html" />
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Integrity and Tracking">
+                            <field name="hash" />
                         </group>
                     </group>
                 </page>

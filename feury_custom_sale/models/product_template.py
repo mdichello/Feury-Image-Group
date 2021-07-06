@@ -27,6 +27,11 @@ class ProductTemplate(models.Model):
         comodel_name='product.brand',
     )
 
+    catalog_id = fields.Many2one(
+        string='Catalog',
+        comodel_name='sellerscommerce.product.catalog',
+    )
+
     msrp = fields.Monetary(
         string='MSRP',
         default=0
@@ -58,6 +63,11 @@ class ProductTemplate(models.Model):
 
     size_chart = fields.Image(
         string='Size chart'
+    )
+
+    hash = fields.Char(
+        string='Hash',
+        required=True
     )
 
     # 1- ORM Methods (create, write, unlink)
