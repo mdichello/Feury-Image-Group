@@ -183,7 +183,7 @@ class API():
         catalog_objects = [Catalog(*item.values()) for item in data]
         return catalog_objects
 
-    def products(self, catalog_id, product_count, batch_size=500):
+    def products(self, catalog_id, product_count=2000, batch_size=500):
         base_url = 'https://ccm.sellerscommerce.com/gateway/product/getproducts.json'
 
         # Use generator.
@@ -193,7 +193,9 @@ class API():
 
         product_data = []
 
-        for batch_count in range(0, upper_bound, batch_size):
+        # TODO delete comment.
+        # for batch_count in range(0, upper_bound, batch_size):
+        for batch_count in range(0, 1):
             headers = self.headers
 
             # Reached the end page.

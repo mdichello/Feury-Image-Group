@@ -18,7 +18,7 @@ class ProductTemplate(models.Model):
     image_ids = fields.One2many(
         comodel_name='product.image', 
         inverse_name='product_tmpl_id', 
-        string="Extra Product Media", 
+        string="Product Image", 
         copy=True
     )
 
@@ -30,6 +30,12 @@ class ProductTemplate(models.Model):
     catalog_id = fields.Many2one(
         string='Catalog',
         comodel_name='sellerscommerce.product.catalog',
+    )
+
+    external_id = fields.Integer(
+        string='External ID',
+        required=True,
+        index=True
     )
 
     msrp = fields.Monetary(
