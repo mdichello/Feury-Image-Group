@@ -194,10 +194,103 @@ class ProductCatalog(models.Model):
                 self.env.cr.commit()
 
     @api.model
-    def api_product_sync(self):
-        PRODUCT_TEMPLATE = self.env['product.template']
-        PRODUCT_IMAGE = self.env['product.image']
+    def prepare_product_values(self, catalog, external_product):
+        PRODUCT_SUPPLIER_INFO = self.env['product.supplierinfo']
         PRODUCT_BRAND = self.env['product.brand']
+        PRODUCT_CATEGORY = self.env['product.category']
+        PRODUCT_IMAGE = self.env['product.image']
+
+        # Image processing.
+        images = [
+            download_image(image_url, encode_base64=True) 
+            for image_url in external_product.images
+        ]
+        main_image = images[0] if images else False
+
+        # Brand processing.
+        brand = PRODUCT_BRAND.search([
+            ('name', '=', external_product.brandName)
+        ], limit=1)
+
+        if not brand:
+            brand = PRODUCT_BRAND.create({
+                'name': external_product.brandName,
+                'image': download_image(
+                    external_product.brandImage,
+                    encode_base64=True
+                )
+            })
+
+        # Prepare image values and conserve the sequence number.
+        image_values = [
+            {
+                'name': external_product.productName,
+                'image_1920': image,
+                'sequence': index + 10
+            }
+            for index, image in enumerate(images)
+            if image
+        ]
+
+        images = PRODUCT_IMAGE.create(image_values) \
+            if image_values \
+            else PRODUCT_IMAGE
+
+        # Supplier pricelist.
+        supplier_info = PRODUCT_SUPPLIER_INFO.create({
+            'name': catalog.partner_id.id,
+            'product_name': external_product.productName,
+            'product_code': external_product.productCode,
+            'price': external_product.costPrice,
+            'min_qty': 0,
+            'company_id': False
+        })
+
+        # Product categories.
+        categories = PRODUCT_CATEGORY
+        for external_category in external_product.categories:
+            category = PRODUCT_CATEGORY.search([
+                '|',
+                ('name', '=', external_category.name),
+                ('external_id', '=', external_category.id)
+            ])
+            if not category:
+                category = PRODUCT_CATEGORY.create({
+                    'name': external_category.name,
+                    'external_id': external_category.id,
+                })
+            categories += category
+
+        # Prepare values.
+        values = {
+            'name': external_product.productName,
+            'type': 'product',
+            'catalog_id': catalog.id,
+            'external_id': external_product.id,
+            'brand_id': brand.id,
+            'msrp': external_product.msrp,
+            'map': external_product.map,
+            'standard_price': external_product.costPrice,
+            'list_price': external_product.msrp,
+            'width': external_product.width,
+            'height': external_product.height,
+            'length': external_product.length,
+            'size_chart': download_image(external_product.sizeChart, encode_base64=True),
+            'description_html': external_product.description,
+            'hash': external_product.hash,
+            'image_1920': main_image,
+            'image_ids': [(6, 0, images.ids)],
+            'seller_ids': [(6, 0, supplier_info.ids)],
+            'category_ids': [(6, 0, categories.ids)],
+            'categ_id': categories[0].id if categories else False
+        }
+
+        return values
+
+    @api.model
+    def api_product_sync(self):
+        # TODO add thread fork.
+        PRODUCT_TEMPLATE = self.env['product.template']
 
         api = self.get_api_connection()
         catalogs = self.search([])
@@ -206,8 +299,6 @@ class ProductCatalog(models.Model):
             external_products = api.products(catalog.external_id, catalog.product_count)
 
             # TODO Archive all products that do not figure in the sync returned data.
-            # TODO add supplier to product.
-            # TODO add text description.
 
             for external_product in external_products:
                 try:
@@ -218,70 +309,14 @@ class ProductCatalog(models.Model):
                     ]
                     product = PRODUCT_TEMPLATE.search(domain, limit=1)
 
-                    # Image processing.
-                    images = [
-                        download_image(image_url, encode_base64=True) 
-                        for image_url in external_product.images
-                    ]
-                    main_image = images[0] if images else False
-
-                    # Brand processing.
-                    brand = PRODUCT_BRAND.search([
-                        ('name', '=', external_product.brandName)
-                    ], limit=1)
-
-                    if not brand:
-                        brand = PRODUCT_BRAND.create({
-                            'name': external_product.brandName,
-                            'image': download_image(
-                                external_product.brandImage,
-                                encode_base64=True
-                            )
-                        })
-
-                    # Prepare image values and conserve the sequence number.
-                    image_values = [
-                        {
-                            'name': external_product.productName,
-                            'image_1920': image,
-                            'sequence': index + 10
-                        }
-                        for index, image in enumerate(images)
-                        if image
-                    ]
-
-                    images = PRODUCT_IMAGE.create(image_values) \
-                        if image_values \
-                        else PRODUCT_IMAGE
-
-                    # Prepare values.
-                    values = {
-                        'name': external_product.productName,
-                        'type': 'product',
-                        'catalog_id': catalog.id,
-                        'external_id': external_product.id,
-                        'brand_id': brand.id,
-                        'msrp': external_product.msrp,
-                        'map': external_product.map,
-                        'standard_price': external_product.costPrice,
-                        'list_price': external_product.msrp,
-                        'width': external_product.width,
-                        'height': external_product.height,
-                        'length': external_product.length,
-                        'size_chart': download_image(external_product.sizeChart, encode_base64=True),
-                        'description_html': external_product.description,
-                        'hash': external_product.hash,
-                        'image_ids': False,
-                        'image_1920': main_image,
-                        'image_ids': [(6, 0, images.ids)]
-                    }
-
                     # Already exists and changed on the API.
                     if product and product.hash != external_product.hash:
+                        values = self.prepare_product_values(catalog, external_product)
                         product.write(values)
 
                     # Is not synced yet.
                     elif not product:
+                        values = self.prepare_product_values(catalog, external_product)
                         product = PRODUCT_TEMPLATE.create(values)
                         log.info(f'A new product is synced id {product.id}')
 

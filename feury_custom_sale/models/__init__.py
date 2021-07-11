@@ -11,5 +11,6 @@ from . import res_partner
 from . import res_config_settings
 from . import product_catalog
 from . import product_image
+from . import product_category
 from . import product_brand
 from . import product_template
