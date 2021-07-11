@@ -296,9 +296,10 @@ class ProductCatalog(models.Model):
         catalogs = self.search([])
 
         for catalog in catalogs:
-            external_products = api.products(catalog.external_id, catalog.product_count)
-
-            # TODO Archive all products that do not figure in the sync returned data.
+            external_products = api.products(
+                catalog.external_id, 
+                catalog.product_count
+            )
 
             for external_product in external_products:
                 try:
@@ -311,12 +312,18 @@ class ProductCatalog(models.Model):
 
                     # Already exists and changed on the API.
                     if product and product.hash != external_product.hash:
-                        values = self.prepare_product_values(catalog, external_product)
+                        values = self.prepare_product_values(
+                            catalog, 
+                            external_product
+                        )
                         product.write(values)
 
                     # Is not synced yet.
                     elif not product:
-                        values = self.prepare_product_values(catalog, external_product)
+                        values = self.prepare_product_values(
+                            catalog, 
+                            external_product
+                        )
                         product = PRODUCT_TEMPLATE.create(values)
                         log.info(f'A new product is synced id {product.id}')
 
