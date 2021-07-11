@@ -216,7 +216,9 @@ class API():
                     categories.append(
                         Category(*category.values())
                     )
-                images = item.get('largeImage', '').split('|')
+                
+                images_urls = item.get('largeImage', '')
+                images = images_urls.split('|') if images_urls else []
                 
                 item.update({
                     'categories': categories,
