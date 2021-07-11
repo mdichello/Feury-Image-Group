@@ -343,7 +343,7 @@ class ProductCatalog(models.Model):
     @api.model
     def api_data_sync(self):
         # TODO start a new thread.
-        #self.api_catalog_sync()
+        self.api_catalog_sync()
         self.api_product_sync()
 
     # ----------------------------------------------------------------------------------------------------
