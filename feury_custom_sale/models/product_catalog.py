@@ -282,7 +282,14 @@ class ProductCatalog(models.Model):
             'image_ids': [(6, 0, images.ids)],
             'seller_ids': [(6, 0, supplier_info.ids)],
             'category_ids': [(6, 0, categories.ids)],
-            'categ_id': categories[0].id if categories else False
+            'categ_id': categories[0].id if categories else False,
+            'vendor_code': catalog.name,
+            'x_studio_vendor_sku': False,
+            'default_code': False,
+            'barcode': False,
+            'style_id': False,
+            'color_id': False,
+            'size_id': False
         }
 
         return values
