@@ -11,7 +11,7 @@ log  = logging.getLogger(__name__)
 class SellersCommerceProductSyncWorkUnit(models.Model):
     _name = 'sellerscommerce.product.sync.work.unit'
     _description = 'Product Sync unit of work'
-    _order = 'create_date'
+    _order = 'id'
 
     catalog_id = fields.Many2one(
         string='Catalog',
