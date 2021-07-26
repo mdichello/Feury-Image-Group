@@ -305,51 +305,51 @@ class ProductCatalog(models.Model):
         return values
 
     @api.model
-    def api_product_sync(self):
-        # TODO add thread fork.
+    def api_product_sync(self, work_unit):
         PRODUCT_TEMPLATE = self.env['product.template']
 
         api = self.get_api_connection()
-        catalogs = self.search([])
 
-        for catalog in catalogs:
-            external_products = api.products(
-                catalog.external_id, 
-                catalog.product_count
-            )
+        external_products = api.products(
+            work_unit.catalog_id.external_id, 
+            work_unit.start_index,
+            work_unit.end_index,
+        )
 
-            for external_product in external_products:
-                try:
-                    external_id = int(external_product.id)
-                    # TODO check products are created twice.
-                    domain = [
-                        ('external_id', '=', external_id),
-                        ('catalog_id', '=', catalog.id)
-                    ]
-                    product = PRODUCT_TEMPLATE.search(domain, limit=1)
+        for external_product in external_products:
+            try:
+                external_id = int(external_product.id)
+                domain = [
+                    ('external_id', '=', external_id),
+                    ('catalog_id', '=', work_unit.catalog_id.id),
+                    '|',
+                    ('active', '=', True),
+                    ('active', '=', False)
+                ]
+                product = PRODUCT_TEMPLATE.search(domain, limit=1)
 
-                    # Already exists and changed on the API.
-                    if product and product.hash != external_product.hash:
-                        values = self.prepare_product_values(
-                            catalog, 
-                            external_product
-                        )
-                        product.write(values)
+                # Already exists and changed on the API.
+                if product and product.hash != external_product.hash:
+                    values = self.prepare_product_values(
+                        work_unit.catalog_id, 
+                        external_product
+                    )
+                    product.write(values)
 
-                    # Is not synced yet.
-                    elif not product:
-                        values = self.prepare_product_values(
-                            catalog, 
-                            external_product
-                        )
-                        product = PRODUCT_TEMPLATE.create(values)
-                        log.info(f'A new product is synced id {product.id}')
+                # Is not synced yet.
+                elif not product:
+                    values = self.prepare_product_values(
+                        work_unit.catalog_id, 
+                        external_product
+                    )
+                    product = PRODUCT_TEMPLATE.create(values)
+                    log.info(f'A new product is synced id {product.id}')
 
-                except Exception as e:
-                    log.error('Unexpected error', e)
+            except Exception as e:
+                log.error('Unexpected error', e)
 
-                else:
-                    self.env.cr.commit()
+            else:
+                self.env.cr.commit()
 
     @api.model
     def create_product_sync_work_units(self):
@@ -401,10 +401,19 @@ class ProductCatalog(models.Model):
 
     @api.model
     def api_batch_product_sync(self):
-        # self.api_product_sync()
-        # Pick a unit of work.
+        PRODUCT_SYNC_WORK_UNIT = self.env['sellerscommerce.product.sync.work.unit']
+
+        # Pick a unit of work (ordered by create data).
+        work_unit = PRODUCT_SYNC_WORK_UNIT.next_work_unit()
+
+        # Start work unit.
+        work_unit.action_start()
+
         # Process the products in this unit of work.
-        pass
+        self.api_product_sync(work_unit)
+
+        # End work unit.
+        work_unit.action_end()
 
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)

@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import logging
+
 from odoo import api, fields, models, _
 
+
+log  = logging.getLogger(__name__)
 
 class SellersCommerceProductSyncWorkUnit(models.Model):
     _name = 'sellerscommerce.product.sync.work.unit'
@@ -69,6 +73,22 @@ class SellersCommerceProductSyncWorkUnit(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
+
+    def action_start(self):
+        self.ensure_one()
+        self.write({
+            'start_time': fields.Datetime.now(),
+            'state': 'pending'
+        })
+        log.info(f'API sync work unit {self.id} started')
+
+    def action_end(self):
+        self.ensure_one()
+        self.write({
+            'end_time': fields.Datetime.now(),
+            'state': 'done'
+        })
+        log.info(f'API sync work unit {self.id} completed')
 
     # ----------------------------------------------------------------------------------------------------
     # 6- CRONs methods

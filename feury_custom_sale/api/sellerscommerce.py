@@ -183,48 +183,34 @@ class API():
         catalog_objects = [Catalog(*item.values()) for item in data]
         return catalog_objects
 
-    def products(self, catalog_id, product_count=2000, batch_size=500):
+    def products(self, catalog_id, start_index=0, end_index=100, batch_size=500):
         base_url = 'https://ccm.sellerscommerce.com/gateway/product/getproducts.json'
-
-        # Use generator.
-        upper_bound = product_count \
-            if product_count % batch_size == 0 \
-            else product_count + batch_size
-
         product_data = []
+        headers = self.headers
+        url = f'{base_url}/{catalog_id}/{start_index}/{end_index}'
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = json.loads(response.content)
 
-        # TODO delete comment.
-        for batch_count in range(0, upper_bound, batch_size):
-            headers = self.headers
+        for item in data:
+            hash = dict_hash(item)
 
-            # Reached the end page.
-            if batch_count > product_count:
-                break
-
-            url = f'{base_url}/{catalog_id}/{batch_count}/{batch_size}'
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()
-            data = json.loads(response.content)
-
-            for item in data:
-                hash = dict_hash(item)
-
-                categories = []
-                for category in item.get('categories', []):
-                    category['hash'] = dict_hash(category)
-                    categories.append(
-                        Category(*category.values())
-                    )
-                
-                images_urls = item.get('largeImage', '')
-                images = images_urls.split('|') if images_urls else []
-                
-                item.update({
-                    'categories': categories,
-                    'images': images,
-                    'hash': hash
-                })
-                product_data.append(item)
+            categories = []
+            for category in item.get('categories', []):
+                category['hash'] = dict_hash(category)
+                categories.append(
+                    Category(*category.values())
+                )
+            
+            images_urls = item.get('largeImage', '')
+            images = images_urls.split('|') if images_urls else []
+            
+            item.update({
+                'categories': categories,
+                'images': images,
+                'hash': hash
+            })
+            product_data.append(item)
 
         products_cleaned = [Product(*item.values()) for item in product_data]
         return products_cleaned
