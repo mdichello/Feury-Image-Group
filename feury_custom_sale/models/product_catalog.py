@@ -64,6 +64,7 @@ class ProductCatalog(models.Model):
     external_id = fields.Integer(
         string='External ID',
         required=True,
+        unique=True,
         index=True
     )
 
@@ -159,7 +160,9 @@ class ProductCatalog(models.Model):
                 external_id = int(external_catalog.id)
                 domain = [
                     ('external_id', '=', external_id),
+                    '|',
                     ('active', '=', False),
+                    ('active', '=', True),
                 ]
                 catalog = self.search(domain, limit=1)
 
