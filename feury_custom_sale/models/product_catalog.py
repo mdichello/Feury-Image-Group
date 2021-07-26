@@ -21,6 +21,7 @@ API_PASSWORD_KEY = 'feury_custom_sale.sellerscommerce_password'
 API_PROCESSING_BATCH_SIZE = 'feury_custom_sale.sellerscommerce_batch_size'
 
 
+# TODO make cron to unlock pending work units (after 5 hours for example)
 # TODO Re-locate function to tools model!.
 def download_image(url, encode_base64=False):
     try:
@@ -349,7 +350,6 @@ class ProductCatalog(models.Model):
 
     @api.model
     def create_product_sync_work_units(self):
-        # TODO make cron to unlock pending work units (after 5 hours for example)
         PRODUCT_SYNC_WORK_UNIT = self.env['sellerscommerce.product.sync.work.unit']
         CONFIG_PARAMETER = self.env['ir.config_parameter']
 
@@ -357,7 +357,7 @@ class ProductCatalog(models.Model):
         get_param = CONFIG_PARAMETER.sudo().get_param
 
         batch_size = int(get_param(API_PROCESSING_BATCH_SIZE, default=100))
-        catalogs = self.search([], limit=1)
+        catalogs = self.search([])
 
         for catalog in catalogs:
             product_count = catalog.product_count
@@ -392,14 +392,13 @@ class ProductCatalog(models.Model):
                 })
 
     @api.model
-    def api_data_sync(self):
-        # TOBE lunch once a day.
+    def lunch_api_data_sync_planning(self):
         self.api_catalog_sync()
         self.create_product_sync_work_units()
-        # self.api_product_sync()
 
     @api.model
-    def api_sub_batch_process(self):
+    def api_batch_product_sync(self):
+        # self.api_product_sync()
         # Pick a unit of work.
         # Process the products in this unit of work.
         pass

@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="ir_cron_feury_sellerscommerce_sync_data" model="ir.cron">
-        <field name="name">SellersCommerce: data sync</field>
+    <record id="ir_cron_feury_sellerscommerce_sync_data_planning" model="ir.cron">
+        <field name="name">SellersCommerce: Overall sync planning</field>
         <field name="model_id" ref="model_sellerscommerce_product_catalog"/>
         <field name="state">code</field>
-        <field name="code">model.api_data_sync()</field>
+        <field name="code">model.lunch_api_data_sync_planning()</field>
         <field name="user_id" ref="base.user_root" />
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
         <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 01:00:00')" />
         <field eval="False" name="doall" />
+        <field eval="False" name="active" />
+        <field name="priority">1000</field>
+    </record>
+
+    <record id="ir_cron_feury_sellerscommerce_sync_data" model="ir.cron">
+        <field name="name">SellersCommerce: product batch data sync</field>
+        <field name="model_id" ref="model_sellerscommerce_product_catalog"/>
+        <field name="state">code</field>
+        <field name="code">model.api_batch_product_sync()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 01:00:00')" />
+        <field eval="False" name="active" />
         <field name="priority">1000</field>
     </record>
 </odoo>
