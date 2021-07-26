@@ -14,3 +14,4 @@ from . import product_image
 from . import product_category
 from . import product_brand
 from . import product_template
+from . import api_sync_work_units

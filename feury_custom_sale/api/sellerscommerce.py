@@ -194,8 +194,7 @@ class API():
         product_data = []
 
         # TODO delete comment.
-        # for batch_count in range(0, upper_bound, batch_size):
-        for batch_count in range(0, 1):
+        for batch_count in range(0, upper_bound, batch_size):
             headers = self.headers
 
             # Reached the end page.
@@ -229,7 +228,7 @@ class API():
 
         products_cleaned = [Product(*item.values()) for item in product_data]
         return products_cleaned
-        
+
 
 def main():
     username = "feury"

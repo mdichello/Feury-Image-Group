@@ -6,7 +6,7 @@
       <field name="arch" type="xml">
         <tree>
           <field name="name" colspan="2"/>
-          <field name="partner_id" string="Customer"/>
+          <field name="partner_id"/>
           <field name="product_count"/>
           <field name="sku_count"/>
           <field name="last_update_timestamp"/>

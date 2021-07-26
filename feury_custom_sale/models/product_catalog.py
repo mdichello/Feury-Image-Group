@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 
 API_USERNAME_KEY = 'feury_custom_sale.sellerscommerce_username'
 API_PASSWORD_KEY = 'feury_custom_sale.sellerscommerce_password'
+API_PROCESSING_BATCH_SIZE = 'feury_custom_sale.sellerscommerce_batch_size'
 
 
 # TODO Re-locate function to tools model!.
@@ -160,6 +161,11 @@ class ProductCatalog(models.Model):
                     ('active', '=', False),
                 ]
                 catalog = self.search(domain, limit=1)
+
+                # Catalog did not change (hash).
+                if catalog and catalog.hash == external_catalog.hash:
+                    catalog.active = True
+                    continue
 
                 # Prepare values.
                 values = {
@@ -311,6 +317,7 @@ class ProductCatalog(models.Model):
             for external_product in external_products:
                 try:
                     external_id = int(external_product.id)
+                    # TODO check products are created twice.
                     domain = [
                         ('external_id', '=', external_id),
                         ('catalog_id', '=', catalog.id)
@@ -341,10 +348,61 @@ class ProductCatalog(models.Model):
                     self.env.cr.commit()
 
     @api.model
+    def create_product_sync_work_units(self):
+        # TODO make cron to unlock pending work units (after 5 hours for example)
+        PRODUCT_SYNC_WORK_UNIT = self.env['sellerscommerce.product.sync.work.unit']
+        CONFIG_PARAMETER = self.env['ir.config_parameter']
+
+        log.info('Started sellerscommerce product sync work unit creation')
+        get_param = CONFIG_PARAMETER.sudo().get_param
+
+        batch_size = int(get_param(API_PROCESSING_BATCH_SIZE, default=100))
+        catalogs = self.search([], limit=1)
+
+        for catalog in catalogs:
+            product_count = catalog.product_count
+
+            upper_bound = product_count \
+                if product_count % batch_size == 0 \
+                else product_count + batch_size
+
+            for start_index in range(0, upper_bound, batch_size):
+                if start_index + batch_size > product_count:
+                    end_index = product_count - 1
+                else:
+                    end_index = start_index + batch_size - 1
+
+                unit = PRODUCT_SYNC_WORK_UNIT.search([
+                    ('catalog_id', '=', catalog.id),
+                    ('start_index', '<=', start_index),
+                    ('end_index', '>=', end_index),
+                    ('state', 'in', ('pending', 'waiting'))
+                ])
+
+                if unit:
+                    log.info(f'Work unit id={unit.id} already exist and not done yet.')
+                    continue
+
+                unit = PRODUCT_SYNC_WORK_UNIT.create({
+                    'catalog_id': catalog.id,
+                    'start_index': start_index,
+                    'end_index': end_index,
+                    'state': 'waiting',
+                    'active': True
+                })
+
+    @api.model
     def api_data_sync(self):
-        # TODO start a new thread.
+        # TOBE lunch once a day.
         self.api_catalog_sync()
-        self.api_product_sync()
+        self.create_product_sync_work_units()
+        # self.api_product_sync()
+
+    @api.model
+    def api_sub_batch_process(self):
+        # Pick a unit of work.
+        # Process the products in this unit of work.
+        pass
 
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
