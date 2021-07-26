@@ -26,6 +26,10 @@
                                             <label for="sellerscommerce_password" string="API password"/>
                                             <field name="sellerscommerce_password"/>
                                         </div>
+                                        <div class="mt16">
+                                            <label for="sellerscommerce_batch_size" string="Batch size"/>
+                                            <field name="sellerscommerce_batch_size"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

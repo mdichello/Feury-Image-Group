@@ -16,6 +16,11 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='feury_custom_sale.sellerscommerce_password'
     )
 
+    sellerscommerce_batch_size = fields.Char(
+        string='Batch size',
+        config_parameter='feury_custom_sale.sellerscommerce_batch_size'
+    )
+
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
@@ -26,19 +31,23 @@ class ResConfigSettings(models.TransientModel):
         res = super(ResConfigSettings, self).set_values()
         CONFIG_PARAMETER.set_param('feury_custom_sale.sellerscommerce_username', self.sellerscommerce_username)
         CONFIG_PARAMETER.set_param('feury_custom_sale.sellerscommerce_password', self.sellerscommerce_password)
+        CONFIG_PARAMETER.set_param('feury_custom_sale.sellerscommerce_batch_size', self.sellerscommerce_batch_size)
         return res
 
     @api.model
     def get_values(self):
         CONFIG_PARAMETER = self.env['ir.config_parameter']
+        PARAMETER = self.env['ir.config_parameter'].sudo()
 
         res = super(ResConfigSettings, self).get_values()
-        PARAMETER = self.env['ir.config_parameter'].sudo()
         sellerscommerce_username = PARAMETER.get_param('feury_custom_sale.sellerscommerce_username')
         sellerscommerce_password = PARAMETER.get_param('feury_custom_sale.sellerscommerce_password')
+        sellerscommerce_batch_size = PARAMETER.get_param('feury_custom_sale.sellerscommerce_batch_size')
+
         res.update(
             sellerscommerce_username=sellerscommerce_username,
-            sellerscommerce_password=sellerscommerce_password
+            sellerscommerce_password=sellerscommerce_password,
+            sellerscommerce_batch_size=sellerscommerce_batch_size
         )
         return res
 
