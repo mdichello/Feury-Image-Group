@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # License AGPL-3
-from odoo import api, fields, models
+from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 
 class ResConfigSettings(models.TransientModel):
@@ -62,6 +63,11 @@ class ResConfigSettings(models.TransientModel):
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.onchange('sellerscommerce_batch_size')
+    def onchange_sellerscommerce_batch_size(self):
+        if self.sellerscommerce_batch_size > 500:
+            raise ValidationError('Batch size can not be more than 500.')
 
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
