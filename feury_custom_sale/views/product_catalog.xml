@@ -34,7 +34,7 @@
                         <group>
                             <field name="company_id" groups="base.group_no_one"/>
                             <field name="partner_id" string="Supplier" />
-                            <field name="external_id"/>
+                            <field name="external_id" readonly="1" groups="base.group_no_one"/>
                         </group>
                         <group>
                             <field name="last_update_timestamp"/>
@@ -44,7 +44,7 @@
                             <field name="sku_count"/>
                             <field name="has_inventory" widget="boolean"/>
                             <field name="has_dropship" widget="boolean"/>
-                            <field name="hash"/>
+                            <field name="hash" readonly="1" groups="base.group_no_one"/>
                         </group>
                     </group>
                 </sheet>

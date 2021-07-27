@@ -35,8 +35,8 @@
                         </group>
                     </group>
                     <group>
-                        <group string="Integrity and Tracking">
-                            <field name="hash" />
+                        <group string="Integrity and Tracking" groups="base.group_no_one">
+                            <field name="hash" readonly="1" />
                         </group>
                     </group>
                 </page>
