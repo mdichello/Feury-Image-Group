@@ -18,6 +18,13 @@ class SellersCommerceProductVirtualInventory(models.Model):
         string='Availability date',
     )
 
+    external_id = fields.Integer(
+        string='External ID',
+        required=True,
+        unique=True,
+        index=True
+    )
+
     active = fields.Boolean(
         string='Active',
         default=True

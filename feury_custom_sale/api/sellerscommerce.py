@@ -216,8 +216,18 @@ class API():
         return products_cleaned
 
     def product_sku(self, catalog_id, product_id):
-        """Return product SKUs"""
-        pass
+        headers = self.headers
+        base_url = 'https://ccm.sellerscommerce.com'
+        endpoint = f'{base_url}/gateway/product/getproductskus.json/{catalog_id}/{product_id}/0/500'
+        
+        skus = []
+
+        # Sending request.
+        response = requests.get(endpoint, headers=headers)
+        response.raise_for_status()
+        data = json.loads(response.content)
+
+        
 
 
 def main():
