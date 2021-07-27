@@ -222,12 +222,35 @@ class API():
         
         skus = []
 
+        # Handle duplicate SKU.
+        ids = set()
+
         # Sending request.
         response = requests.get(endpoint, headers=headers)
         response.raise_for_status()
         data = json.loads(response.content)
 
-        
+        for item in data:
+            attributes = (
+                external_product_id,
+                availability_date,
+                upc,
+                options,
+                id
+            ) = map(
+                lambda key: item.get(key, False),
+                (
+                    'productID',
+                    'skuAvailableDate',
+                    'upc',
+                    'skuOptions',
+                    'id'
+                )
+            )
+
+            # This is a duplicate SKU.
+            if id in ids:
+                continue
 
 
 def main():

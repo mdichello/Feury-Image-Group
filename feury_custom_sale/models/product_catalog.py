@@ -76,8 +76,8 @@ class ProductCatalog(models.Model):
         string='Catalog Account ID'
     )
 
-    product_count = fields.Integer(
-        string='Product Count',
+    item_count = fields.Integer(
+        string='Item Count',
         required=True
     )
 
@@ -203,7 +203,7 @@ class ProductCatalog(models.Model):
                     'external_id': external_catalog.id,
                     'approval_status': external_catalog.approvalStatus,
                     'catalog_account_id': external_catalog.catalogAccountID,
-                    'product_count': external_catalog.productCount,
+                    'item_count': external_catalog.productCount,
                     'sku_count': external_catalog.skuCount,
                     'last_update_timestamp': external_catalog.lastPublishedDate,
                     'has_inventory': external_catalog.hasInventory,
@@ -388,7 +388,7 @@ class ProductCatalog(models.Model):
         catalogs = self.search([])
 
         for catalog in catalogs:
-            product_count = catalog.product_count
+            product_count = catalog.item_count
 
             upper_bound = product_count \
                 if product_count % batch_size == 0 \
