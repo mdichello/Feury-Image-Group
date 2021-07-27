@@ -20,7 +20,16 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <div class="oe_button_box" name="button_box"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button 
+                            name="action_view_products"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-th-list"
+                            attrs="{'invisible': [('product_count', '=', 0)]}">
+                            <field name="product_count" widget="statinfo" string="Products" />
+                        </button>
+                    </div>
                     <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
                     <field name="logo" widget="image" class="oe_avatar" />
                     <field name="active" invisible="1" />

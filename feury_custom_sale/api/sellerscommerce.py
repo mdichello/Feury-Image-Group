@@ -215,6 +215,10 @@ class API():
         products_cleaned = [Product(*item.values()) for item in product_data]
         return products_cleaned
 
+    def product_sku(self, catalog_id, product_id):
+        """Return product SKUs"""
+        pass
+
 
 def main():
     username = "feury"

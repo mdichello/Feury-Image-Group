@@ -7,7 +7,7 @@ import requests
 import hashlib
 import json
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 from odoo.modules.module import get_module_resource
 from odoo.addons.feury_custom_sale.api.sellerscommerce import API as SellersCommerceConnector
@@ -120,6 +120,31 @@ class ProductCatalog(models.Model):
         string='Hash',
         required=True
     )
+
+    product_ids = fields.One2many(
+        string='Products',
+        comodel_name='product.template',
+        inverse_name='catalog_id',
+    )
+
+    product_count = fields.Integer(
+        compute='_compute_product_count',
+    )
+
+    def _compute_product_count(self):
+        PRODUCT_TEMPLATE = self.env['product.template']
+
+        for record in self:
+            record.product_count = len(record.product_ids)
+
+    def action_view_products(self):
+        return {
+            'name': _('Products'),
+            'res_model': 'product.template',
+            'view_mode': 'tree,form',
+            'type': 'ir.actions.act_window',
+            'domain': [('catalog_id', 'in', self.ids)]
+        }
 
     active = fields.Boolean(
         string='Active',
