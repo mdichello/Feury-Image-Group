@@ -141,7 +141,7 @@ class ProductCatalog(models.Model):
         return {
             'name': _('Products'),
             'res_model': 'product.template',
-            'view_mode': 'tree,form',
+            'view_mode': 'kanban,tree,form',
             'type': 'ir.actions.act_window',
             'domain': [('catalog_id', 'in', self.ids)]
         }
