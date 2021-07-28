@@ -22,6 +22,11 @@ class ProductTemplate(models.Model):
         copy=True
     )
 
+    parent_id = fields.Many2one(
+        string='Parent product',
+        comodel_name='product.template',
+    )
+
     brand_id = fields.Many2one(
         string='Brand',
         comodel_name='product.brand',
