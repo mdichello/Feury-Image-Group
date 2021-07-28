@@ -96,7 +96,9 @@ SKU = namedtuple(
         'skuAvailableDate',
         'skuOptions',
         'id',
-        'hash'
+        'hash',
+        'color',
+        'size'
     )
 )
 
@@ -261,7 +263,12 @@ class API():
         data = json.loads(response.content)
 
         for item in data:
-            item['hash'] = False
+            item.update({
+                'hash': False,
+                'color': False,
+                'size': False
+            })
+
             hash = dict_hash(item)
             sku = SKU(*item.values())
 
@@ -272,6 +279,17 @@ class API():
             # Process options.
             options = [SKUOption(*o.values()) for o in sku.skuOptions]
             
+            color = size = False
+            for option in options:
+                if not option.optionValue:
+                    continue
+
+                if option.optionName == 'Color':
+                    color = option.optionValue.upper()
+
+                if option.optionName == 'Size':
+                    size = option.optionValue.upper()
+
             # Parse dates.
             skuAvailableDate = parser.parse(sku.skuAvailableDate) \
                 if sku.skuAvailableDate \
@@ -280,7 +298,9 @@ class API():
             item.update({
                 'skuAvailableDate': skuAvailableDate,
                 'skuOptions': options,
-                'hash': hash
+                'hash': hash,
+                'color': color,
+                'size': size
             })
 
         skus = [SKU(*item.values()) for item in data]
