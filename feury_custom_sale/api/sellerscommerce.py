@@ -79,6 +79,38 @@ Product = namedtuple(
     )
 )
 
+SKU = namedtuple(
+    'SKU',
+    (
+        'productID',
+        'upc',
+        'msrp',
+        'map',
+        'costPrice',
+        'stock',
+        'weight',
+        'smallImages',
+        'bigImages',
+        'skuAdditionalDescription',
+        'default',
+        'skuAvailableDate',
+        'skuOptions',
+        'id',
+        'hash'
+    )
+)
+
+
+SKUOption = namedtuple(
+    'SKUOption',
+    (
+        'optionName',
+        'optionValue',
+        'image',
+        'id'
+    )
+)
+
 
 def download_image(url, encode_base64=False):
     try:
@@ -220,8 +252,6 @@ class API():
         base_url = 'https://ccm.sellerscommerce.com'
         endpoint = f'{base_url}/gateway/product/getproductskus.json/{catalog_id}/{product_id}/0/500'
         
-        skus = []
-
         # Handle duplicate SKU.
         ids = set()
 
@@ -231,33 +261,37 @@ class API():
         data = json.loads(response.content)
 
         for item in data:
-            attributes = (
-                external_product_id,
-                availability_date,
-                upc,
-                options,
-                id
-            ) = map(
-                lambda key: item.get(key, False),
-                (
-                    'productID',
-                    'skuAvailableDate',
-                    'upc',
-                    'skuOptions',
-                    'id'
-                )
-            )
+            item['hash'] = False
+            hash = dict_hash(item)
+            sku = SKU(*item.values())
 
             # This is a duplicate SKU.
-            if id in ids:
+            if sku.id in ids:
                 continue
+
+            # Process options.
+            options = [SKUOption(*o.values()) for o in sku.skuOptions]
+            
+            # Parse dates.
+            skuAvailableDate = parser.parse(sku.skuAvailableDate) \
+                if sku.skuAvailableDate \
+                else False
+
+            item.update({
+                'skuAvailableDate': skuAvailableDate,
+                'skuOptions': options,
+                'hash': hash
+            })
+
+        skus = [SKU(*item.values()) for item in data]
+        return skus
 
 
 def main():
     username = "feury"
     password = "8eb47c07f0aa41fe9e0b94c44c723be4"
     api = API(username=username, password=password)
-    products = api.products(40, 4229)
+    skus = api.product_sku(150, 31019)
     a = 10
 
 
