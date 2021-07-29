@@ -1,0 +1,52 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="product_virtual_inventory_list">
+      <field name="name">Virtual Inventory list</field>
+      <field name="model">sellerscommerce.product.virtual.inventory</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="product_id"/>
+          <field name="availability_date"/>
+          <field name="quantity"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="product_virtual_inventory_form">
+        <field name="name">Virtual Inventory</field>
+        <field name="model">sellerscommerce.product.virtual.inventory</field>
+        <field name="arch" type="xml">
+            <form string="Virtual Inventory">
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1" />
+                    <group>
+                        <field name="product_id" />
+                        <field name="availability_date" />
+                        <field name="quantity" />
+                        <field name="external_id" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ADD default filters -->
+    <record id="view_product_virtual_inventory_filter" model="ir.ui.view">
+        <field name="name">type.select</field>
+        <field name="model">sellerscommerce.product.virtual.inventory</field>
+        <field name="arch" type="xml">
+            <search string="Search Virtual Inventory">
+                <field name="product_id" filter_domain="[('product_id', 'ilike', self)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="product_virtual_inventory_action">
+      <field name="name">Virtual Inventory</field>
+      <field name="res_model">sellerscommerce.product.virtual.inventory</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+  </data>
+</odoo>

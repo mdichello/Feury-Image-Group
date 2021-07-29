@@ -22,6 +22,13 @@ class ProductTemplate(models.Model):
         copy=True
     )
 
+    skus = fields.One2many(
+        comodel_name='sellerscommerce.product.virtual.inventory', 
+        inverse_name='product_id', 
+        string="SKUs", 
+        copy=False
+    )
+
     brand_id = fields.Many2one(
         string='Brand',
         comodel_name='product.brand',

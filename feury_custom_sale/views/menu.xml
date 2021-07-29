@@ -24,5 +24,10 @@
             action="sellerscommerce_product_catalog_action" 
             parent="menu_sale_sellerscommerce"
             name="Product Catalog" />
+
+        <menuitem id="product_virtual_inventory_menu_list" 
+            action="product_virtual_inventory_action" 
+            parent="menu_sale_sellerscommerce"
+            name="Product Virtual Inventory" />
     </data>
 </odoo>

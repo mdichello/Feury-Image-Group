@@ -9,13 +9,17 @@ class SellersCommerceProductVirtualInventory(models.Model):
     _description = 'Product virtual inventory'
 
     product_id = fields.Many2one(
-        string='Catalog',
+        string='Product',
         comodel_name='product.template',
         required=True
     )
 
     availability_date = fields.Datetime(
         string='Availability date',
+    )
+
+    quantity = fields.Integer(
+        string='Available quantity'
     )
 
     external_id = fields.Integer(

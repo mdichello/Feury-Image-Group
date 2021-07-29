@@ -22,6 +22,7 @@
         'views/res_partner.xml',
         'views/product_catalog.xml',
         'views/product_template.xml',
+        'views/virtual_inventory.xml',
         'views/templates.xml',
         'views/menu.xml',
         'data/clothes_location.xml',
