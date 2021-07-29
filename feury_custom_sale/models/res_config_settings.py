@@ -66,7 +66,7 @@ class ResConfigSettings(models.TransientModel):
 
     @api.onchange('sellerscommerce_batch_size')
     def onchange_sellerscommerce_batch_size(self):
-        if self.sellerscommerce_batch_size > 500:
+        if int(self.sellerscommerce_batch_size) > 500:
             raise ValidationError('Batch size can not be more than 500.')
 
     # ----------------------------------------------------------------------------------------------------
