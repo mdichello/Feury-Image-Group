@@ -35,7 +35,7 @@ class ProductTemplate(models.Model):
 
     def _compute_sku_count(self):
         for record in self:
-            record.sku_count = len(record.sku_ids)
+            record.sku_count = sum(record.sku_ids.mapped('quantity') or [])
 
     brand_id = fields.Many2one(
         string='Brand',
