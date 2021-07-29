@@ -329,6 +329,7 @@ class ProductCatalog(models.Model):
 
     @api.model
     def api_product_sync(self, work_unit):
+        PRODUCT_SKU = self.env['sellerscommerce.product.virtual.inventory']
         PRODUCT_TEMPLATE = self.env['product.template']
         PRODUCT_SIZE = self.env['product.size']
         COLOR = self.env['color']
@@ -350,6 +351,8 @@ class ProductCatalog(models.Model):
                     work_unit.catalog_id.external_id,
                     external_id
                 )
+
+                sku_values = []
 
                 for sku in skus:
                     # Missing data in the sku unit.
@@ -389,7 +392,7 @@ class ProductCatalog(models.Model):
                     x_studio_vendor_sku = f'{external_product.productCode}/{sku.color}/{sku.size}'
                     default_code = f'{work_unit.catalog_id.name}/{x_studio_vendor_sku}'
 
-                    sku_values = {
+                    extra_values = {
                         'color_id': color.id,
                         'size_id': size.id,
                         'weight': sku.weight,
@@ -401,6 +404,7 @@ class ProductCatalog(models.Model):
                         'vendor_code': work_unit.catalog_id.name,
                         'x_studio_vendor_sku': x_studio_vendor_sku.upper(),
                         'default_code': default_code.upper(),
+                        'sku_ids': False
                     }
 
                     # Prepare values.
@@ -410,7 +414,7 @@ class ProductCatalog(models.Model):
                             external_product,
                         )
 
-                        values.update(sku_values)
+                        values.update(extra_values)
 
                         # Already exists and changed on the API.
                         if product:
@@ -420,7 +424,20 @@ class ProductCatalog(models.Model):
                         else:
                             product = PRODUCT_TEMPLATE.create(values)
                             log.info(f'A new product is synced id {product.id}')
+                        
+                        # Check SKU exist.
+                        sku_values.append({
+                            'product_id': product.id,
+                            'availability_date': sku.skuAvailableDate,
+                            'quantity': sku.stock,
+                            'external_id': sku.id
+                        })
                     
+                    # Save changes.
+                    self.env.cr.commit()
+
+                if sku_values:
+                    PRODUCT_SKU.create(sku_values)
                     # Save changes.
                     self.env.cr.commit()
 
