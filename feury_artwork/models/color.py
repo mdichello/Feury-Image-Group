@@ -36,8 +36,7 @@ class Color(models.Model):
 
     hex_code = fields.Char(
         string='Hex Code',
-        required=True,
-        unique=True
+        required=False,
     )
 
     active = fields.Boolean(

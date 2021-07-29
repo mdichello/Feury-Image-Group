@@ -332,6 +332,8 @@ class ProductCatalog(models.Model):
     @api.model
     def api_product_sync(self, work_unit):
         PRODUCT_TEMPLATE = self.env['product.template']
+        PRODUCT_SIZE = self.env['product.size']
+        COLOR = self.env['color']
 
         api = self.get_api_connection()
 
@@ -344,37 +346,88 @@ class ProductCatalog(models.Model):
         for external_product in external_products:
             try:
                 external_id = int(external_product.id)
-                domain = [
-                    ('external_id', '=', external_id),
-                    ('catalog_id', '=', work_unit.catalog_id.id),
-                    '|',
-                    ('active', '=', True),
-                    ('active', '=', False)
-                ]
-                product = PRODUCT_TEMPLATE.search(domain, limit=1)
 
-                # Already exists and changed on the API.
-                if product and product.hash != external_product.hash:
-                    values = self.prepare_product_values(
-                        work_unit.catalog_id, 
-                        external_product
-                    )
-                    product.write(values)
+                # SKU processing.
+                skus = api.product_sku(
+                    work_unit.catalog_id.external_id,
+                    external_id
+                )
 
-                # Is not synced yet.
-                elif not product:
-                    values = self.prepare_product_values(
-                        work_unit.catalog_id, 
-                        external_product
-                    )
-                    product = PRODUCT_TEMPLATE.create(values)
-                    log.info(f'A new product is synced id {product.id}')
+                for sku in skus:
+                    # Missing data in the sku unit.
+                    if not (sku.color and sku.size):
+                        continue
+
+                    size = PRODUCT_SIZE.search([('name', 'ilike', sku.size)], limit=1)
+                    color = COLOR.search([('name', 'ilike', sku.color)], limit=1)
+
+
+                    # Size does not exist yet.
+                    if not size:
+                        size = PRODUCT_SIZE.create({
+                            'name': sku.size,
+                            'code': sku.size,
+                        })
+
+                    # Color does not exit yet.
+                    if not color:
+                        color = COLOR.create({
+                            'name': sku.color,
+                            'code': sku.color,
+                            'hex_code': 'FFFFF',
+                        })
+
+                    domain = [
+                        ('catalog_id', '=', work_unit.catalog_id.id),
+                        ('external_id', '=', external_id),
+                        ('color_id', '=', color.id),
+                        ('size_id', '=', size.id),
+                        '|',
+                        ('active', '=', True),
+                        ('active', '=', False)
+                    ]
+                    product = PRODUCT_TEMPLATE.search(domain, limit=1)
+
+                    x_studio_vendor_sku = f'{external_product.productCode}/{sku.color}/{sku.size}'
+                    default_code = f'{work_unit.catalog_id.name}/{x_studio_vendor_sku}'
+
+                    sku_values = {
+                        'color_id': color.id,
+                        'size_id': size.id,
+                        'weight': sku.weight,
+                        'barcode': sku.upc,
+                        'msrp': sku.msrp,
+                        'map': sku.map,
+                        'standard_price': sku.costPrice,
+                        'list_price': sku.msrp,
+                        'vendor_code': work_unit.catalog_id.name,
+                        'x_studio_vendor_sku': x_studio_vendor_sku.upper(),
+                        'default_code': default_code.upper(),
+                    }
+
+                    # Prepare values.
+                    if not product or product.hash != external_product.hash:
+                        values = self.prepare_product_values(
+                            work_unit.catalog_id, 
+                            external_product,
+                        )
+
+                        values.update(sku_values)
+
+                        # Already exists and changed on the API.
+                        if product:
+                            product.write(values)
+
+                        # Is not synced yet.
+                        else:
+                            product = PRODUCT_TEMPLATE.create(values)
+                            log.info(f'A new product is synced id {product.id}')
+                    
+                    # Save changes.
+                    self.env.cr.commit()
 
             except Exception as e:
                 log.error('Unexpected error', e)
-
-            else:
-                self.env.cr.commit()
 
     @api.model
     def create_product_sync_work_units(self):

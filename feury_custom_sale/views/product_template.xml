@@ -41,6 +41,10 @@
                     </group>
                 </page>
             </xpath>
+
+            <field name="type" position="before">
+                <field name="brand_id" widget="Many2one" options="{'no_open': True}"/>
+            </field>
         </field>
     </record>
 
