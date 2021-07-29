@@ -22,12 +22,20 @@ class ProductTemplate(models.Model):
         copy=True
     )
 
-    skus = fields.One2many(
+    sku_ids = fields.One2many(
         comodel_name='sellerscommerce.product.virtual.inventory', 
         inverse_name='product_id', 
         string="SKUs", 
         copy=False
     )
+
+    sku_count = fields.Float(
+        compute='_compute_sku_count',
+    )
+
+    def _compute_sku_count(self):
+        for record in self:
+            record.sku_count = len(record.sku_ids)
 
     brand_id = fields.Many2one(
         string='Brand',
@@ -101,6 +109,15 @@ class ProductTemplate(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
+
+    def action_view_skus(self):
+        return {
+            'name': _('SKUs'),
+            'res_model': 'sellerscommerce.product.virtual.inventory',
+            'view_mode': 'tree,form',
+            'type': 'ir.actions.act_window',
+            'domain': [('product_id', 'in', self.ids)]
+        }
 
     # ----------------------------------------------------------------------------------------------------
     # 6- CRONs methods

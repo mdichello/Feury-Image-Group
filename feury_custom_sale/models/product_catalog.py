@@ -132,8 +132,6 @@ class ProductCatalog(models.Model):
     )
 
     def _compute_product_count(self):
-        PRODUCT_TEMPLATE = self.env['product.template']
-
         for record in self:
             record.product_count = len(record.product_ids)
 
