@@ -390,7 +390,11 @@ class ProductCatalog(models.Model):
                     product = PRODUCT_TEMPLATE.search(domain, limit=1)
 
                     x_studio_vendor_sku = f'{external_product.productCode}-{sku.color}-{sku.size}'
-                    default_code = f'{work_unit.catalog_id.name}-{x_studio_vendor_sku}'
+                    vendor_code = work_unit.catalog_id \
+                        and work_unit.catalog_id.partner_id \
+                        and work_unit.catalog_id.partner_id.x_studio_vendor_code \
+                        or ''
+                    default_code = f'{vendor_code}-{x_studio_vendor_sku}'
                     
                     # Image processing.
                     image_urls = sku.bigImages.split('|')
@@ -432,7 +436,7 @@ class ProductCatalog(models.Model):
                         'map': map,
                         'standard_price': cost,
                         'list_price': msrp,
-                        'vendor_code': work_unit.catalog_id.name,
+                        'vendor_code': vendor_code,
                         'x_studio_vendor_sku': x_studio_vendor_sku.upper(),
                         'default_code': default_code.upper(),
                         'sku_ids': False,
