@@ -106,7 +106,6 @@ class ProductCatalog(models.Model):
         comodel_name='res.partner', 
         ondelete='cascade', 
         index=True,
-        domain=['&', ('parent_id', '=', False), ('is_vendor', '=', True)], 
         required=False
     )
 
@@ -331,6 +330,7 @@ class ProductCatalog(models.Model):
     def api_product_sync(self, work_unit):
         PRODUCT_SKU = self.env['sellerscommerce.product.virtual.inventory']
         PRODUCT_TEMPLATE = self.env['product.template']
+        PRODUCT_IMAGE = self.env['product.image']
         PRODUCT_SIZE = self.env['product.size']
         COLOR = self.env['color']
 
@@ -389,22 +389,55 @@ class ProductCatalog(models.Model):
                     ]
                     product = PRODUCT_TEMPLATE.search(domain, limit=1)
 
-                    x_studio_vendor_sku = f'{external_product.productCode}/{sku.color}/{sku.size}'
-                    default_code = f'{work_unit.catalog_id.name}/{x_studio_vendor_sku}'
+                    x_studio_vendor_sku = f'{external_product.productCode}-{sku.color}-{sku.size}'
+                    default_code = f'{work_unit.catalog_id.name}-{x_studio_vendor_sku}'
+                    
+                    # Image processing.
+                    image_urls = sku.bigImages.split('|')
+                    images = [
+                        download_image(image_url, encode_base64=True) 
+                        for image_url in image_urls
+                    ]
+                    main_image = images[0] if images else False
+
+                    # Prepare image values and conserve the sequence number.
+                    image_values = [
+                        {
+                            'name': external_product.productName,
+                            'image_1920': image,
+                            'sequence': index + 10
+                        }
+                        for index, image in enumerate(images)
+                        if image
+                    ]
+
+                    images = PRODUCT_IMAGE.create(image_values) \
+                        if image_values \
+                        else PRODUCT_IMAGE
+
+                    cost = sku.costPrice
+                    msrp = sku.msrp
+                    map = sku.map
+
+                    # MSRP is equal to the COST, leave the msrp and the map and the cost as zero.
+                    if msrp == cost:
+                        map = cost = 0
 
                     extra_values = {
                         'color_id': color.id,
                         'size_id': size.id,
                         'weight': sku.weight,
                         'barcode': sku.upc,
-                        'msrp': sku.msrp,
-                        'map': sku.map,
-                        'standard_price': sku.costPrice,
-                        'list_price': sku.msrp,
+                        'msrp': msrp,
+                        'map': map,
+                        'standard_price': cost,
+                        'list_price': msrp,
                         'vendor_code': work_unit.catalog_id.name,
                         'x_studio_vendor_sku': x_studio_vendor_sku.upper(),
                         'default_code': default_code.upper(),
-                        'sku_ids': False
+                        'sku_ids': False,
+                        'image_1920': main_image,
+                        'image_ids': [(6, 0, images.ids)],
                     }
 
                     # Prepare values.

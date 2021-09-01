@@ -109,6 +109,7 @@ SKUOption = namedtuple(
         'optionName',
         'optionValue',
         'image',
+        'code',
         'id'
     )
 )
@@ -281,14 +282,15 @@ class API():
             
             color = size = False
             for option in options:
-                if not option.optionValue:
+                value = option.code or option.optionValue
+                if not value:
                     continue
 
                 if option.optionName == 'Color':
-                    color = option.optionValue.upper()
+                    color = value.upper().split('-')[-1]
 
                 if option.optionName == 'Size':
-                    size = option.optionValue.upper()
+                    size = value.upper()
 
             # Parse dates.
             skuAvailableDate = parser.parse(sku.skuAvailableDate) \

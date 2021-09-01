@@ -42,7 +42,7 @@
                     <group>
                         <group>
                             <field name="company_id" groups="base.group_no_one"/>
-                            <field name="partner_id" string="Supplier" />
+                            <field name="partner_id" string="Supplier" domain="[('parent_id', '=', False), ('x_studio_is_a_vendor', '=', True)]"  />
                             <field name="external_id" readonly="1" groups="base.group_no_one"/>
                         </group>
                         <group>
