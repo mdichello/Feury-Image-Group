@@ -126,3 +126,9 @@ class ProductTemplate(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 7- Technical methods (name must reflect the use)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.model
+    def _add_dropshipping_route(self):
+        dropshiping_route = self.env.ref('stock_dropshipping.route_drop_shipping')
+        products = self.search([])
+        products.route_ids = [(4, dropshiping_route.id, 0)]
