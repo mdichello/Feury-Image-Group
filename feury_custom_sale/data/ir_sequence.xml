@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="sellerscommerce_sync_iteration" model="ir.sequence">
+            <field name="name">Sellerscommerce Sync Iteration</field>
+            <field name="code">sellerscommerce.sync.iteration</field>
+            <field name="active">True</field>
+            <field name="prefix">SYNC/</field>
+            <field name="padding">8</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+    </data>
+</odoo>

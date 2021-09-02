@@ -331,6 +331,7 @@ class ProductCatalog(models.Model):
         PRODUCT_SKU = self.env['sellerscommerce.product.virtual.inventory']
         PRODUCT_TEMPLATE = self.env['product.template']
         PRODUCT_IMAGE = self.env['product.image']
+        PRODUCT_STYLE = self.env['product.style']
         PRODUCT_SIZE = self.env['product.size']
         COLOR = self.env['color']
 
@@ -389,13 +390,14 @@ class ProductCatalog(models.Model):
                     ]
                     product = PRODUCT_TEMPLATE.search(domain, limit=1)
 
-                    x_studio_vendor_sku = f'{external_product.productCode}-{sku.color}-{sku.size}'
+                    style_code = external_product.productCode
+                    x_studio_vendor_sku = f'{style_code}-{sku.color}-{sku.size}'
                     vendor_code = work_unit.catalog_id \
                         and work_unit.catalog_id.partner_id \
                         and work_unit.catalog_id.partner_id.x_studio_vendor_code \
                         or ''
                     default_code = f'{vendor_code}-{x_studio_vendor_sku}'
-                    
+
                     # Image processing.
                     image_urls = sku.bigImages.split('|')
                     images = [
@@ -444,6 +446,21 @@ class ProductCatalog(models.Model):
                         'image_ids': [(6, 0, images.ids)],
                     }
 
+                    # Style processing.
+                    if style_code and vendor_code:
+                        style = PRODUCT_STYLE.search([
+                            ('code', '=', style_code),
+                            ('vendor_code', '=', vendor_code),
+                        ], limit=1)
+
+                        if not style:
+                            style = PRODUCT_STYLE.create({
+                                'code': style_code,
+                                'vendor_code': vendor_code
+                            })
+
+                        extra_values['style_id'] = style.id
+
                     # Prepare values.
                     if not product or product.hash != external_product.hash:
                         values = self.prepare_product_values(
@@ -485,12 +502,40 @@ class ProductCatalog(models.Model):
     def create_product_sync_work_units(self):
         PRODUCT_SYNC_WORK_UNIT = self.env['sellerscommerce.product.sync.work.unit']
         CONFIG_PARAMETER = self.env['ir.config_parameter']
+        IR_SEQUENCE = self.env['ir.sequence']
 
         log.info('Started sellerscommerce product sync work unit creation')
         get_param = CONFIG_PARAMETER.sudo().get_param
 
         batch_size = int(get_param(API_PROCESSING_BATCH_SIZE, default=100))
         catalogs = self.search([])
+
+        waiting_work_units = PRODUCT_SYNC_WORK_UNIT.search([
+            ('state', '=', 'waiting')
+        ])
+
+        if waiting_work_units:
+            pervious_operations = set(waiting_work_units.mapped('reference'))
+            references = ','.join(pervious_operations)
+            message = f'Planning for a sync operation is skipped since the previous one "{references}" did not complete yet'
+            log.info(message)
+
+            for catalog in catalogs:
+                catalog.message_post(body=message)
+
+            return None
+
+        # Unblock pending work units (e.g: due to a CRON timeout the operation did not complete)
+        stuck_work_units = PRODUCT_SYNC_WORK_UNIT.search([
+            ('state', '=', 'pending')
+        ])
+        stuck_work_units.state = 'waiting'
+
+        # Get a sequence for the current sync operation.
+        reference = IR_SEQUENCE.next_by_code('sellerscommerce.sync.iteration') or _('New')
+        message = f'A new SellersCommerce sync operation {reference} is planned'
+        for catalog in catalogs:
+            catalog.message_post(body=message)
 
         for catalog in catalogs:
             product_count = catalog.item_count
@@ -521,7 +566,8 @@ class ProductCatalog(models.Model):
                     'start_index': start_index,
                     'end_index': end_index,
                     'state': 'waiting',
-                    'active': True
+                    'active': True,
+                    'reference': reference
                 })
 
     @api.model

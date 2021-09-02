@@ -29,7 +29,6 @@ class ProductTemplate(models.Model):
 
     vendor_code = fields.Char(
         string='Vendor Code',
-        related='style_id.vendor_code',
         required=False,
         readonly=False,
     )

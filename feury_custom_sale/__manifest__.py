@@ -27,6 +27,7 @@
         'views/menu.xml',
         'data/clothes_location.xml',
         'data/clothes_type.xml',
-        'data/sellerscommerce_cron.xml'
+        'data/sellerscommerce_cron.xml',
+        'data/ir_sequence.xml'
     ],
 }

@@ -19,6 +19,14 @@ class SellersCommerceProductSyncWorkUnit(models.Model):
         required=True
     )
 
+    reference = fields.Char(
+        string="Reference", 
+        readonly=False, 
+        required=True,
+        copy=False, 
+        default=_('New')
+    )
+
     start_index = fields.Integer(
         string='Start Index',
         required=True
@@ -57,6 +65,14 @@ class SellersCommerceProductSyncWorkUnit(models.Model):
 
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.model
+    def create(self, values):
+        IR_SEQUENCE = self.env['ir.sequence']
+        if values.get('reference', 'New') == 'New':
+            values['reference'] = IR_SEQUENCE.next_by_code('sellerscommerce.sync.iteration') or _('New')
+        result = super(SellersCommerceProductSyncWorkUnit, self).create(values)
+        return result
 
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)
