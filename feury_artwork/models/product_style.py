@@ -7,6 +7,7 @@ from odoo import api, fields, models
 class ProductStyle(models.Model):
     _name = 'product.style'
     _description = 'Product style'
+    _rec_name = 'code'
 
     _sql_constraints = [
         ('product_style_vendor_code_uniq', 'unique(code, vendor_code)', 'A product style code / vendor code should be unique.')
@@ -30,15 +31,6 @@ class ProductStyle(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
-
-    def name_get(self):
-        return [
-            (
-                record.id, 
-                f'{record.vendor_code}-{record.code}' if record.vendor_code else f'{record.code}'
-            )
-            for record in self
-        ]
 
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)
