@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="ir_cron_feury_enable_dropshipping" model="ir.cron">
+    <record id="ir_cron_feury_partner_migrate_relationships" model="ir.cron">
         <field name="name">Partner: Migrate relationships</field>
         <field name="model_id" ref="model_res_partner"/>
         <field name="state">code</field>
