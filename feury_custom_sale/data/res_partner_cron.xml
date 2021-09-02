@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_feury_enable_dropshipping" model="ir.cron">
+        <field name="name">Partner: Migrate relationships</field>
+        <field name="model_id" ref="model_res_partner"/>
+        <field name="state">code</field>
+        <field name="code">model._migrate_partner_relationships()</field>
+        <field name="user_id" ref="base.user_root" />
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="nextcall" eval="(DateTime.now() + timedelta(days=1)).strftime('%Y-%m-%d 01:00:00')" />
+        <field eval="False" name="doall" />
+        <field eval="False" name="active" />
+        <field name="priority">10</field>
+    </record>
+</odoo>
