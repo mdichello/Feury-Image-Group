@@ -582,6 +582,10 @@ class ProductCatalog(models.Model):
         # Pick a unit of work (ordered by create data).
         work_unit = PRODUCT_SYNC_WORK_UNIT.next_work_unit()
 
+        if not work_unit:
+            log.info('No pending work unit is found.')
+            return
+
         # Start work unit.
         work_unit.action_start()
 
