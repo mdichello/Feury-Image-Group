@@ -7,7 +7,7 @@ import requests
 import hashlib
 import json
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models, tools, _
 from odoo.exceptions import ValidationError
 from odoo.modules.module import get_module_resource
 from odoo.addons.feury_custom_sale.api.sellerscommerce import API as SellersCommerceConnector
@@ -226,18 +226,11 @@ class ProductCatalog(models.Model):
                 self.env.cr.commit()
 
     @api.model
-    def prepare_product_values(self, catalog, external_product):
+    def _prepare_product_values(self, catalog, external_product):
         PRODUCT_SUPPLIER_INFO = self.env['product.supplierinfo']
         PRODUCT_BRAND = self.env['product.brand']
         PRODUCT_CATEGORY = self.env['product.category']
         PRODUCT_IMAGE = self.env['product.image']
-
-        # Image processing.
-        images = [
-            download_image(image_url, encode_base64=True) 
-            for image_url in external_product.images
-        ]
-        main_image = images[0] if images else False
 
         # Brand processing.
         brand = PRODUCT_BRAND.search([
@@ -252,21 +245,6 @@ class ProductCatalog(models.Model):
                     encode_base64=True
                 )
             })
-
-        # Prepare image values and conserve the sequence number.
-        image_values = [
-            {
-                'name': external_product.productName,
-                'image_1920': image,
-                'sequence': index + 10
-            }
-            for index, image in enumerate(images)
-            if image
-        ]
-
-        images = PRODUCT_IMAGE.create(image_values) \
-            if image_values \
-            else PRODUCT_IMAGE
 
         # Supplier pricelist.
         supplier_info = PRODUCT_SUPPLIER_INFO.create({
@@ -310,8 +288,6 @@ class ProductCatalog(models.Model):
             'size_chart': download_image(external_product.sizeChart, encode_base64=True),
             'description_html': external_product.description,
             'hash': external_product.hash,
-            'image_1920': main_image,
-            'image_ids': [(6, 0, images.ids)],
             'seller_ids': [(6, 0, supplier_info.ids)],
             'category_ids': [(6, 0, categories.ids)],
             'categ_id': categories[0].id if categories else False,
@@ -363,31 +339,16 @@ class ProductCatalog(models.Model):
                     # Missing data in the sku unit.
                     if not (sku.color and sku.size):
                         continue
+                    
+                    size_id = PRODUCT_SIZE._search_or_create_by_name(sku.size)
+                    color_id = COLOR._search_or_create_by_name(sku.color)
 
-                    size = PRODUCT_SIZE.search([('name', '=', sku.size)], limit=1)
-                    color = COLOR.search([('name', 'ilike', sku.color)], limit=1)
-
-
-                    # Size does not exist yet.
-                    if not size:
-                        size = PRODUCT_SIZE.create({
-                            'name': sku.size,
-                            'code': sku.size,
-                        })
-
-                    # Color does not exit yet.
-                    if not color:
-                        color = COLOR.create({
-                            'name': sku.color,
-                            'code': sku.color,
-                            'hex_code': 'FFFFF',
-                        })
-
+                    # TODO create a composite index to accelerate search.
                     domain = [
                         ('catalog_id', '=', work_unit.catalog_id.id),
                         ('external_id', '=', external_id),
-                        ('color_id', '=', color.id),
-                        ('size_id', '=', size.id),
+                        ('color_id', '=', color_id),
+                        ('size_id', '=', size_id),
                         '|',
                         ('active', '=', True),
                         ('active', '=', False)
@@ -434,8 +395,8 @@ class ProductCatalog(models.Model):
                         map = cost = 0
 
                     extra_values = {
-                        'color_id': color.id,
-                        'size_id': size.id,
+                        'color_id': color_id,
+                        'size_id': size_id,
                         'weight': sku.weight,
                         'barcode': sku.upc,
                         'msrp': msrp,
@@ -452,22 +413,12 @@ class ProductCatalog(models.Model):
 
                     # Style processing.
                     if style_code and vendor_code:
-                        style = PRODUCT_STYLE.search([
-                            ('code', '=', style_code),
-                            ('vendor_code', '=', vendor_code),
-                        ], limit=1)
-
-                        if not style:
-                            style = PRODUCT_STYLE.create({
-                                'code': style_code,
-                                'vendor_code': vendor_code
-                            })
-
-                        extra_values['style_id'] = style.id
+                        style_id = PRODUCT_STYLE._search_or_create_by_name(style_code, vendor_code)
+                        extra_values['style_id'] = style_id
 
                     # Prepare values.
                     if not product or product.hash != external_product.hash:
-                        values = self.prepare_product_values(
+                        values = self._prepare_product_values(
                             work_unit.catalog_id, 
                             external_product,
                         )

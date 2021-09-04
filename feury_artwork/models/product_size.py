@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models
+from odoo import api, fields, models, tools
 
 
 class ProductSize(models.Model):
@@ -15,7 +15,7 @@ class ProductSize(models.Model):
 
     name = fields.Char(
         string='Name',
-        required=False,
+        required=True,
         unique=True
     )
 
@@ -34,6 +34,22 @@ class ProductSize(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.model
+    @tools.ormcache('name')
+    def _search_or_create_by_name(self, name):
+        if not name:
+            return False
+    
+        size = self.search([('name', 'ilike', name)], limit=1)
+
+        if not size:
+            size = self.create({
+                'name': name,
+                'code': name,
+            })
+
+        return size.id
 
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)

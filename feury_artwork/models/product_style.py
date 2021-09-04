@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models
+from odoo import api, fields, models, tools
 
 
 class ProductStyle(models.Model):
@@ -20,7 +20,7 @@ class ProductStyle(models.Model):
 
     vendor_code = fields.Char(
         string='Vendor Code',
-        required=False
+        required=True
     )
 
     active = fields.Boolean(
@@ -55,3 +55,22 @@ class ProductStyle(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 7- Technical methods (name must reflect the use)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.model
+    @tools.ormcache('code', 'vendor_code')
+    def _search_or_create_by_name(self, code, vendor_code):
+        if not code or not vendor_code:
+            return False
+    
+        style = self.search([
+            ('code', '=', code),
+            ('vendor_code', '=', vendor_code),
+        ], limit=1)
+
+        if not style:
+            style = self.create({
+                'code': code,
+                'vendor_code': vendor_code
+            })
+
+        return style.id
