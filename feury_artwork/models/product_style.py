@@ -15,7 +15,8 @@ class ProductStyle(models.Model):
 
     code = fields.Char(
         string='Style Code',
-        required=True
+        required=True,
+        unique=False
     )
 
     vendor_code = fields.Char(
