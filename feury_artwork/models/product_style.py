@@ -7,7 +7,6 @@ from odoo import api, fields, models, tools
 class ProductStyle(models.Model):
     _name = 'product.style'
     _description = 'Product style'
-    _rec_name = 'code'
 
     _sql_constraints = [
         ('product_style_vendor_code_uniq', 'unique(code, vendor_code)', 'A product style code / vendor code should be unique.')
@@ -75,3 +74,6 @@ class ProductStyle(models.Model):
             })
 
         return style.id
+
+    def name_get(self):
+        return [(record.id, self.code) for record in self]
