@@ -360,7 +360,7 @@ class ProductCatalog(models.Model):
                     if not (sku.color and sku.size):
                         continue
 
-                    size = PRODUCT_SIZE.search([('name', 'ilike', sku.size)], limit=1)
+                    size = PRODUCT_SIZE.search([('name', '=', sku.size)], limit=1)
                     color = COLOR.search([('name', 'ilike', sku.color)], limit=1)
 
 

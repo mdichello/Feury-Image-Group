@@ -22,7 +22,8 @@ class ProductSize(models.Model):
     code = fields.Char(
         string='Code',
         required=True,
-        unique=True
+        unique=True,
+        index=True,
     )
 
     active = fields.Boolean(
