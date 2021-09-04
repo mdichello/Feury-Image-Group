@@ -3,7 +3,7 @@
 
 import base64
 
-from odoo import api, fields, models
+from odoo import api, fields, models, tools
 from odoo.modules.module import get_module_resource
 
 
@@ -71,3 +71,20 @@ class Color(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 7- Technical methods (name must reflect the use)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.model
+    @tools.ormcache('name')
+    def _search_or_create_by_name(self, name):
+        if not name:
+            return False
+    
+        color = self.search([('name', 'ilike', name)], limit=1)
+
+        if not color:
+            color = self.create({
+                'name': name,
+                'code': name,
+                'hex_code': 'FFFFF',
+            })
+
+        return color.id
