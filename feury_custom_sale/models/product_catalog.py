@@ -327,6 +327,10 @@ class ProductCatalog(models.Model):
         return values
 
     @api.model
+    def _prepare_image_values(self, image_urls):
+        pass
+
+    @api.model
     def api_product_sync(self, work_unit):
         PRODUCT_SKU = self.env['sellerscommerce.product.virtual.inventory']
         PRODUCT_TEMPLATE = self.env['product.template']
@@ -486,9 +490,6 @@ class ProductCatalog(models.Model):
                             'quantity': sku.stock,
                             'external_id': sku.id
                         })
-                    
-                    # Save changes.
-                    self.env.cr.commit()
 
                 if sku_values and product.exists():
                     PRODUCT_SKU.create(sku_values)
