@@ -435,14 +435,16 @@ class ProductCatalog(models.Model):
                             log.info(f'A new product is synced id {product.id}')
                         
                         # Check SKU exist.
-                        sku_values.append({
-                            'product_id': product.id,
-                            'availability_date': sku.skuAvailableDate,
-                            'quantity': sku.stock,
-                            'external_id': sku.id
-                        })
+                        if product.exists():
+                            sku_values.append({
+                                'product_id': product.id,
+                                'availability_date': sku.skuAvailableDate,
+                                'quantity': sku.stock,
+                                'external_id': sku.id
+                            })
+                            self.env.cr.commit()
 
-                if sku_values and product.exists():
+                if sku_values:
                     PRODUCT_SKU.create(sku_values)
                     # Save changes.
                     self.env.cr.commit()

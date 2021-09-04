@@ -11,7 +11,8 @@ class SellersCommerceProductVirtualInventory(models.Model):
     product_id = fields.Many2one(
         string='Product',
         comodel_name='product.template',
-        required=True
+        required=True,
+        ondelete='cascade'
     )
 
     availability_date = fields.Datetime(
