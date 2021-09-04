@@ -490,7 +490,7 @@ class ProductCatalog(models.Model):
                     # Save changes.
                     self.env.cr.commit()
 
-                if sku_values:
+                if sku_values and product.exists():
                     PRODUCT_SKU.create(sku_values)
                     # Save changes.
                     self.env.cr.commit()
