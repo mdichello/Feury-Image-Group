@@ -91,6 +91,13 @@ class ProductTemplate(models.Model):
         required=True
     )
 
+    product_variant_id = fields.Many2one(
+        string='Product', 
+        comodel_name='product.product', 
+        compute='_compute_product_variant_id',
+        store=True
+    )
+
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
 
