@@ -464,6 +464,12 @@ class ProductCatalog(models.Model):
         batch_size = int(get_param(API_PROCESSING_BATCH_SIZE, default=100))
         catalogs = self.search([])
 
+        # Unblock pending work units (e.g: due to a CRON timeout the operation did not complete)
+        stuck_work_units = PRODUCT_SYNC_WORK_UNIT.search([
+            ('state', '=', 'pending')
+        ])
+        stuck_work_units.state = 'waiting'
+
         waiting_work_units = PRODUCT_SYNC_WORK_UNIT.search([
             ('state', '=', 'waiting')
         ])
@@ -478,12 +484,6 @@ class ProductCatalog(models.Model):
                 catalog.message_post(body=message)
 
             return None
-
-        # Unblock pending work units (e.g: due to a CRON timeout the operation did not complete)
-        stuck_work_units = PRODUCT_SYNC_WORK_UNIT.search([
-            ('state', '=', 'pending')
-        ])
-        stuck_work_units.state = 'waiting'
 
         # Get a sequence for the current sync operation.
         reference = IR_SEQUENCE.next_by_code('sellerscommerce.sync.iteration') or _('New')
