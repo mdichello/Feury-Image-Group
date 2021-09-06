@@ -23,9 +23,10 @@ API_PROCESSING_BATCH_SIZE = 'feury_custom_sale.sellerscommerce_batch_size'
 
 # TODO make cron to unlock pending work units (after 5 hours for example)
 # TODO Re-locate function to tools model!.
+# TODO set a reasonable timeout.
 def download_image(url, encode_base64=False):
     try:
-        response = requests.get(url, allow_redirects=True)
+        response = requests.get(url, allow_redirects=True, timeout=4)
         response.raise_for_status()
         
         if encode_base64:
@@ -230,7 +231,6 @@ class ProductCatalog(models.Model):
         PRODUCT_SUPPLIER_INFO = self.env['product.supplierinfo']
         PRODUCT_BRAND = self.env['product.brand']
         PRODUCT_CATEGORY = self.env['product.category']
-        PRODUCT_IMAGE = self.env['product.image']
 
         # Brand processing.
         brand = PRODUCT_BRAND.search([
@@ -303,14 +303,36 @@ class ProductCatalog(models.Model):
         return values
 
     @api.model
-    def _prepare_image_values(self, image_urls):
-        pass
+    def _prepare_image_values(self, image_urls, name):
+        PRODUCT_IMAGE = self.env['product.image']
+
+        images = [
+            download_image(image_url, encode_base64=True) 
+            for image_url in image_urls
+        ]
+        main_image = images[0] if images else False
+
+        # Prepare image values and conserve the sequence number.
+        image_values = [
+            {
+                'name': name,
+                'image_1920': image,
+                'sequence': index + 10
+            }
+            for index, image in enumerate(images)
+            if image
+        ]
+
+        images = PRODUCT_IMAGE.create(image_values) \
+            if image_values \
+            else PRODUCT_IMAGE
+
+        return images.ids, main_image
 
     @api.model
     def api_product_sync(self, work_unit):
         PRODUCT_SKU = self.env['sellerscommerce.product.virtual.inventory']
         PRODUCT_TEMPLATE = self.env['product.template']
-        PRODUCT_IMAGE = self.env['product.image']
         PRODUCT_STYLE = self.env['product.style']
         PRODUCT_SIZE = self.env['product.size']
         COLOR = self.env['color']
@@ -322,6 +344,8 @@ class ProductCatalog(models.Model):
             work_unit.start_index,
             work_unit.end_index,
         )
+
+        vendor_code = work_unit.vendor_code
 
         for external_product in external_products:
             try:
@@ -335,6 +359,10 @@ class ProductCatalog(models.Model):
 
                 sku_values = []
 
+                # Style processing.
+                style_code = external_product.productCode
+                style_id = PRODUCT_STYLE._search_or_create_by_name(style_code, vendor_code)
+
                 for sku in skus:
                     # Missing data in the sku unit.
                     if not (sku.color and sku.size):
@@ -343,10 +371,10 @@ class ProductCatalog(models.Model):
                     size_id = PRODUCT_SIZE._search_or_create_by_name(sku.size)
                     color_id = COLOR._search_or_create_by_name(sku.color)
 
-                    # TODO create a composite index to accelerate search.
                     domain = [
                         ('catalog_id', '=', work_unit.catalog_id.id),
                         ('external_id', '=', external_id),
+                        ('style_id', '=', style_id),
                         ('color_id', '=', color_id),
                         ('size_id', '=', size_id),
                         '|',
@@ -355,75 +383,44 @@ class ProductCatalog(models.Model):
                     ]
                     product = PRODUCT_TEMPLATE.search(domain, limit=1)
 
-                    style_code = external_product.productCode
-                    x_studio_vendor_sku = f'{style_code}-{sku.color}-{sku.size}'
-                    vendor_code = work_unit.catalog_id \
-                        and work_unit.catalog_id.partner_id \
-                        and work_unit.catalog_id.partner_id.x_studio_vendor_code \
-                        or ''
-                    default_code = f'{vendor_code}-{x_studio_vendor_sku}'
-
-                    # Image processing.
-                    image_urls = sku.bigImages.split('|')
-                    images = [
-                        download_image(image_url, encode_base64=True) 
-                        for image_url in image_urls
-                    ]
-                    main_image = images[0] if images else False
-
-                    # Prepare image values and conserve the sequence number.
-                    image_values = [
-                        {
-                            'name': external_product.productName,
-                            'image_1920': image,
-                            'sequence': index + 10
-                        }
-                        for index, image in enumerate(images)
-                        if image
-                    ]
-
-                    images = PRODUCT_IMAGE.create(image_values) \
-                        if image_values \
-                        else PRODUCT_IMAGE
-
-                    cost = sku.costPrice
-                    msrp = sku.msrp
-                    map = sku.map
-
-                    # MSRP is equal to the COST, leave the msrp and the map and the cost as zero.
-                    if msrp == cost:
-                        map = cost = 0
-
-                    extra_values = {
-                        'color_id': color_id,
-                        'size_id': size_id,
-                        'weight': sku.weight,
-                        'barcode': sku.upc,
-                        'msrp': msrp,
-                        'map': map,
-                        'standard_price': cost,
-                        'list_price': msrp,
-                        'vendor_code': vendor_code,
-                        'x_studio_vendor_sku': x_studio_vendor_sku.upper(),
-                        'default_code': default_code.upper(),
-                        'sku_ids': False,
-                        'image_1920': main_image,
-                        'image_ids': [(6, 0, images.ids)],
-                    }
-
-                    # Style processing.
-                    if style_code and vendor_code:
-                        style_id = PRODUCT_STYLE._search_or_create_by_name(style_code, vendor_code)
-                        extra_values['style_id'] = style_id
-
-                    # Prepare values.
+                    # Product does not yet exists or changed on the API.
                     if not product or product.hash != external_product.hash:
                         values = self._prepare_product_values(
                             work_unit.catalog_id, 
                             external_product,
                         )
 
-                        values.update(extra_values)
+                        x_studio_vendor_sku = f'{style_code}-{sku.color}-{sku.size}'
+                        default_code = f'{vendor_code}-{x_studio_vendor_sku}'
+
+                        # Image processing.
+                        image_ids, main_image = self._prepare_image_values(
+                            sku.bigImages.split('|'), 
+                            external_product.productName
+                        )
+
+                        cost, msrp, map = sku.costPrice, sku.msrp, sku.map
+
+                        # MSRP is equal to the COST, leave the msrp and the map and the cost as zero.
+                        if msrp == cost:
+                            map = cost = 0
+
+                        values.update({
+                            'color_id': color_id,
+                            'style_id': style_id,
+                            'size_id': size_id,
+                            'weight': sku.weight,
+                            'barcode': sku.upc,
+                            'msrp': msrp,
+                            'map': map,
+                            'standard_price': cost,
+                            'list_price': msrp,
+                            'vendor_code': vendor_code,
+                            'x_studio_vendor_sku': x_studio_vendor_sku.upper(),
+                            'default_code': default_code.upper(),
+                            'image_1920': main_image,
+                            'image_ids': [(6, 0, image_ids)],
+                        })
 
                         # Already exists and changed on the API.
                         if product:
@@ -443,6 +440,9 @@ class ProductCatalog(models.Model):
                                 'external_id': sku.id
                             })
                             self.env.cr.commit()
+
+                    else:
+                        log.info(f'Skipped product {product.id} [No change detected]')
 
                 if sku_values:
                     PRODUCT_SKU.create(sku_values)

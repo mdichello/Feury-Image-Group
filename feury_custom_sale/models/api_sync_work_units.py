@@ -27,6 +27,12 @@ class SellersCommerceProductSyncWorkUnit(models.Model):
         default=_('New')
     )
 
+    vendor_code = fields.Char(
+        string="Vendor Code", 
+        compute='_compute_vendor_code',
+        store=True
+    )
+
     start_index = fields.Integer(
         string='Start Index',
         required=True
@@ -81,6 +87,14 @@ class SellersCommerceProductSyncWorkUnit(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 3- Compute methods (namely _compute_***)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.depends('catalog_id')
+    def _compute_vendor_code(self):
+        for record in self:
+            record.vendor_code = record.catalog_id \
+                and record.catalog_id.partner_id \
+                and record.catalog_id.partner_id.x_studio_vendor_code \
+                or ''
 
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)

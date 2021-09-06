@@ -259,7 +259,7 @@ class API():
         ids = set()
 
         # Sending request.
-        response = requests.get(endpoint, headers=headers)
+        response = requests.get(endpoint, headers=headers, timeout=2)
         response.raise_for_status()
         data = json.loads(response.content)
 
