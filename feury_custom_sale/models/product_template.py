@@ -98,6 +98,11 @@ class ProductTemplate(models.Model):
         store=True
     )
 
+    last_api_sync_reference = fields.Char(
+        string="Last API sync reference",
+        index=True
+    )
+
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
 

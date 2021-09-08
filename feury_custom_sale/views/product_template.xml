@@ -37,6 +37,8 @@
                     <group>
                         <group string="Integrity and Tracking" groups="base.group_no_one">
                             <field name="hash" readonly="1" />
+                            <field name="last_api_sync_reference" readonly="1" />
+                            <field name="external_id" readonly="1" />
                         </group>
                     </group>
                 </page>

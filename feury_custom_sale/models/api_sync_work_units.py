@@ -61,7 +61,8 @@ class SellersCommerceProductSyncWorkUnit(models.Model):
         ], 
         string='Status', 
         required=True,
-        default='waiting'
+        default='waiting',
+        index=True
     )
 
     active = fields.Boolean(

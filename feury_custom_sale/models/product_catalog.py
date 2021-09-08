@@ -4,8 +4,6 @@
 import base64
 import logging
 import requests
-import hashlib
-import json
 
 from odoo import api, fields, models, tools, _
 from odoo.exceptions import ValidationError
@@ -420,6 +418,7 @@ class ProductCatalog(models.Model):
                             'default_code': default_code.upper(),
                             'image_1920': main_image,
                             'image_ids': [(6, 0, image_ids)],
+                            'last_api_sync_reference': work_unit.reference
                         })
 
                         # Already exists and changed on the API.
@@ -439,10 +438,14 @@ class ProductCatalog(models.Model):
                                 'quantity': sku.stock,
                                 'external_id': sku.id
                             })
-                            self.env.cr.commit()
 
                     else:
+                        # Update reference to the last API sync operation.
+                        product.last_api_sync_reference = work_unit.reference
                         log.info(f'Skipped product {product.id} [No change detected]')
+                    
+                    # Save changes.
+                    self.env.cr.commit()
 
                 if sku_values:
                     PRODUCT_SKU.create(sku_values)
@@ -453,9 +456,25 @@ class ProductCatalog(models.Model):
                 log.error('Unexpected error', e)
 
     @api.model
-    def create_product_sync_work_units(self):
+    def _get_last_sync_operation_reference(self):
+        query =  """
+            SELECT reference 
+            FROM sellerscommerce_product_sync_work_unit 
+            WHERE id = (
+                SELECT MAX(id) 
+                FROM sellerscommerce_product_sync_work_unit 
+                WHERE state = 'done'
+            )
+        """
+        self.env.cr.execute(query)
+        result = self.env.cr.fetchone()
+        return result[0] if result else False
+
+    @api.model
+    def create_product_sync_work_units(self, archive_discontinued_products):
         PRODUCT_SYNC_WORK_UNIT = self.env['sellerscommerce.product.sync.work.unit']
         CONFIG_PARAMETER = self.env['ir.config_parameter']
+        PRODUCT_TEMPLATE = self.env['product.template']
         IR_SEQUENCE = self.env['ir.sequence']
 
         log.info('Started sellerscommerce product sync work unit creation')
@@ -468,22 +487,40 @@ class ProductCatalog(models.Model):
         stuck_work_units = PRODUCT_SYNC_WORK_UNIT.search([
             ('state', '=', 'pending')
         ])
-        stuck_work_units.state = 'waiting'
+
+        if stuck_work_units:
+            stuck_work_units.state = 'waiting'
 
         waiting_work_units = PRODUCT_SYNC_WORK_UNIT.search([
             ('state', '=', 'waiting')
         ])
 
+        # Sync iteration did not finish yet.
         if waiting_work_units:
             pervious_operations = set(waiting_work_units.mapped('reference'))
             references = ','.join(pervious_operations)
-            message = f'Planning for a sync operation is skipped since the previous one "{references}" did not complete yet'
+            message = f'Planning for a sync operation is skipped since '
+            f'the previous one "{references}" did not complete yet'
             log.info(message)
 
             for catalog in catalogs:
                 catalog.message_post(body=message)
 
             return None
+        
+        # Previous sync operation completed.
+        else:
+            # Fetch previous sync operation reference.
+            last_sync_reference = self._get_last_sync_operation_reference()
+
+            # Update directly using SQL!
+            if archive_discontinued_products and last_sync_reference:
+                domain = [
+                    ('external_id', '!=', False),
+                    ('last_api_sync_reference', '!=', last_sync_reference)
+                ]
+                products = PRODUCT_TEMPLATE.search(domain)
+                products.active = False
 
         # Get a sequence for the current sync operation.
         reference = IR_SEQUENCE.next_by_code('sellerscommerce.sync.iteration') or _('New')
@@ -525,9 +562,9 @@ class ProductCatalog(models.Model):
                 })
 
     @api.model
-    def lunch_api_data_sync_planning(self):
+    def lunch_api_data_sync_planning(self,archive_discontinued_products=True):
         self.api_catalog_sync()
-        self.create_product_sync_work_units()
+        self.create_product_sync_work_units(archive_discontinued_products)
 
     @api.model
     def api_batch_product_sync(self):
