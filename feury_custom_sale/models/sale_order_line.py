@@ -38,6 +38,7 @@ class SaleOrderLine(models.Model):
     # ----------------------------------------------------------------------------------------------------
 
     @api.depends('product_uom_qty', 'discount', 'price_unit', 'tax_id', 'embellishment_cost')
+    @api.onchange('product_uom_qty', 'discount', 'price_unit', 'tax_id', 'embellishment_cost')
     def _compute_amount(self):
         """
         Compute the amounts of the SO line.
