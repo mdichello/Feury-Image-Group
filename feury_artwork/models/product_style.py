@@ -76,4 +76,4 @@ class ProductStyle(models.Model):
         return style.id
 
     def name_get(self):
-        return [(record.id, self.code) for record in self]
+        return [(record.id, record.code) for record in self]
