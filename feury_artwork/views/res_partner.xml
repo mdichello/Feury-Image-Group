@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <xpath expr="//notebook/page[@name='sales_purchases']" position="before">
                 <page string="Artwork" groups="base.group_user" attrs="{'invisible': [('is_customer', '!=', True)]}">
-                    <field name="artwork_ids" context="{'default_partner_id': id, 'hide_partner': True}">>
+                    <field name="artwork_ids" context="{'default_partner_id': id, 'hide_partner': True}">
                          <tree>
                             <control>
                                 <create name="create" string="Add an artwork"/>

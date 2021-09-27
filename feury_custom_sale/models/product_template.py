@@ -88,7 +88,7 @@ class ProductTemplate(models.Model):
 
     hash = fields.Char(
         string='Hash',
-        required=True
+        required=False
     )
 
     product_variant_id = fields.Many2one(

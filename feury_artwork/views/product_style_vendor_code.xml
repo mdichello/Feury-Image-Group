@@ -1,8 +1,8 @@
 <odoo>
   <data>
-    <record model="ir.ui.view" id="product_style_list">
-      <field name="name">product style list</field>
-      <field name="model">product.style</field>
+    <record model="ir.ui.view" id="product_style_vendor_code_list">
+      <field name="name">Product style vendor code list</field>
+      <field name="model">product.style.vendor.code</field>
       <field name="arch" type="xml">
         <tree>
           <field name="code"/>
@@ -11,9 +11,9 @@
       </field>
     </record>
 
-    <record model="ir.ui.view" id="product_style_form">
-        <field name="name">product style</field>
-        <field name="model">product.style</field>
+    <record model="ir.ui.view" id="product_style_vendor_code_form">
+        <field name="name">Product style vendor code</field>
+        <field name="model">product.style.vendor.code</field>
         <field name="arch" type="xml">
             <form>
                 <sheet>
@@ -30,9 +30,9 @@
     </record>
 
     <!-- ADD default filters -->
-    <record id="view_product_style_filter" model="ir.ui.view">
-        <field name="name">product.style.select</field>
-        <field name="model">product.style</field>
+    <record id="view_product_style_vendor_code_filter" model="ir.ui.view">
+        <field name="name">product.style.vendor.code.select</field>
+        <field name="model">product.style.vendor.code</field>
         <field name="arch" type="xml">
             <search string="Search Code">
                 <field name="name" filter_domain="[('name', 'ilike', self)]"/>
@@ -42,9 +42,9 @@
         </field>
     </record>
 
-    <record model="ir.actions.act_window" id="product_style_action">
-      <field name="name">Product style</field>
-      <field name="res_model">product.style</field>
+    <record model="ir.actions.act_window" id="product_style_vendor_code_action">
+      <field name="name">Product style vendor code</field>
+      <field name="res_model">product.style.vendor.code</field>
       <field name="view_mode">tree,form</field>
     </record>
   </data>

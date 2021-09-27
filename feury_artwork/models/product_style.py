@@ -12,6 +12,12 @@ class ProductStyle(models.Model):
         ('product_style_vendor_code_uniq', 'unique(code, vendor_code)', 'A product style code / vendor code should be unique.')
     ]
 
+    name = fields.Char(
+        string='Name',
+        compute='_compute_name',
+        store=True
+    )
+
     code = fields.Char(
         string='Style Code',
         required=True,
@@ -39,6 +45,13 @@ class ProductStyle(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 3- Compute methods (namely _compute_***)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.depends('code', 'vendor_code')
+    def _compute_name(self):
+        for record in self:
+            vendor_code = record.vendor_code or ''
+            code = record.code or ''
+            record.name = f'{vendor_code}-{code}'
 
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)

@@ -8,3 +8,4 @@ access_feury_material_type,feury_custom_sale.material_type,model_material_type,b
 access_feury_material_size,feury_custom_sale.material_size,model_material_size,base.group_user,1,1,1,1
 access_feury_product_size,feury_custom_sale.product_size,model_product_size,base.group_user,1,1,1,1
 access_feury_product_style,feury_custom_sale.product_style,model_product_style,base.group_user,1,1,1,1
+access_feury_product_style_vendor_code,feury_custom_sale.product_style_vendor_code,model_product_style_vendor_code,base.group_user,1,1,1,1

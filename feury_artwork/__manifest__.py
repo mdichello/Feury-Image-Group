@@ -23,6 +23,7 @@
         'views/color.xml',
         'views/product_size.xml',
         'views/product_style.xml',
+        'views/product_style_vendor_code.xml',
         'views/artwork.xml',
         'views/res_partner.xml',
         'views/product_template.xml',

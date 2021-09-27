@@ -41,9 +41,7 @@ class CustomerPricelistLine(models.Model):
 
     style_id = fields.Many2one(
         string="Style Code",
-        comodel_name="product.style",
-        ondelete='cascade',
-        index=True,
+        comodel_name="product.style.vendor.code",
         required=True
     )
 
@@ -137,16 +135,6 @@ class CustomerPricelistLine(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 3- Compute methods (namely _compute_***)
     # ----------------------------------------------------------------------------------------------------
-
-    # @api.depends('product_ids')
-    # def _compute_thumbnail(self):
-    #     for record in self:
-    #         products_with_images = record.product_ids.filtered(
-    #             lambda p: p.image_1920
-    #         )
-    #         record.thumbnail = products_with_images[0].image_1920 \
-    #             if products_with_images \
-    #             else record._default_image()
 
     # ----------------------------------------------------------------------------------------------------
     # 4- Onchange methods (namely onchange_***)
