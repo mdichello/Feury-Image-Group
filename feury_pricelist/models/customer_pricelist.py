@@ -432,7 +432,10 @@ class CustomerPricelist(models.Model):
                 })
             
             # Lock pricelist.
-            partner.is_locked_pricelist = True
+            partner.write({
+                'is_locked_pricelist': True,
+                'property_product_pricelist': pricelist.id
+            })
 
             values = [
                 {
