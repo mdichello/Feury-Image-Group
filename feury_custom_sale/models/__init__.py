@@ -14,5 +14,8 @@ from . import product_image
 from . import product_category
 from . import product_brand
 from . import product_template
+from . import product_product
 from . import api_sync_work_units
 from . import product_virtual_inventory
+from . import sale_order
+from . import mrp_production

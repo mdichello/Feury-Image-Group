@@ -45,17 +45,19 @@ class ProductTemplate(models.Model):
     catalog_id = fields.Many2one(
         string='Catalog',
         comodel_name='sellerscommerce.product.catalog',
+        copy=False,
     )
 
     external_id = fields.Integer(
         string='External ID',
         required=True,
+        copy=False,
         index=True
     )
 
     msrp = fields.Monetary(
         string='MSRP',
-        default=0
+        default=0,
     )
 
     description_html = fields.Html(
@@ -100,9 +102,19 @@ class ProductTemplate(models.Model):
 
     last_api_sync_reference = fields.Char(
         string="Last API sync reference",
-        index=True
+        index=True,
+        copy=False,
     )
 
+    embellishment_id = fields.Many2one(
+        string="Embellishment", 
+        comodel_name="embellishment", 
+        required=False,
+        copy=False,
+        readonly=True
+    )
+
+    # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
 

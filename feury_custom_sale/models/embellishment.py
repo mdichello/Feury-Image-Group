@@ -10,6 +10,20 @@ from odoo.exceptions import ValidationError
 class Embellishment(models.Model):
     _name = 'embellishment'
     _description = 'embellishment'
+    _rec_name = 'reference'
+
+
+    _sql_constraints = [
+        ('embellishment_reference_unique', 'unique(reference)', 'Reference should be unique.')
+    ]
+
+    reference = fields.Char(
+        string="Reference", 
+        readonly=True, 
+        required=True, 
+        copy=False, 
+        default=_('New')
+    )
 
     sale_order_line_id = fields.Many2one(
         string='Sale order line',
@@ -89,6 +103,21 @@ class Embellishment(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
+
+    @api.model
+    def create(self, values):
+        IR_SEQUENCE = self.env['ir.sequence']
+        if values.get('reference', 'New') == 'New':
+            values['reference'] = IR_SEQUENCE.next_by_code('embellishment') or _('New')
+        result = super(Embellishment, self).create(values)
+        return result
+
+    @api.depends('reference', 'type')
+    def name_get(self):
+        return [
+            (record.id, f'[{record.reference}] {record.type}')
+            for record in self
+        ]
 
     # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)
