@@ -31,7 +31,9 @@ class SaleOrder(models.Model):
         MRP = self.env['mrp.bom']
 
         for order in self:
-            order_lines = order.order_line.filtered(lambda l: not l.display_type)
+            order_lines = order.order_line.filtered(
+                lambda l: not l.display_type and l.embellishment_id
+            )
             manufacturing_route = self.env.ref('mrp.route_warehouse0_manufacture')
             mto_route = self.env.ref('stock.route_warehouse0_mto')
     
