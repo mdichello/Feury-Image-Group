@@ -411,7 +411,6 @@ class ProductCatalog(models.Model):
                             'barcode': sku.upc,
                             'msrp': msrp,
                             'map': map,
-                            'standard_price': cost,
                             'list_price': msrp,
                             'vendor_code': vendor_code,
                             'x_studio_vendor_sku': x_studio_vendor_sku.upper(),
@@ -432,6 +431,10 @@ class ProductCatalog(models.Model):
                         
                         # Check SKU exist.
                         if product.exists():
+                            # Change the cost value of the product.
+                            product.product_variant_ids._change_standard_price(
+                                cost
+                            )
                             sku_values.append({
                                 'product_id': product.id,
                                 'availability_date': sku.skuAvailableDate,

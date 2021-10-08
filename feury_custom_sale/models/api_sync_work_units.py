@@ -30,7 +30,6 @@ class SellersCommerceProductSyncWorkUnit(models.Model):
     vendor_code = fields.Char(
         string="Vendor Code", 
         compute='_compute_vendor_code',
-        store=True
     )
 
     start_index = fields.Integer(

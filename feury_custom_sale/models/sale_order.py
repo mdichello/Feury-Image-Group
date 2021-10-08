@@ -29,30 +29,32 @@ class SaleOrder(models.Model):
 
     def action_confirm(self):
         MRP = self.env['mrp.bom']
+        manufacturing_route = self.env.ref('mrp.route_warehouse0_manufacture')
+        mto_route = self.env.ref('stock.route_warehouse0_mto')
 
         for order in self:
             order_lines = order.order_line.filtered(
                 lambda l: not l.display_type and l.embellishment_id
             )
-            manufacturing_route = self.env.ref('mrp.route_warehouse0_manufacture')
-            mto_route = self.env.ref('stock.route_warehouse0_mto')
     
             for line in order_lines:
                 product = line.product_id.product_tmpl_id
                 # Add non copy fields.
                 style_id = line.product_id.style_id and line.product_id.style_id.id
+                embellishment_reference = line.embellishment_id.reference
+
                 embellished_product = product.sudo().copy({
-                    'name': f'{line.product_id.name}-embellished',
+                    'name': f'{line.product_id.name} {embellishment_reference}',
                     'embellishment_id': line.embellishment_id.id,
                     'x_studio_vendor_sku': line.product_id.x_studio_vendor_sku,
                     'default_code': line.product_id.default_code,
-                    # 'barcode': line.product_id.barcode,
+                    'barcode': f'{line.product_id.barcode}-{embellishment_reference}',
                     'style_id': style_id,
                     'route_ids': [(6, 0, (manufacturing_route.id, mto_route.id))]
                 })
 
                 # Create bill of materials.
-                bom  = MRP.sudo().create({
+                bom = MRP.sudo().create({
                     'product_tmpl_id': embellished_product.id,
                     'type': 'normal',
                     'product_qty': 1,
