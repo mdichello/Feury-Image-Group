@@ -37,16 +37,6 @@ class ProductTemplate(models.Model):
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
     
-    def init(self):
-        """ change index on product to a multi-column index to optimize used search in Sellers Commerce API integration
-        """
-        cr = self._cr
-        cr.execute('DROP INDEX IF EXISTS product_template_sellers_commerce_index')
-        cr.execute('SELECT indexname FROM pg_indexes WHERE indexname = %s', ('product_template_sellers_commerce_index',))
-        if not cr.fetchone():
-            cr.execute('CREATE INDEX product_template_sellers_commerce_index ON product_template (catalog_id, external_id, style_id, color_id, size_id, active)')
-
-    # ----------------------------------------------------------------------------------------------------
     # 2- Constraints methods (_check_***)
     # ----------------------------------------------------------------------------------------------------
 
