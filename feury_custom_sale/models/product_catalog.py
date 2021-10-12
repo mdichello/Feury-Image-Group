@@ -295,7 +295,8 @@ class ProductCatalog(models.Model):
             'barcode': False,
             'style_id': False,
             'color_id': False,
-            'size_id': False
+            'size_id': False,
+            'active': True
         }
 
         return values
@@ -368,18 +369,30 @@ class ProductCatalog(models.Model):
                     
                     size_id = PRODUCT_SIZE._search_or_create_by_name(sku.size)
                     color_id = COLOR._search_or_create_by_name(sku.color)
+                    product = PRODUCT_TEMPLATE
 
-                    domain = [
-                        ('catalog_id', '=', work_unit.catalog_id.id),
-                        ('external_id', '=', external_id),
-                        ('style_id', '=', style_id),
-                        ('color_id', '=', color_id),
-                        ('size_id', '=', size_id),
-                        '|',
-                        ('active', '=', True),
-                        ('active', '=', False)
-                    ]
-                    product = PRODUCT_TEMPLATE.search(domain, limit=1)
+                    # First search using the UPC.
+                    if sku.upc:
+                        domain = [
+                            ('barcode', '=', sku.upc),
+                            '|',
+                            ('active', '=', True),
+                            ('active', '=', False)
+                        ]
+                        product = PRODUCT_TEMPLATE.search(domain, limit=1)
+                    
+                    elif not product:
+                        domain = [
+                            ('catalog_id', '=', work_unit.catalog_id.id),
+                            ('external_id', '=', external_id),
+                            ('style_id', '=', style_id),
+                            ('color_id', '=', color_id),
+                            ('size_id', '=', size_id),
+                            '|',
+                            ('active', '=', True),
+                            ('active', '=', False)
+                        ]
+                        product = PRODUCT_TEMPLATE.search(domain, limit=1)
 
                     # Product does not yet exists or changed on the API.
                     if not product or product.hash != external_product.hash:
@@ -444,7 +457,10 @@ class ProductCatalog(models.Model):
 
                     else:
                         # Update reference to the last API sync operation.
-                        product.last_api_sync_reference = work_unit.reference
+                        product.write({
+                            'active': True,
+                            'last_api_sync_reference': work_unit.reference
+                        })
                         log.info(f'Skipped product {product.id} [No change detected]')
                     
                     # Save changes.
