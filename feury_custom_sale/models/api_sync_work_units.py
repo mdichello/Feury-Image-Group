@@ -130,6 +130,9 @@ class SellersCommerceProductSyncWorkUnit(models.Model):
 
     @api.model
     def next_work_unit(self, catalog_id=False):
+        """
+        Support catalog choice
+        """
         domain = [
             ('state', '=', 'waiting')
         ]
