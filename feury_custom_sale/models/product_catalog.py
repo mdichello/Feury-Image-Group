@@ -641,6 +641,9 @@ class ProductCatalog(models.Model):
     # ----------------------------------------------------------------------------------------------------
 
     def action_sync_next_products_bacth(self):
+        """
+        Force sync operation within a catalog.
+        """
         PRODUCT_SYNC_WORK_UNIT = self.env[WORK_UNIT_MODEL]
 
         self.ensure_one()
