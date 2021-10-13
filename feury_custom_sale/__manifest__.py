@@ -6,7 +6,8 @@
     'depends': [
         'feury_artwork',
         'sale_management',
-        'mrp'
+        'mrp',
+        'web_progress'
     ],
     'author': 'Business Software Development Solutions',
     'license': 'AGPL-3',

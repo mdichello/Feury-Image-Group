@@ -129,9 +129,13 @@ class SellersCommerceProductSyncWorkUnit(models.Model):
     # ----------------------------------------------------------------------------------------------------
 
     @api.model
-    def next_work_unit(self):
+    def next_work_unit(self, catalog_id=False):
         domain = [
             ('state', '=', 'waiting')
         ]
+
+        if catalog_id:
+            domain.append(('catalog_id', '=', catalog_id))
+
         work_unit = self.search(domain, limit=1)
         return work_unit

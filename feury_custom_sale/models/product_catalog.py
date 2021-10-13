@@ -18,6 +18,8 @@ API_USERNAME_KEY = 'feury_custom_sale.sellerscommerce_username'
 API_PASSWORD_KEY = 'feury_custom_sale.sellerscommerce_password'
 API_PROCESSING_BATCH_SIZE = 'feury_custom_sale.sellerscommerce_batch_size'
 
+WORK_UNIT_MODEL = 'sellerscommerce.product.sync.work.unit'
+
 
 # TODO make cron to unlock pending work units (after 5 hours for example)
 # TODO Re-locate function to tools model!.
@@ -346,7 +348,7 @@ class ProductCatalog(models.Model):
 
         vendor_code = work_unit.vendor_code
 
-        for external_product in external_products:
+        for external_product in self.web_progress_iter(external_products, msg='Synching products'):
             try:
                 external_id = int(external_product.id)
 
@@ -362,7 +364,7 @@ class ProductCatalog(models.Model):
                 style_code = external_product.productCode
                 style_id = PRODUCT_STYLE._search_or_create_by_name(style_code, vendor_code)
 
-                for sku in skus:
+                for sku in self.web_progress_iter(skus, msg='Synching SKU'):
                     # Missing data in the sku unit.
                     if not (sku.color and sku.size):
                         continue
@@ -587,7 +589,7 @@ class ProductCatalog(models.Model):
 
     @api.model
     def api_batch_product_sync(self):
-        PRODUCT_SYNC_WORK_UNIT = self.env['sellerscommerce.product.sync.work.unit']
+        PRODUCT_SYNC_WORK_UNIT = self.env[WORK_UNIT_MODEL]
 
         # Pick a unit of work (ordered by create data).
         work_unit = PRODUCT_SYNC_WORK_UNIT.next_work_unit()
@@ -637,6 +639,26 @@ class ProductCatalog(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
+
+    def action_sync_next_products_bacth(self):
+        PRODUCT_SYNC_WORK_UNIT = self.env[WORK_UNIT_MODEL]
+
+        self.ensure_one()
+
+        # Pick a unit of work (ordered by create data).
+        work_unit = PRODUCT_SYNC_WORK_UNIT.next_work_unit(catalog_id=self.id)
+
+        if not work_unit:
+            raise ValidationError(_('No pending Sync job is found, please re-launch sync planning CRON'))
+    
+        # Start work unit.
+        work_unit.action_start()
+
+        # Process the products in this unit of work.
+        self.api_product_sync(work_unit)
+
+        # End work unit.
+        work_unit.action_end()
 
     # ----------------------------------------------------------------------------------------------------
     # 6- CRONs methods
