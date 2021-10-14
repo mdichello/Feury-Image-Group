@@ -103,7 +103,7 @@
                                     <field name="pricelist_id" invisible="1"/>
                                     <field name="currency_id" invisible="1"/>
                                     <field name="is_atomic" invisible="1"/>
-                                    <field name="product_ids" invisible="1" force_save="1"/>
+                                    <field name="product_ids" widget="many2many_tags" readonly="1" optional="hide" force_save="1"/>
 
                                     <field name="sequence" widget="handle"/>
                                     <field name="style_id" options="{'no_create': True, 'no_open': True}"/>
@@ -137,6 +137,8 @@
                                             <field name="sale_price"/>
                                         </group>
                                     </group>
+                                    <label for="product_ids" string="Products"/>
+                                    <field name="product_ids" widget="many2many_tags" force_save="1"/>
                                 </form>
                             </field>
 

@@ -13,6 +13,7 @@ class EmbellishmentComposition(models.Model):
     embellishment_id = fields.Many2one(
         string='Embellishment',
         comodel_name='embellishment',
+        copy=False
     )
 
     location_id = fields.Many2one(

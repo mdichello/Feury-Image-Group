@@ -412,6 +412,7 @@ class CustomerPricelist(models.Model):
         PRODUCT_PRICELIST = self.env['product.pricelist']
         IR_SEQUENCE = self.env['ir.sequence']
 
+        self.ensure_one()
         partners = self.partner_ids
 
         if self.is_applied_on_parent_partner:
@@ -456,6 +457,58 @@ class CustomerPricelist(models.Model):
 
             PRODUCT_PRICELIST_ITEM.create(values)
 
+    def _create_embelished_products(self):
+        """
+        Create embellished product, each product has a bill of material composed
+        the original product.
+        """
+        PRODUCT_TEMPLATE = self.env['product.template']
+        MRP = self.env['mrp.bom']
+        
+        self.ensure_one()
+
+        manufacturing_route = self.env.ref('mrp.route_warehouse0_manufacture')
+        mto_route = self.env.ref('stock.route_warehouse0_mto')
+
+        lines = self.line_ids.filtered(lambda l: l.clothing_type_id and l.embellishment_id)
+        
+        for line in lines:
+            embellished_products = PRODUCT_TEMPLATE
+
+            for product in line.product_ids:
+                # Add non copy fields.
+                style_id = product.style_id and product.style_id.id
+                embellishment_reference = line.embellishment_id.reference
+
+                embellished_product = product.sudo().copy({
+                    'name': f'{product.name} {embellishment_reference}',
+                    'embellishment_id': line.embellishment_id.id,
+                    'x_studio_vendor_sku': product.x_studio_vendor_sku,
+                    'default_code': product.default_code,
+                    'barcode': f'{product.barcode}-{embellishment_reference}',
+                    'style_id': style_id,
+                    'route_ids': [(6, 0, (manufacturing_route.id, mto_route.id))],
+                    'embellished_product_id': product.id
+                })
+
+                embellished_products += embellished_product
+
+                # Create bill of materials.
+                bom = MRP.sudo().create({
+                    'product_tmpl_id': embellished_product.id,
+                    'type': 'normal',
+                    'product_qty': 1,
+                    'bom_line_ids': [(
+                        0, 0, {
+                            'routing_id': False,
+                            'sequence': 1,
+                            'product_id': product.product_variant_id.id,
+                            'product_qty': 1
+                        }
+                    )]
+                })
+            
+            line.product_ids = [(6, 0, embellished_products.ids)]
 
     def _disable_product_pricelist_items(self):
         PRODUCT_PRICELIST_ITEM = self.env['product.pricelist.item']
@@ -485,16 +538,34 @@ class CustomerPricelist(models.Model):
             if unsubscribed_partners:
                 pricelist.message_subscribe(unsubscribed_partners.ids)
 
-        self._create_product_pricelist_items()
-        self.write({
-            'state': 'approved',
-            'approved_date': fields.Datetime.now()
-        })
+            pricelist._create_product_pricelist_items()
+            pricelist._create_embelished_products()
+
+            pricelist.write({
+                'state': 'approved',
+                'approved_date': fields.Datetime.now()
+            })
         return True
 
     def action_cancel(self):
-        self._disable_product_pricelist_items()
-        self.state = 'cancel'
+        # Reset the base product in the embellished products.
+        for record in self:
+            record._disable_product_pricelist_items()
+
+            lines = record.line_ids.filtered(lambda l: l.clothing_type_id and l.embellishment_id)
+            
+            for line in lines:
+                products = line.product_ids.embellished_product_id
+                line.write({
+                    'product_ids': [(6, 0, products.ids)]
+                })
+
+            record.line_ids.write({
+                'embellishment_id': False,
+                'clothing_type_id': False
+            })
+
+            record.state = 'cancel'
 
     def action_reject(self):
         self.state = 'rejected'

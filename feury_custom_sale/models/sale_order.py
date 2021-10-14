@@ -50,7 +50,8 @@ class SaleOrder(models.Model):
                     'default_code': line.product_id.default_code,
                     'barcode': f'{line.product_id.barcode}-{embellishment_reference}',
                     'style_id': style_id,
-                    'route_ids': [(6, 0, (manufacturing_route.id, mto_route.id))]
+                    'route_ids': [(6, 0, (manufacturing_route.id, mto_route.id))],
+                    'embellished_product_id': product.id
                 })
 
                 # Create bill of materials.
@@ -76,6 +77,35 @@ class SaleOrder(models.Model):
                 })
 
         res = super(SaleOrder, self).action_confirm()
+        return res
+
+    def action_cancel(self):
+        for order in self:
+            if order.state not in ('sale', 'done'):
+                continue
+
+            order_lines = order.order_line.filtered(
+                lambda l: not l.display_type and l.embellishment_id
+            )
+
+            for line in order_lines:
+                product = line.product_id.product_tmpl_id
+
+                if product.embellished_product_id:
+                    product = product.embellished_product_id
+
+                line.write({
+                    'product_id': product.product_variant_id.id,
+                    'price_subtotal': line.price_subtotal,
+                    'price_total': line.price_total,
+                    'price_tax': line.price_tax,
+                })
+            
+            order_lines.write({
+                'embellishment_id': False,
+                'clothing_type_id': False
+            })
+        res = super(SaleOrder, self).action_cancel()
         return res
 
     # ----------------------------------------------------------------------------------------------------

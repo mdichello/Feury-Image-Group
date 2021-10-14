@@ -55,6 +55,13 @@ class ProductTemplate(models.Model):
         index=True
     )
 
+    embellished_product_id = fields.Many2one(
+        string='Embellished Product',
+        comodel_name='product.template', 
+        index=True, 
+        ondelete='cascade'
+    )
+
     msrp = fields.Monetary(
         string='MSRP',
         default=0,
