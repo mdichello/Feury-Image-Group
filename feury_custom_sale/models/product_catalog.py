@@ -589,6 +589,7 @@ class ProductCatalog(models.Model):
 
     @api.model
     def api_batch_product_sync(self):
+        self = self.sudo()
         PRODUCT_SYNC_WORK_UNIT = self.env[WORK_UNIT_MODEL]
 
         # Pick a unit of work (ordered by create data).
@@ -644,6 +645,7 @@ class ProductCatalog(models.Model):
         """
         Force sync operation within a catalog.
         """
+        self = self.sudo()
         PRODUCT_SYNC_WORK_UNIT = self.env[WORK_UNIT_MODEL]
 
         self.ensure_one()
