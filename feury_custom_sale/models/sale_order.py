@@ -54,6 +54,11 @@ class SaleOrder(models.Model):
                     'embellished_product_id': product.id
                 })
 
+                # Change the price for the embellished product.
+                embellished_product.product_variant_ids._change_standard_price(
+                    product.standard_price + line.embellishment_cost
+                )
+
                 # Create bill of materials.
                 bom = MRP.sudo().create({
                     'product_tmpl_id': embellished_product.id,

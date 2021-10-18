@@ -491,6 +491,16 @@ class CustomerPricelist(models.Model):
                     'embellished_product_id': product.id
                 })
 
+                # Change the price for the embellished product.
+                embellished_product_cost = sum((
+                    product.standard_price,
+                    line.embellishment_cost,
+                    line.extra_embellishment_cost
+                ))
+                embellished_product.product_variant_ids._change_standard_price(
+                    embellished_product_cost
+                )
+
                 embellished_products += embellished_product
 
                 # Create bill of materials.
