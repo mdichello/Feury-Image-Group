@@ -9,7 +9,8 @@ class ProductStyle(models.Model):
     _description = 'Product style'
 
     _sql_constraints = [
-        ('product_style_vendor_code_uniq', 'unique(code, vendor_code)', 'A product style code / vendor code should be unique.')
+        ('product_style_vendor_code_uniq', 'unique(code, vendor_code)', 'A product style code / vendor code should be unique.'),
+        ('product_style_code_uniq', 'check(1=1)', 'A product style code should be unique.'),
     ]
 
     name = fields.Char(
@@ -70,7 +71,6 @@ class ProductStyle(models.Model):
     # ----------------------------------------------------------------------------------------------------
 
     @api.model
-    @tools.ormcache('code', 'vendor_code')
     def _search_or_create_by_name(self, code, vendor_code):
         if not code or not vendor_code:
             return False

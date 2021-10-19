@@ -367,6 +367,7 @@ class ProductCatalog(models.Model):
                 for sku in self.web_progress_iter(skus, msg='Synching SKU'):
                     # Missing data in the sku unit.
                     if not (sku.color and sku.size):
+                        log.warning(f'product skipped: missing size of color {sku}')
                         continue
                     
                     size_id = PRODUCT_SIZE._search_or_create_by_name(sku.size)
