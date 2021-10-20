@@ -551,7 +551,8 @@ class ProductCatalog(models.Model):
             catalog.message_post(body=message)
 
         for catalog in catalogs:
-            product_count = catalog.item_count
+            # In case the product count is zero, we assume it has 2000 products.
+            product_count = catalog.item_count or catalog.sku_count or 2000
 
             upper_bound = product_count \
                 if product_count % batch_size == 0 \
@@ -642,29 +643,36 @@ class ProductCatalog(models.Model):
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
 
-    def action_sync_next_products_bacth(self):
+    def action_sync_next_products_batch(self):
         """
         Force sync operation within a catalog.
         """
         self = self.sudo()
         PRODUCT_SYNC_WORK_UNIT = self.env[WORK_UNIT_MODEL]
 
-        self.ensure_one()
+        try:
+            self.ensure_one()
 
-        # Pick a unit of work (ordered by create data).
-        work_unit = PRODUCT_SYNC_WORK_UNIT.next_work_unit(catalog_id=self.id)
+            # Pick a unit of work (ordered by create data).
+            work_unit = PRODUCT_SYNC_WORK_UNIT.next_work_unit(catalog_id=self.id)
 
-        if not work_unit:
-            raise ValidationError(_('No pending Sync job is found, please re-launch sync planning CRON'))
-    
-        # Start work unit.
-        work_unit.action_start()
+            if not work_unit:
+                raise ValidationError(_('No pending Sync job is found, please re-launch sync planning CRON'))
+        
+            # Start work unit.
+            work_unit.action_start()
 
-        # Process the products in this unit of work.
-        self.api_product_sync(work_unit)
+            # Process the products in this unit of work.
+            self.api_product_sync(work_unit)
 
-        # End work unit.
-        work_unit.action_end()
+            # End work unit.
+            work_unit.action_end()
+
+        except ValidationError as e:
+            raise e
+
+        except Exception as e:
+            raise ValidationError(_('Unexpected error, please retry again after a few minutes or contact adminstrator'))
 
     # ----------------------------------------------------------------------------------------------------
     # 6- CRONs methods

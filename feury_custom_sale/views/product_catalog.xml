@@ -20,7 +20,7 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button class="oe_highlight" name="action_sync_next_products_bacth" groups="base.group_no_one" type="object" string="Sync next product batch"/>
+                    <button class="oe_highlight" name="action_sync_next_products_batch" groups="base.group_no_one" type="object" string="Sync next product batch"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
