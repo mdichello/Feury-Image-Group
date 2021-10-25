@@ -26,6 +26,12 @@ class ProductSize(models.Model):
         index=True,
     )
 
+    code_components = fields.Char(
+        string='Code component(s)',
+        required=False,
+        default='Size'
+    )
+
     active = fields.Boolean(
         string='Active',
         default=True
@@ -37,16 +43,22 @@ class ProductSize(models.Model):
 
     @api.model
     @tools.ormcache('name')
-    def _search_or_create_by_name(self, name):
+    def _search_or_create_by_name(self, name, compenents='Size'):
         if not name:
             return False
+
+        domain = [('name', 'ilike', name)]
+
+        if compenents:
+            domain.append(('code_components', 'ilike', compenents))
     
-        size = self.search([('name', 'ilike', name)], limit=1)
+        size = self.search(domain, limit=1)
 
         if not size:
             size = self.create({
                 'name': name,
                 'code': name,
+                'code_components': compenents,
             })
 
         return size.id

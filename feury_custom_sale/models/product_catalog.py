@@ -370,7 +370,7 @@ class ProductCatalog(models.Model):
                         log.warning(f'product skipped: missing size of color {sku}')
                         continue
                     
-                    size_id = PRODUCT_SIZE._search_or_create_by_name(sku.size)
+                    size_id = PRODUCT_SIZE._search_or_create_by_name(sku.size, sku.size_compenents)
                     color_id = COLOR._search_or_create_by_name(sku.color)
                     product = PRODUCT_TEMPLATE
 

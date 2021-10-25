@@ -98,7 +98,8 @@ SKU = namedtuple(
         'id',
         'hash',
         'color',
-        'size'
+        'size',
+        'size_compenents'
     )
 )
 
@@ -267,7 +268,8 @@ class API():
             item.update({
                 'hash': False,
                 'color': False,
-                'size': False
+                'size': False,
+                'size_compenents': False
             })
 
             hash = dict_hash(item)
@@ -281,6 +283,8 @@ class API():
             options = [SKUOption(*o.values()) for o in sku.skuOptions]
             
             color = size = False
+            size_compenents = 'Size'
+
             for option in options:
                 value = option.code or option.optionValue
                 if not value:
@@ -291,6 +295,16 @@ class API():
 
                 if option.optionName == 'Size':
                     size = value.upper()
+            
+            # Compute size value if not found.
+            if not size:
+                size_compenents_options = [option for option in options if option.optionName != 'Color']
+
+                # Order options alphabaticaly.
+                size_compenents_options.sort(key=lambda x: x.optionName, reverse=True)
+
+                size_compenents = 'x'.join(option.optionName for option in size_compenents_options)
+                size = 'x'.join(option.value for option in size_compenents_options)
 
             # Parse dates.
             skuAvailableDate = parser.parse(sku.skuAvailableDate) \
@@ -302,7 +316,8 @@ class API():
                 'skuOptions': options,
                 'hash': hash,
                 'color': color,
-                'size': size
+                'size': size,
+                'size_compenents': size_compenents
             })
 
         skus = [SKU(*item.values()) for item in data]
