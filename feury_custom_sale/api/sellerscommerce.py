@@ -304,7 +304,7 @@ class API():
                 size_compenents_options.sort(key=lambda x: x.optionName, reverse=True)
 
                 size_compenents = 'x'.join(option.optionName for option in size_compenents_options)
-                size = 'x'.join(option.value for option in size_compenents_options)
+                size = 'x'.join(option.code or option.optionValue for option in size_compenents_options)
 
             # Parse dates.
             skuAvailableDate = parser.parse(sku.skuAvailableDate) \
