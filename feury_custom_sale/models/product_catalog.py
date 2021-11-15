@@ -340,11 +340,30 @@ class ProductCatalog(models.Model):
 
         api = self.get_api_connection()
 
-        external_products = api.products(
-            work_unit.catalog_id.external_id, 
-            work_unit.start_index,
-            work_unit.end_index,
-        )
+        try:
+            external_products = api.products(
+                work_unit.catalog_id.external_id, 
+                work_unit.start_index,
+                work_unit.end_index,
+            )
+
+        except requests.exceptions.HTTPError as e:
+            log.error(f'Ressource not found {e}')
+            # Cancel all next sub-jobs for the same catalog.
+            log.warning(f'Cancelling all next waiting operation for catalog {work_unit.catalog_id.id}')
+
+            next_work_units = work_unit.search([
+                ('catalog_id', '=', work_unit.catalog_id.id),
+                ('reference', '=', work_unit.reference),
+                ('state', '=', 'waiting'),
+                ('start_index', '>=', work_unit.start_index)
+            ])
+
+            next_work_units.state = 'cancel'
+            return True
+
+        except Exception as e:
+            raise e
 
         vendor_code = work_unit.vendor_code
 
@@ -607,8 +626,9 @@ class ProductCatalog(models.Model):
         # Process the products in this unit of work.
         self.api_product_sync(work_unit)
 
-        # End work unit.
-        work_unit.action_end()
+        # End work unit if not already canceled.
+        if work_unit.state != 'cancel':
+            work_unit.action_end()
 
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)

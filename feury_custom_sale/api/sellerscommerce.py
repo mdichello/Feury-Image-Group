@@ -223,7 +223,8 @@ class API():
         base_url = 'https://ccm.sellerscommerce.com/gateway/product/getproducts.json'
         product_data = []
         headers = self.headers
-        url = f'{base_url}/{catalog_id}/{start_index}/{end_index}'
+        take = end_index - start_index
+        url = f'{base_url}/{catalog_id}/{start_index}/{take}'
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         data = json.loads(response.content)

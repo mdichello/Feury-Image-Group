@@ -56,6 +56,7 @@ class SellersCommerceProductSyncWorkUnit(models.Model):
         [
             ('waiting', 'Waiting'), 
             ('pending', 'Pending'),
+            ('cancel', 'Canceled'),
             ('done', 'Done'),
         ], 
         string='Status', 
