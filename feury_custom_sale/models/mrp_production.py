@@ -36,6 +36,23 @@ class MrpProduction(models.Model):
     # 5- Actions methods (namely action_***)
     # ----------------------------------------------------------------------------------------------------
 
+    def action_replenish(self):
+        PRODUCT_REPLENISH = self.env['product.replenish']
+
+        self.ensure_one()
+
+        buy_route = self.env.ref('purchase_stock.route_warehouse0_buy')
+
+        for move in self.move_raw_ids:
+            replenishment = PRODUCT_REPLENISH.create({
+                'product_id': move.product_id.id,
+                'product_tmpl_id': move.product_id.product_tmpl_id.id,
+                'product_uom_id': move.product_id.uom_id.id,
+                'quantity': move.product_uom_qty,
+                'route_ids': [(6, 0, (buy_route.id, ))]
+            })
+            replenishment.launch_replenishment()
+
     # ----------------------------------------------------------------------------------------------------
     # 6- CRONs methods
     # ----------------------------------------------------------------------------------------------------
