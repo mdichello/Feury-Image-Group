@@ -168,3 +168,11 @@ class ResPartner(models.Model):
                 
                 child.partner_parent_company_id = parent.id
                 self.env.cr.commit()
+
+    @api.model
+    def _fix_partner_name(self, old='Yale New Hampshire', new='Yale New Haven'):
+        partners = self.search([])
+
+        for partner in partners:
+            if old in partner.name:
+                partner.name = partner.name.replace(old, new)
