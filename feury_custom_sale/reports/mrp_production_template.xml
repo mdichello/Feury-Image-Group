@@ -116,7 +116,7 @@
                                                 <li>Location: <strong t-field="embroider.location_id"/></li>
                                                 <li t-if="embroider.artwork_id">Artwork: <strong t-field="embroider.artwork_id"/>, with reference <strong t-field="embroider.artwork_id.reference"/></li>
                                                 <li t-if="embroider.text">Personalization: <strong t-field="embroider.text"/></li>
-                                                <li>Font: <strong t-field="embroider.font"/></li>
+                                                <li t-if="embroider.font">Font: <strong t-field="embroider.font"/></li>
                                             </ul>
                                             <i t-if="embroider.artwork_id" style="font-size: 0.8em">Please see Artwork figure below for more details.</i>
                                         </td>
@@ -134,7 +134,7 @@
                                                 <li>Location: <strong t-field="screen_print.location_id"/></li>
                                                 <li t-if="screen_print.artwork_id">Artwork: <strong t-field="screen_print.artwork_id"/>, with reference <strong t-field="screen_print.artwork_id.reference"/></li>
                                                 <li t-if="screen_print.text">Personalization: <strong t-field="screen_print.text"/></li>
-                                                <li>Font: <strong t-field="screen_print.font"/></li>
+                                                <li t-if="screen_print.font">Font: <strong t-field="screen_print.font"/></li>
                                             </ul>
                                             <i t-if="screen_print.artwork_id" style="font-size: 0.8em">Please see Artwork figure below for more details.</i>
                                         </td>
@@ -152,7 +152,7 @@
                                                 <li>Location: <strong t-field="heat_seal.location_id"/></li>
                                                 <li t-if="heat_seal.artwork_id">Artwork: <strong t-field="heat_seal.artwork_id"/>, with reference <strong t-field="heat_seal.artwork_id.reference"/></li>
                                                 <li t-if="heat_seal.text">Personalization: <strong t-field="heat_seal.text"/></li>
-                                                <li>Font <strong t-field="heat_seal.font"/></li>
+                                                <li t-if="heat_seal.font">Font: <strong t-field="heat_seal.font"/></li>
                                             </ul>
                                             <i t-if="heat_seal.artwork_id" style="font-size: 0.8em">Please see Artwork figure below for more details.</i>
                                         </td>
@@ -170,7 +170,7 @@
                                                 <li>Location: <strong t-field="sew_patch.location_id"/></li>
                                                 <li t-if="sew_patch.artwork_id">Artwork: <strong t-field="sew_patch.artwork_id"/>, with reference <strong t-field="sew_patch.artwork_id.reference"/></li>
                                                 <li t-if="sew_patch.text">Personalization: <strong t-field="sew_patch.text"/></li>
-                                                <li>Font: <strong t-field="sew_patch.font"/></li>
+                                                <li t-if="sew_patch.font">Font: <strong t-field="sew_patch.font"/></li>
                                             </ul>
                                             <i t-if="sew_patch.artwork_id" style="font-size: 0.8em">Please see Artwork figure below for more details.</i>
                                         </td>
@@ -211,6 +211,29 @@
                                 </t>
                             </tbody>
                         </table>
+
+                        <t t-set="artworks" t-value="o.embellishment_id._get_artworks()"/>
+                        <t t-foreach="artworks" t-as="artwork">
+                            <div style="page-break-inside: avoid;" class="mt-5 container">
+                                <div class="row">
+                                    <div class="col-5">
+                                        Embellishment <strong t-field="o.embellishment_id"/>
+                                        <p t-field="artwork.type"/>
+                                        <h3 t-field="artwork.name"/>
+                                        <span t-if="artwork.reference">- Logo number: <strong t-field="artwork.reference"/><br/></span>
+                                        <span t-if="artwork.type">- Type: <strong t-field="artwork.type"/><br/></span>
+                                        <span t-if="artwork.partner_id">- Customer: <strong t-field="artwork.partner_id"/><br/></span>
+                                        <span t-if="artwork.stitch_count">- Stitch count: <strong t-field="artwork.stitch_count"/><br/></span>
+                                        <span t-if="artwork.color_wave">- Color wave: <strong t-field="artwork.color_wave"/></span>
+                                    </div>
+
+                                    <div class="col-7">
+                                        <img t-if="artwork.image" style="max-height: 7cm; max-width: 12cm;" t-att-src="image_data_uri(artwork.image)" />
+                                    </div>
+                                </div>
+                            </div>
+                            <hr/>
+                        </t>
                         <div class="oe_structure"/>
                     </div>
                 </t>

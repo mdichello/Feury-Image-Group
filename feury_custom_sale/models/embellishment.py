@@ -198,3 +198,23 @@ class Embellishment(models.Model):
     # ----------------------------------------------------------------------------------------------------
     # 7- Technical methods (name must reflect the use)
     # ----------------------------------------------------------------------------------------------------
+
+    def _get_artworks(self):
+        ARTWORK = self.env['artwork']
+        artworks = ARTWORK
+
+        self.ensure_one()
+
+        if self.embroider_ids:
+            artworks += self.embroider_ids.mapped('artwork_id')
+
+        if self.screen_print_ids:
+            artworks += self.screen_print_ids.mapped('artwork_id')
+
+        if self.heat_seal_ids:
+            artworks += self.heat_seal_ids.mapped('artwork_id')
+
+        if self.sew_patch_ids:
+            artworks += self.sew_patch_ids.mapped('artwork_id')
+
+        return artworks
