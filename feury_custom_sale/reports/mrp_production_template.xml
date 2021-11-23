@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="mrp.report_mrporder">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.internal_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row">
+                            <div class="col-7">
+                                <h2><span t-field="o.name"/></h2>
+                            </div>
+                            <div class="col-5">
+                                <span class="text-right">
+                                    <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', o.name, 600, 100)" style="width:350px;height:60px"/>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-3" t-if="o.origin">
+                                <strong>Source Document:</strong><br/>
+                                <span t-field="o.origin"/>
+                            </div>
+                            <div class="col-3">
+                                <strong>Responsible:</strong><br/>
+                                <span t-field="o.user_id"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt32 mb32">
+                            <div class="col-3">
+                                <strong>Finished Product:</strong><br/>
+                                <span t-field="o.product_id"/>
+                            </div>
+                            <div class="col-3">
+                                <strong>Quantity to Produce:</strong><br/>
+                                <span t-field="o.product_qty"/>
+                                <span t-field="o.product_uom_id.name" groups="uom.group_uom"/>
+                            </div>
+                        </div>
+
+                        <div t-if="o.workorder_ids">
+                            <h3>
+                                <t t-if="o.state == 'done'">Operations Done</t>
+                                <t t-else="">Operations Planned</t>
+                            </h3>
+                            <table class="table table-sm">
+                                <tr>
+                                    <th><strong>Operation</strong></th>
+                                    <th><strong>WorkCenter</strong></th>
+                                    <th><strong>No. Of Minutes</strong></th>
+                                </tr>
+                                <tr t-foreach="o.workorder_ids" t-as="line2">
+                                    <td><span t-field="line2.name"/></td>
+                                    <td><span t-field="line2.workcenter_id.name"/></td>
+                                    <td>
+                                        <span t-if="o.state != 'done'" t-field="line2.duration_expected"/>
+                                        <span t-if="o.state == 'done'" t-field="line2.duration"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <h3 t-if="o.move_raw_ids">
+                            <t t-if="o.state == 'done'">
+                                Consumed Products
+                            </t>
+                            <t t-else="">
+                                Products to Consume
+                            </t>
+                        </h3>
+
+                        <table class="table table-sm" t-if="o.move_raw_ids">
+                            <t t-set="has_product_barcode" t-value="any(o.move_raw_ids.filtered(lambda x: x.product_id.barcode))"/>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th t-attf-class="{{ 'text-right' if not has_product_barcode else '' }}">Quantity</th>
+                                    <th t-if="has_product_barcode" width="15%" class="text-center">Barcode</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="o.move_raw_ids">
+                                    <tr t-foreach="o.move_raw_ids" t-as="raw_line">
+                                        <td>
+                                            <span t-field="raw_line.product_id"/>
+                                        </td>
+                                        <td t-attf-class="{{ 'text-right' if not has_product_barcode else '' }}">
+                                            <span t-field="raw_line.product_uom_qty"/>
+                                            <span t-field="raw_line.product_uom" groups="uom.group_uom"/>
+                                        </td>
+                                        <td t-if="has_product_barcode" width="15%" class="text-center">
+                                            <t t-if="raw_line.product_id.barcode">
+                                                <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', raw_line.product_id.barcode, 600, 100)" style="width:100%;height:35px" alt="Barcode"/>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- Insert embellishment overview -->
+                        <table class="table table-sm mt-5" t-if="o.embellishment_id">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">Embellishment: <strong t-field="o.embellishment_id"/></th>
+                                    <th class="text-center">Complete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-if="o.embellishment_id.embroider_ids">
+                                    <tr t-foreach="o.embellishment_id.embroider_ids" t-as="embroider">
+                                        <td>
+                                            <strong>&#10004; Embroider</strong>
+                                            <ul>
+                                                <li>Location: <strong t-field="embroider.location_id"/></li>
+                                                <li t-if="embroider.artwork_id">Artwork: <strong t-field="embroider.artwork_id"/>, with reference <strong t-field="embroider.artwork_id.reference"/></li>
+                                                <li t-if="embroider.text">Personalization: <strong t-field="embroider.text"/></li>
+                                                <li>Font: <strong t-field="embroider.font"/></li>
+                                            </ul>
+                                            <i t-if="embroider.artwork_id" style="font-size: 0.8em">Please see Artwork figure below for more details.</i>
+                                        </td>
+                                        <td width="15%" style="font-size: x-large;" class="text-center">
+                                            &#9744;
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <t t-if="o.embellishment_id.screen_print_ids">
+                                    <tr t-foreach="o.embellishment_id.screen_print_ids" t-as="screen_print">
+                                        <td>
+                                            <strong>&#10004; Screen print</strong>
+                                            <ul>
+                                                <li>Location: <strong t-field="screen_print.location_id"/></li>
+                                                <li t-if="screen_print.artwork_id">Artwork: <strong t-field="screen_print.artwork_id"/>, with reference <strong t-field="screen_print.artwork_id.reference"/></li>
+                                                <li t-if="screen_print.text">Personalization: <strong t-field="screen_print.text"/></li>
+                                                <li>Font: <strong t-field="screen_print.font"/></li>
+                                            </ul>
+                                            <i t-if="screen_print.artwork_id" style="font-size: 0.8em">Please see Artwork figure below for more details.</i>
+                                        </td>
+                                        <td width="15%" style="font-size: x-large;" class="text-center">
+                                            &#9744;
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <t t-if="o.embellishment_id.heat_seal_ids">
+                                    <tr t-foreach="o.embellishment_id.heat_seal_ids" t-as="heat_seal">
+                                        <td>
+                                            <strong>&#10004; Heat Seal</strong>
+                                            <ul>
+                                                <li>Location: <strong t-field="heat_seal.location_id"/></li>
+                                                <li t-if="heat_seal.artwork_id">Artwork: <strong t-field="heat_seal.artwork_id"/>, with reference <strong t-field="heat_seal.artwork_id.reference"/></li>
+                                                <li t-if="heat_seal.text">Personalization: <strong t-field="heat_seal.text"/></li>
+                                                <li>Font <strong t-field="heat_seal.font"/></li>
+                                            </ul>
+                                            <i t-if="heat_seal.artwork_id" style="font-size: 0.8em">Please see Artwork figure below for more details.</i>
+                                        </td>
+                                        <td width="15%" style="font-size: x-large;" class="text-center">
+                                            &#9744;
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <t t-if="o.embellishment_id.sew_patch_ids">
+                                    <tr t-foreach="o.embellishment_id.sew_patch_ids" t-as="sew_patch">
+                                        <td>
+                                            <strong>&#10004; Sew Patch</strong>
+                                            <ul>
+                                                <li>Location: <strong t-field="sew_patch.location_id"/></li>
+                                                <li t-if="sew_patch.artwork_id">Artwork: <strong t-field="sew_patch.artwork_id"/>, with reference <strong t-field="sew_patch.artwork_id.reference"/></li>
+                                                <li t-if="sew_patch.text">Personalization: <strong t-field="sew_patch.text"/></li>
+                                                <li>Font: <strong t-field="sew_patch.font"/></li>
+                                            </ul>
+                                            <i t-if="sew_patch.artwork_id" style="font-size: 0.8em">Please see Artwork figure below for more details.</i>
+                                        </td>
+                                        <td width="15%" style="font-size: x-large;" class="text-center">
+                                            &#9744;
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <t t-if="o.embellishment_id.sew_stripe_ids">
+                                    <tr t-foreach="o.embellishment_id.sew_stripe_ids" t-as="sew_stripe">
+                                        <td>
+                                            <strong>&#10004; Sew Stripe</strong>
+                                            <ul>
+                                                <li>Location: <strong t-field="sew_stripe.location_id"/></li>
+                                                <li t-if="sew_stripe.material_color_id">Color: <strong t-field="sew_stripe.material_color_id"/></li>
+                                                <li t-if="sew_stripe.material_type_id">Type: <strong t-field="sew_stripe.material_type_id"/></li>
+                                                <li t-if="sew_stripe.material_size_id">Size: <strong t-field="sew_stripe.material_size_id"/></li>
+                                            </ul>
+                                            <i t-if="sew_stripe.per_print_file" style="font-size: 0.8em">Please see instructions in the last part of document.</i>
+                                        </td>
+                                        <td width="15%" style="font-size: x-large;" class="text-center">
+                                            &#9744;
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <t t-if="o.embellishment_id.is_hem_included">
+                                    <td>
+                                        <strong>&#10004; Hem</strong>
+                                        <ul>
+                                            <li>Length: <strong t-field="o.embellishment_id.hem_length"/></li>
+                                        </ul>
+                                    </td>
+                                    <td width="15%" style="font-size: x-large;" class="text-center">
+                                        &#9744;
+                                    </td>
+                                </t>
+                            </tbody>
+                        </table>
+                        <div class="oe_structure"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

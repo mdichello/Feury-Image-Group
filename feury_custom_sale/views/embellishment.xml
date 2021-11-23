@@ -106,9 +106,12 @@
 
                     <page string="Hem Pants" name="hem_pants">
                         <group>
-                            <field name="hem_length"/>
-                        </group>
-                        <group>
+                            <group>
+                                <field name="is_hem_included"/>
+                            </group>
+                            <group>
+                                <field name="hem_length" attrs="{'invisible': [('is_hem_included', '=', False)]}"/>
+                            </group>
                         </group>
                     </page>
                 </notebook>

@@ -80,6 +80,11 @@ class Embellishment(models.Model):
         default='embroider'
     )
 
+    is_hem_included = fields.Boolean(
+        string='Add hem',
+        default=False
+    )
+
     hem_length = fields.Integer(
         string='Length',
         default=22

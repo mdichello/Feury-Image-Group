@@ -34,6 +34,7 @@
         'data/sellerscommerce_cron.xml',
         'data/product_cron.xml',
         'data/res_partner_cron.xml',
-        'data/ir_sequence.xml'
+        'data/ir_sequence.xml',
+        'reports/mrp_production_template.xml',
     ],
 }
