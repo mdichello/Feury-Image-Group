@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import mimetypes
+
 from odoo import api, fields, models, _
 from odoo.tools import image_process
 from odoo.exceptions import ValidationError, UserError
+from odoo.tools.mimetypes import guess_mimetype
 
 
 class HemPants(models.Model):
