@@ -99,7 +99,8 @@
                                 <field string="Color" name="material_color_id" />
                                 <field string="Type" name="material_type_id" />
                                 <field string="Size" name="material_size_id" />
-                                <field name="per_print_file" filename="per_print" string="Upload" attrs="{'required': [('is_other_location', '=', True)]}"/>
+                                <field name="per_print_file" widget='file' filename="per_print_filename" string="Upload" attrs="{'required': [('is_other_location', '=', True)]}"/>
+                                <field name="per_print_filename" invisible="1"/>
                             </tree>
                         </field>
                     </page>

@@ -19,3 +19,4 @@ from . import api_sync_work_units
 from . import product_virtual_inventory
 from . import sale_order
 from . import mrp_production
+from . import report

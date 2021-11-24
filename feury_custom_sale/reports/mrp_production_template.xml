@@ -118,7 +118,7 @@
                                                 <li t-if="embroider.text">Personalization: <strong t-field="embroider.text"/></li>
                                                 <li t-if="embroider.font">Font: <strong t-field="embroider.font"/></li>
                                             </ul>
-                                            <i t-if="embroider.artwork_id" style="font-size: 0.8em">Please see Artwork figure below for more details.</i>
+                                            <i t-if="embroider.artwork_id" style="font-size: 0.8em">Please see Artwork below for more details.</i>
                                         </td>
                                         <td width="15%" style="font-size: x-large;" class="text-center">
                                             &#9744;
