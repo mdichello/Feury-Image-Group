@@ -2,12 +2,17 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import mimetypes
+import base64
 
 from odoo import api, fields, models, _
 from odoo.tools import image_process
 from odoo.exceptions import ValidationError, UserError
 from odoo.tools.mimetypes import guess_mimetype
 
+
+SUPPORTED_FILE_TYPE = [
+    'application/pdf'
+]
 
 class HemPants(models.Model):
     _name = 'hem.pant'
@@ -506,6 +511,10 @@ class SewStripe(models.Model):
         attachment=True,
     )
 
+    per_print_filename = fields.Char(
+        string="Per Print File Name"
+    )
+
     text = fields.Text(
         string='Personalization',
         required=False,
@@ -563,12 +572,19 @@ class SewStripe(models.Model):
     # 2- Constraints methods (_check_***)
     # ----------------------------------------------------------------------------------------------------
 
-    # TODO fix this constraint.
-    # @api.constrains('artwork_id', 'text')
-    # def _check_either_artwork_id_or_text(self):
-    #     for record in self:
-    #         if record.artwork_id and record.text:
-    #             raise ValidationError(_('You can set both the artwork and text at the same time.'))
+    @api.constrains('per_print_file')
+    def _check_per_print_file_extension(self):
+        self.ensure_one()
+
+        if not self.per_print_file:
+            return
+
+        file = base64.b64decode(self.per_print_file)
+        # Guess mimetype from file content
+        mimetype = guess_mimetype(file or b'')
+
+        if mimetype not in SUPPORTED_FILE_TYPE:
+            raise UserError(_('File has the wrong extension (only supports PDF extension).'))
 
     # ----------------------------------------------------------------------------------------------------
     # 3- Compute methods (namely _compute_***)
