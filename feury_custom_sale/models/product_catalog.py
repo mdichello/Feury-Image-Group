@@ -129,8 +129,10 @@ class ProductCatalog(models.Model):
 
     product_count = fields.Integer(
         compute='_compute_product_count',
+        store=True
     )
 
+    @api.depends('product_ids')
     def _compute_product_count(self):
         for record in self:
             record.product_count = len(record.product_ids)

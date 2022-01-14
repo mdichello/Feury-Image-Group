@@ -17,6 +17,17 @@ class ResPartner(models.Model):
         domain="[('is_company', '=', True)]"
     )
 
+    x_studio_customervendor = fields.Selection(
+        selection=[
+            ('Vendor', 'Vendor'),
+            ('Customer', 'Customer'),
+            ('Contact', 'Contact'),
+        ],
+        string='is customer / vendor',
+        required=True,
+        default='Contact'
+    )
+
     # ----------------------------------------------------------------------------------------------------
     # 1- ORM Methods (create, write, unlink)
     # ----------------------------------------------------------------------------------------------------
