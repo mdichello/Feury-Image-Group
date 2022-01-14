@@ -21,7 +21,7 @@ class ResPartner(models.Model):
         selection=[
             ('Vendor', 'Vendor'),
             ('Customer', 'Customer'),
-            ('Contact', 'Contact'),
+            ('Contacts', 'Contacts'),
         ],
         string='is customer / vendor',
         required=True,
